@@ -64,6 +64,10 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.SystemUserAllDependency(),
+                cancellationToken);
+
             return Unit.Value;
         }
 

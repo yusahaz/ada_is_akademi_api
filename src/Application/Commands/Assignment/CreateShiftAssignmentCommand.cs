@@ -43,12 +43,12 @@ namespace Azoxia.AdaIsAkademi.Application
 
             if (request.JobApplicationId <= 0)
             {
-                failures.Add(ApplicationValidationCodes.CreateShiftAssignmentJobApplicationId.ForField(nameof(request.JobApplicationId)));
+                failures.Add(ApplicationValidationCodes.CreateShiftAssignmentJobApplicationId.ForField(nameof(CreateShiftAssignmentCommand.JobApplicationId)));
             }
 
-            if (string.IsNullOrWhiteSpace(request.CheckInTokenHash))
+            if (request.CheckInTokenHash.IsNullOrWhiteSpace())
             {
-                failures.Add(ApplicationValidationCodes.CreateShiftAssignmentCheckInTokenHashRequired.ForField(nameof(request.CheckInTokenHash)));
+                failures.Add(ApplicationValidationCodes.CreateShiftAssignmentCheckInTokenHashRequired.ForField(nameof(CreateShiftAssignmentCommand.CheckInTokenHash)));
             }
 
             return new ValidationResult(failures);
@@ -94,6 +94,18 @@ namespace Azoxia.AdaIsAkademi.Application
                 command.CheckInTokenHash);
             UnitOfWork.Add(assignment);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.ShiftAssignmentAllDependency(),
+                cancellationToken);
+
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.JobPostingAllDependency(),
+                cancellationToken);
+
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.WorkerDependency(application.WorkerId),
+                cancellationToken);
 
             return assignment.Id;
         }

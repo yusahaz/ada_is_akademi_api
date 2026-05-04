@@ -2,6 +2,7 @@ namespace Azoxia.AdaIsAkademi.Application
 {
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application;
+    using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
 
@@ -37,12 +38,12 @@ namespace Azoxia.AdaIsAkademi.Application
 
             if (request.WorkerId <= 0)
             {
-                failures.Add(ApplicationValidationCodes.ListSemanticMatchedJobPostingsWorkerId.ForField(nameof(request.WorkerId)));
+                failures.Add(ApplicationValidationCodes.ListSemanticMatchedJobPostingsWorkerId.ForField(nameof(ListSemanticMatchedJobPostingsQuery.WorkerId)));
             }
 
             if (request.Limit <= 0 || request.Limit > 50)
             {
-                failures.Add(ApplicationValidationCodes.ListSemanticMatchedJobPostingsLimitRange.ForField(nameof(request.Limit)));
+                failures.Add(ApplicationValidationCodes.ListSemanticMatchedJobPostingsLimitRange.ForField(nameof(ListSemanticMatchedJobPostingsQuery.Limit)));
             }
 
             return new ValidationResult(failures);
@@ -61,6 +62,14 @@ namespace Azoxia.AdaIsAkademi.Application
             ListSemanticMatchedJobPostingsQuery query,
             CancellationToken cancellationToken)
         {
+            CacheKey cacheKey = AdaIsCacheKeys.JobPostingSemanticMatchedListKey(query.WorkerId, query.Limit);
+            IReadOnlyList<SemanticMatchedJobPostingModel>? cached =
+                await CacheService.GetAsync<IReadOnlyList<SemanticMatchedJobPostingModel>>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return cached;
+            }
+
             Worker? worker = await UnitOfWork
                 .GetRepository<Worker>()
                 .Filter(x => x.Id == query.WorkerId)
@@ -92,6 +101,14 @@ namespace Azoxia.AdaIsAkademi.Application
                 .OrderByDescending(x => x.SimilarityScore)
                 .Take(query.Limit)
                 .ToList();
+
+            await CacheService.SetAsync(
+                cacheKey,
+                rows,
+                AdaIsCacheKeys.DetailReadModelOptions(
+                    AdaIsCacheKeys.WorkerDependency(query.WorkerId),
+                    AdaIsCacheKeys.JobPostingAllDependency()),
+                cancellationToken);
 
             return rows;
         }

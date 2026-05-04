@@ -75,6 +75,10 @@ namespace Azoxia.AdaIsAkademi.Application
                 AdaIsCacheKeys.EmployerJobPostingsSummaryDependency(entity.EmployerId),
                 cancellationToken);
 
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.JobPostingAllDependency(),
+                cancellationToken);
+
             return Unit.Value;
         }
 

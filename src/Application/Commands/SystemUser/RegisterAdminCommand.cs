@@ -113,6 +113,10 @@ namespace Azoxia.AdaIsAkademi.Application
                 }
             }
 
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.SystemUserAllDependency(),
+                cancellationToken);
+
             return user.Id;
         }
 

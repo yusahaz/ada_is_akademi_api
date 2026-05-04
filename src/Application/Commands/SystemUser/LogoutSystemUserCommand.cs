@@ -45,17 +45,17 @@ namespace Azoxia.AdaIsAkademi.Application
 
             if (request.SystemUserId <= 0)
             {
-                failures.Add(ApplicationValidationCodes.LogoutSystemUserSystemUserId.ForField(nameof(request.SystemUserId)));
+                failures.Add(ApplicationValidationCodes.LogoutSystemUserSystemUserId.ForField(nameof(LogoutSystemUserCommand.SystemUserId)));
             }
 
-            if (string.IsNullOrWhiteSpace(request.DeviceIdentifier))
+            if (request.DeviceIdentifier.IsNullOrWhiteSpace())
             {
-                failures.Add(ApplicationValidationCodes.LogoutSystemUserDeviceIdentifierRequired.ForField(nameof(request.DeviceIdentifier)));
+                failures.Add(ApplicationValidationCodes.LogoutSystemUserDeviceIdentifierRequired.ForField(nameof(LogoutSystemUserCommand.DeviceIdentifier)));
             }
 
-            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            if (request.RefreshToken.IsNullOrWhiteSpace())
             {
-                failures.Add(ApplicationValidationCodes.LogoutSystemUserRefreshTokenRequired.ForField(nameof(request.RefreshToken)));
+                failures.Add(ApplicationValidationCodes.LogoutSystemUserRefreshTokenRequired.ForField(nameof(LogoutSystemUserCommand.RefreshToken)));
             }
 
             return new ValidationResult(failures);

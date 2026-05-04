@@ -31,6 +31,36 @@ namespace Azoxia.AdaIsAkademi.Application
             };
 
         /// <summary>
+        /// Cache key for system-user counter block used by dashboard statistics.
+        /// </summary>
+        internal static CacheKey DashboardSystemUserStatisticsKey() =>
+            new(QueryNamespace, "DashboardSystemUserStatistics", "default");
+
+        /// <summary>
+        /// Cache key for worker counter block used by dashboard statistics.
+        /// </summary>
+        internal static CacheKey DashboardWorkerStatisticsKey() =>
+            new(QueryNamespace, "DashboardWorkerStatistics", "default");
+
+        /// <summary>
+        /// Cache key for employer counter block used by dashboard statistics.
+        /// </summary>
+        internal static CacheKey DashboardEmployerStatisticsKey() =>
+            new(QueryNamespace, "DashboardEmployerStatistics", "default");
+
+        /// <summary>
+        /// Cache key for job-posting counter block used by dashboard statistics.
+        /// </summary>
+        internal static CacheKey DashboardJobPostingStatisticsKey() =>
+            new(QueryNamespace, "DashboardJobPostingStatistics", "default");
+
+        /// <summary>
+        /// Cache key for job-application counter block used by dashboard statistics.
+        /// </summary>
+        internal static CacheKey DashboardJobApplicationStatisticsKey() =>
+            new(QueryNamespace, "DashboardJobApplicationStatistics", "default");
+
+        /// <summary>
         /// Cache key for <see cref="EmployerDetailModel"/> by employer id.
         /// </summary>
         internal static CacheKey EmployerDetailKey(int employerId) =>
@@ -41,6 +71,12 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheDependency EmployerDependency(int employerId) =>
             new(nameof(Employer), employerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="Employer"/> counters.
+        /// </summary>
+        internal static CacheDependency EmployerAllDependency() =>
+            new(nameof(Employer), "all");
 
         /// <summary>
         /// Cache key for <see cref="ListJobPostingsByEmployerIdQuery"/> result (summary rows per employer).
@@ -61,10 +97,22 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, nameof(JobPosting) + DetailSuffix, jobPostingId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Cache key for semantic matched postings by worker and limit.
+        /// </summary>
+        internal static CacheKey JobPostingSemanticMatchedListKey(int workerId, int limit) =>
+            new(QueryNamespace, "JobPostingSemanticMatchedList", $"{workerId}:{limit}");
+
+        /// <summary>
         /// Invalidation tag for a <see cref="JobPosting"/> aggregate instance.
         /// </summary>
         internal static CacheDependency JobPostingDependency(int jobPostingId) =>
             new(nameof(JobPosting), jobPostingId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="JobPosting"/> counters.
+        /// </summary>
+        internal static CacheDependency JobPostingAllDependency() =>
+            new(nameof(JobPosting), "all");
 
         /// <summary>
         /// Cache key for <see cref="WorkerDetailModel"/> by worker id.
@@ -77,6 +125,36 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheDependency WorkerDependency(int workerId) =>
             new(nameof(Worker), workerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="Worker"/> counters.
+        /// </summary>
+        internal static CacheDependency WorkerAllDependency() =>
+            new(nameof(Worker), "all");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="SystemUser"/> counters.
+        /// </summary>
+        internal static CacheDependency SystemUserAllDependency() =>
+            new(nameof(SystemUser), "all");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="JobApplication"/> counters.
+        /// </summary>
+        internal static CacheDependency JobApplicationAllDependency() =>
+            new(nameof(JobApplication), "all");
+
+        /// <summary>
+        /// Invalidation tag for a <see cref="ShiftAssignment"/> aggregate instance.
+        /// </summary>
+        internal static CacheDependency ShiftAssignmentDependency(int assignmentId) =>
+            new(nameof(ShiftAssignment), assignmentId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="ShiftAssignment"/> read models.
+        /// </summary>
+        internal static CacheDependency ShiftAssignmentAllDependency() =>
+            new(nameof(ShiftAssignment), "all");
 
         #endregion Methods
     }

@@ -96,6 +96,14 @@ namespace Azoxia.AdaIsAkademi.Application
                 AdaIsCacheKeys.WorkerDependency(worker.Id),
                 cancellationToken);
 
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.SystemUserAllDependency(),
+                cancellationToken);
+
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.WorkerAllDependency(),
+                cancellationToken);
+
             return worker.Id;
         }
 
