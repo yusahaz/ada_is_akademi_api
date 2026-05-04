@@ -40,6 +40,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Gets personalized notification preview with push/email fallback.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker notification preview")]
+        [EndpointDescription("Builds notification preview for the authenticated worker and falls back to email when push token is missing.")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerNotificationPreviewModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> NotificationPreview(
+            [FromBody] GetWorkerPersonalizedNotificationPreviewQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         #endregion Methods
     }
 }

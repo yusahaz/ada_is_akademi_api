@@ -73,6 +73,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<GetDashboardStatisticsQuery, DashboardStatisticsModel>, GetDashboardStatisticsQueryHandler>();
             services.AddScoped<IRequestHandler<GetJobPostingByIdQuery, JobPostingDetailModel>, GetJobPostingByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetSystemUserMeQuery, SystemUserMeModel>, GetSystemUserMeQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerPersonalizedNotificationPreviewQuery, WorkerNotificationPreviewModel>, GetWorkerPersonalizedNotificationPreviewQueryHandler>();
             services.AddScoped<IRequestHandler<GetWorkerByIdQuery, WorkerDetailModel>, GetWorkerByIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListJobApplicationsByJobPostingIdQuery, IReadOnlyList<JobApplicationListItemModel>>, ListJobApplicationsByJobPostingIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListJobPostingsByEmployerIdQuery, IReadOnlyList<JobPostingSummaryModel>>, ListJobPostingsByEmployerIdQueryHandler>();
@@ -105,6 +106,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<GetDashboardStatisticsQuery>, GetDashboardStatisticsQueryValidator>();
             services.AddScoped<IRequestValidator<GetJobPostingByIdQuery>, GetJobPostingByIdQueryValidator>();
             services.AddScoped<IRequestValidator<GetSystemUserMeQuery>, GetSystemUserMeQueryValidator>();
+            services.AddScoped<IRequestValidator<GetWorkerPersonalizedNotificationPreviewQuery>, GetWorkerPersonalizedNotificationPreviewQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerByIdQuery>, GetWorkerByIdQueryValidator>();
             services.AddScoped<IRequestValidator<ListJobApplicationsByJobPostingIdQuery>, ListJobApplicationsByJobPostingIdQueryValidator>();
             services.AddScoped<IRequestValidator<ListJobPostingsByEmployerIdQuery>, ListJobPostingsByEmployerIdQueryValidator>();

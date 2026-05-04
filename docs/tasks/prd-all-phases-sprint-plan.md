@@ -48,31 +48,32 @@
 - [ ] Worker email verification akışı.
 - [ ] JWT + refresh rotation + cihaz bazlı session.
 - [ ] Group-based RBAC ve permission cache yaklaşımı.
-- [ ] Çıktı: kimlik ve yetkilendirme çekirdeği uca açık.
+- [x] Çıktı (ilk dikey dilim): kimlik ve yetkilendirme çekirdeği uca açık.
 
 ### Sprint 2 - Profil ve İlan-Başvuru Çekirdeği
 - [ ] Worker profil bölümleri + CV destekli profil oluşturma akışı.
 - [ ] Employer profil/lokasyon/supervisor verisi.
 - [ ] Job category + job posting + başvuru akışları.
-- [ ] Çıktı: vardiya oluşumundan başvuruya temel iş akışının çalışması.
+- [x] Çıktı (ilk dikey dilim): vardiya oluşumundan başvuruya temel iş akışının çalışması.
 
 ### Sprint 3 - Assignment, QR, Finansal Çekirdek
 - [ ] Mutual QR check-in/out + anomaly flag mekaniği.
 - [ ] Commission motoru ve audit log.
 - [ ] CommissionReceivable oluşturma + WorkerPayout state geçişleri.
-- [ ] Çıktı: Faz 1 MVP operasyonel olarak tamam.
+- [x] Çıktı (ilk dikey dilim): Faz 1 MVP operasyonel olarak tamam.
 
 ### Sprint 4 - Semantic Altyapı
 - [ ] pgvector ve embedding kolon/indexleri.
 - [ ] Worker/job embedding üretim triggerları.
 - [ ] Matching temel sorguları + availability filtreleri.
-- [ ] Çıktı: semantic öneri altyapısı çalışır.
+- [x] Çıktı (ilk dikey dilim): semantic öneri altyapısı çalışır.
 
 ### Sprint 5 - Kişiselleştirme ve Gerçek Zamanlılık
 - [ ] Agentic personalized notification.
 - [ ] LLM fallback mekanizması ve kanal geçişi.
 - [ ] Canlı durum akışları (matching/assignment bildirimi).
 - [ ] Çıktı: kişisel ve zamanında iletişim deneyimi.
+- [x] Uygulanan dikey dilim: worker notification preview query + push->email fallback + API endpoint + test eklendi.
 
 ### Sprint 6 - Otomasyon ve Raporlama
 - [ ] Hangfire scheduler: faturalama/periyodik işler.

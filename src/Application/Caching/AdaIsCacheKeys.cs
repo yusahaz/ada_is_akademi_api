@@ -121,6 +121,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, nameof(Worker) + DetailSuffix, workerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Cache key for worker-personalized notification preview for a posting.
+        /// </summary>
+        internal static CacheKey WorkerNotificationPreviewKey(int workerId, int jobPostingId) =>
+            new(QueryNamespace, "WorkerNotificationPreview", $"{workerId}:{jobPostingId}");
+
+        /// <summary>
         /// Invalidation tag for a <see cref="Worker"/> aggregate instance.
         /// </summary>
         internal static CacheDependency WorkerDependency(int workerId) =>

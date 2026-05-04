@@ -241,6 +241,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "WorkerId must be greater than zero.");
 
         /// <summary>
+        /// Job posting id must be positive on worker notification preview query.
+        /// </summary>
+        internal static readonly ErrorCode GetWorkerPersonalizedNotificationPreviewJobPostingId = new(
+            Code: "AZX_ADA_APP_VAL_602",
+            ErrorMessage: "JobPostingId must be greater than zero.");
+
+        /// <summary>
         /// Job posting id must be positive when listing applications by posting.
         /// </summary>
         internal static readonly ErrorCode ListJobApplicationsByJobPostingIdJobPostingId = new(
