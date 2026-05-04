@@ -41,6 +41,19 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             result.Errors.Should().Contain(x => x.Field == nameof(RefreshSystemUserTokenCommand.RefreshToken));
         }
 
+        [Fact]
+        public void Logout_requires_system_user_id_device_identifier_and_token()
+        {
+            var validator = new LogoutSystemUserCommandValidator();
+            ValidationResult result = validator.Validate(new LogoutSystemUserCommand());
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().HaveCount(3);
+            result.Errors.Should().Contain(x => x.Field == nameof(LogoutSystemUserCommand.SystemUserId));
+            result.Errors.Should().Contain(x => x.Field == nameof(LogoutSystemUserCommand.DeviceIdentifier));
+            result.Errors.Should().Contain(x => x.Field == nameof(LogoutSystemUserCommand.RefreshToken));
+        }
+
         #endregion Methods
     }
 }

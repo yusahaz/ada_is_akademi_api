@@ -255,6 +255,27 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Password cannot be null, empty, or whitespace.");
 
         /// <summary>
+        /// Device identifier is required when logging out a system user.
+        /// </summary>
+        internal static readonly ErrorCode LogoutSystemUserDeviceIdentifierRequired = new(
+            Code: "AZX_ADA_APP_VAL_328",
+            ErrorMessage: "DeviceIdentifier cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Refresh token is required when logging out a system user.
+        /// </summary>
+        internal static readonly ErrorCode LogoutSystemUserRefreshTokenRequired = new(
+            Code: "AZX_ADA_APP_VAL_329",
+            ErrorMessage: "RefreshToken cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// System user id must be positive when logging out a system user.
+        /// </summary>
+        internal static readonly ErrorCode LogoutSystemUserSystemUserId = new(
+            Code: "AZX_ADA_APP_VAL_330",
+            ErrorMessage: "SystemUserId must be greater than zero.");
+
+        /// <summary>
         /// Job posting id must be positive when publishing a posting.
         /// </summary>
         internal static readonly ErrorCode PublishJobPostingJobPostingId = new(

@@ -112,6 +112,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetSystemUserMeQuery(), cancellationToken);
 
+        /// <summary>Revokes a device-bound refresh token (logout).</summary>
+        [AllowAnonymous]
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Logout system user")]
+        [EndpointDescription("Revokes the provided active refresh token for the given user and device pair.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> Logout(
+            [FromBody] LogoutSystemUserCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Rotates access and refresh tokens for a valid refresh token.</summary>
         [AllowAnonymous]
         [HttpPost]
