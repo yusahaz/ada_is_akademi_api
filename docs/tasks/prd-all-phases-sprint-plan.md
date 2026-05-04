@@ -154,6 +154,7 @@
 - [ ] Persistence: pgvector kolonları, index ve update stratejisini migration ile uygula.
 - [ ] API: Matching preview/query endpointlerini performans sınırıyla aç.
 - [ ] Test: Stale embedding ve fallback keyword arama tutarlılığını ölç.
+- [x] Uygulanan dikey dilim: `ListSemanticMatchedJobPostingsQuery` + API endpoint + validator testi eklendi.
 
 ### Sprint 5 - Kişiselleştirme ve Gerçek Zamanlılık
 - [ ] Domain: Bildirim öncelik ve kanal fallback kurallarını tanımla.

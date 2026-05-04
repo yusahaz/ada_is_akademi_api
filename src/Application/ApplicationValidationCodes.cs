@@ -248,6 +248,20 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "JobPostingId must be greater than zero.");
 
         /// <summary>
+        /// Limit must be between 1 and 50 for semantic posting list query.
+        /// </summary>
+        internal static readonly ErrorCode ListSemanticMatchedJobPostingsLimitRange = new(
+            Code: "AZX_ADA_APP_VAL_335",
+            ErrorMessage: "Limit must be between 1 and 50.");
+
+        /// <summary>
+        /// Worker id must be positive for semantic posting list query.
+        /// </summary>
+        internal static readonly ErrorCode ListSemanticMatchedJobPostingsWorkerId = new(
+            Code: "AZX_ADA_APP_VAL_336",
+            ErrorMessage: "WorkerId must be greater than zero.");
+
+        /// <summary>
         /// Device identifier is required when logging in a system user.
         /// </summary>
         internal static readonly ErrorCode LoginSystemUserDeviceIdentifierRequired = new(

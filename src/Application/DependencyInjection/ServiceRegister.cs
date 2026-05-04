@@ -77,6 +77,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<ListJobApplicationsByJobPostingIdQuery, IReadOnlyList<JobApplicationListItemModel>>, ListJobApplicationsByJobPostingIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListJobPostingsByEmployerIdQuery, IReadOnlyList<JobPostingSummaryModel>>, ListJobPostingsByEmployerIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListOpenJobPostingsQuery, IReadOnlyList<JobPostingSummaryModel>>, ListOpenJobPostingsQueryHandler>();
+            services.AddScoped<IRequestHandler<ListSemanticMatchedJobPostingsQuery, IReadOnlyList<SemanticMatchedJobPostingModel>>, ListSemanticMatchedJobPostingsQueryHandler>();
         }
 
         /// <summary>
@@ -108,6 +109,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ListJobApplicationsByJobPostingIdQuery>, ListJobApplicationsByJobPostingIdQueryValidator>();
             services.AddScoped<IRequestValidator<ListJobPostingsByEmployerIdQuery>, ListJobPostingsByEmployerIdQueryValidator>();
             services.AddScoped<IRequestValidator<ListOpenJobPostingsQuery>, ListOpenJobPostingsQueryValidator>();
+            services.AddScoped<IRequestValidator<ListSemanticMatchedJobPostingsQuery>, ListSemanticMatchedJobPostingsQueryValidator>();
             services.AddScoped<IRequestValidator<LoginSystemUserCommand>, LoginSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<LogoutSystemUserCommand>, LogoutSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<PublishJobPostingCommand>, PublishJobPostingCommandValidator>();

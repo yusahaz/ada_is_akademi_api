@@ -101,6 +101,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new ListOpenJobPostingsQuery(), cancellationToken);
 
+        /// <summary>Lists semantically matched open postings for a worker embedding.</summary>
+        [AllowAnonymous]
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List semantic matched job postings")]
+        [EndpointDescription("Ranks open postings by cosine similarity between worker skill embedding and posting description embedding.")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<SemanticMatchedJobPostingModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListSemanticMatched(
+            [FromBody] ListSemanticMatchedJobPostingsQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Publishes a draft posting.</summary>
         [HttpPost]
         [Consumes("application/json")]
