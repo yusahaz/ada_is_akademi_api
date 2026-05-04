@@ -189,6 +189,32 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
         }
 
         [Fact]
+        public async Task WithdrawJobPostingApplicationHandler_marks_pending_application_as_withdrawn_for_owner_worker()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+            (_, _, _, int postingId, int workerId, int applicationId) =
+                await SeedOpenPostingWithOneApplicationAsync(db);
+            executionContext.ReplaceClaim("worker_id", workerId.ToString());
+
+            var withdrawHandler = new WithdrawJobPostingApplicationCommandHandler(sp);
+            await ((IRequestHandler<WithdrawJobPostingApplicationCommand, Unit>)withdrawHandler).HandleAsync(
+                new WithdrawJobPostingApplicationCommand
+                {
+                    ApplicationId = applicationId,
+                    JobPostingId = postingId,
+                },
+                CancellationToken.None);
+
+            JobApplication? app = await db.Set<JobApplication>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == applicationId);
+            app.Should().NotBeNull();
+            app!.Status.Should().Be(JobApplicationStatus.Withdrawn);
+        }
+
+        [Fact]
         public async Task VerifySystemUserEmailHandler_activates_user_when_token_matches()
         {
             using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider();

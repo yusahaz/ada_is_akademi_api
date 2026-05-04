@@ -138,6 +138,7 @@
 - [ ] Persistence: Profil ve ilan/başvuru entity mapping, relation ve status indekslerini ekle.
 - [ ] API: Profil, ilan ve başvuru controller aksiyonlarını sözleşmeye uygun yayımla.
 - [ ] Test: Profil eksik veri, duplicate başvuru, ilan statü geçiş regresyonlarını çalıştır.
+- [x] Uygulanan dikey dilim: `WithdrawJobPostingApplicationCommandHandler` için owner-worker withdraw senaryosu handler testi eklendi.
 
 ### Sprint 3 - Assignment, QR ve Finansal Çekirdek
 - [ ] Domain: Assignment check-in/out kuralları, anomaly flag ve payout state transitionlarını finalize et.
