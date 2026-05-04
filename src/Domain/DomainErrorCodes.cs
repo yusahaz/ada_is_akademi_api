@@ -93,6 +93,20 @@ namespace Azoxia.AdaIsAkademi.Domain
             ErrorMessage: "Skill tag cannot be null, empty, or whitespace.");
 
         /// <summary>
+        /// The provided check-in token is invalid for the assignment.
+        /// </summary>
+        public static readonly ErrorCode ShiftAssignmentCheckInTokenInvalid = new(
+            Code: "AZX_ADA_DOMAIN_020",
+            ErrorMessage: "The provided check-in token is invalid.");
+
+        /// <summary>
+        /// The requested shift assignment state transition is not allowed.
+        /// </summary>
+        public static readonly ErrorCode ShiftAssignmentInvalidStatusTransition = new(
+            Code: "AZX_ADA_DOMAIN_021",
+            ErrorMessage: "This operation is not allowed for the current shift assignment status.");
+
+        /// <summary>
         /// Email is already verified for the account.
         /// </summary>
         public static readonly ErrorCode SystemUserEmailAlreadyVerified = new(

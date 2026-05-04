@@ -199,6 +199,20 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "WageCurrency cannot be null, empty, or whitespace.");
 
         /// <summary>
+        /// Check-in token hash is required when creating a shift assignment.
+        /// </summary>
+        internal static readonly ErrorCode CreateShiftAssignmentCheckInTokenHashRequired = new(
+            Code: "AZX_ADA_APP_VAL_331",
+            ErrorMessage: "CheckInTokenHash cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Job application id must be positive when creating a shift assignment.
+        /// </summary>
+        internal static readonly ErrorCode CreateShiftAssignmentJobApplicationId = new(
+            Code: "AZX_ADA_APP_VAL_332",
+            ErrorMessage: "JobApplicationId must be greater than zero.");
+
+        /// <summary>
         /// System user group id must be positive when deactivating a group.
         /// </summary>
         internal static readonly ErrorCode DeactivateSystemUserGroupSystemUserGroupId = new(
@@ -274,6 +288,20 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode LogoutSystemUserSystemUserId = new(
             Code: "AZX_ADA_APP_VAL_330",
             ErrorMessage: "SystemUserId must be greater than zero.");
+
+        /// <summary>
+        /// Assignment id must be positive when checking in a shift assignment.
+        /// </summary>
+        internal static readonly ErrorCode CheckInShiftAssignmentAssignmentId = new(
+            Code: "AZX_ADA_APP_VAL_333",
+            ErrorMessage: "AssignmentId must be greater than zero.");
+
+        /// <summary>
+        /// Check-in token hash is required when checking in a shift assignment.
+        /// </summary>
+        internal static readonly ErrorCode CheckInShiftAssignmentTokenHashRequired = new(
+            Code: "AZX_ADA_APP_VAL_334",
+            ErrorMessage: "CheckInTokenHash cannot be null, empty, or whitespace.");
 
         /// <summary>
         /// Job posting id must be positive when publishing a posting.

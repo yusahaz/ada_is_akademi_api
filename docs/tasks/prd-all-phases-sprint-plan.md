@@ -146,6 +146,7 @@
 - [ ] Persistence: Assignment, check event ve finansal çekirdek tabloları/mappinglerini tamamla.
 - [ ] API: Assignment operasyon ve finansal özet endpointlerini ekle.
 - [ ] Test: QR replay, race condition ve payout idempotency senaryolarını doğrula.
+- [x] Uygulanan dikey dilim: `ShiftAssignment` çekirdeği + create/check-in command/endpoint + handler testleri eklendi.
 
 ### Sprint 4 - Semantic Altyapı
 - [ ] Domain: Matching skoru için kuralları ve minimum eşleşme eşiğini tanımla.

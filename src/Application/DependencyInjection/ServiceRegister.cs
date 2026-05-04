@@ -39,7 +39,9 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<BanSystemUserCommand, Unit>, BanSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<CancelJobPostingCommand, Unit>, CancelJobPostingCommandHandler>();
             services.AddScoped<IRequestHandler<ChangeSystemUserPasswordCommand, Unit>, ChangeSystemUserPasswordCommandHandler>();
+            services.AddScoped<IRequestHandler<CheckInShiftAssignmentCommand, Unit>, CheckInShiftAssignmentCommandHandler>();
             services.AddScoped<IRequestHandler<CompleteJobPostingCommand, Unit>, CompleteJobPostingCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateShiftAssignmentCommand, int>, CreateShiftAssignmentCommandHandler>();
             services.AddScoped<IRequestHandler<CreateJobPostingCommand, int>, CreateJobPostingCommandHandler>();
             services.AddScoped<IRequestHandler<DeactivateSystemUserGroupCommand, Unit>, DeactivateSystemUserGroupCommandHandler>();
             services.AddScoped<IRequestHandler<PublishJobPostingCommand, Unit>, PublishJobPostingCommandHandler>();
@@ -93,7 +95,9 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<BanSystemUserCommand>, BanSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<CancelJobPostingCommand>, CancelJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<ChangeSystemUserPasswordCommand>, ChangeSystemUserPasswordCommandValidator>();
+            services.AddScoped<IRequestValidator<CheckInShiftAssignmentCommand>, CheckInShiftAssignmentCommandValidator>();
             services.AddScoped<IRequestValidator<CompleteJobPostingCommand>, CompleteJobPostingCommandValidator>();
+            services.AddScoped<IRequestValidator<CreateShiftAssignmentCommand>, CreateShiftAssignmentCommandValidator>();
             services.AddScoped<IRequestValidator<CreateJobPostingCommand>, CreateJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<DeactivateSystemUserGroupCommand>, DeactivateSystemUserGroupCommandValidator>();
             services.AddScoped<IRequestValidator<GetEmployerByIdQuery>, GetEmployerByIdQueryValidator>();
