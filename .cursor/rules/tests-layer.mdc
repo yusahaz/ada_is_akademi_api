@@ -1,0 +1,15 @@
+---
+description: AdaIsAkademi test layer rules
+globs: tests/**/*.cs
+alwaysApply: false
+---
+
+# Test layer rules
+
+- Organize tests by layer: `DomainTests` validates domain behavior only; `ApplicationTests` validates application flows.
+- Each test should assert one behavior; use readable naming such as `Given_When_Then` or an equivalent convention.
+- Use mocks/stubs only for boundary dependencies; avoid unnecessary mocks in pure domain tests.
+- Assertions should state intent clearly; control time and randomness to avoid flaky tests.
+- Use builders/factories to reduce duplicated test data.
+- On failure, leave minimal but meaningful fixtures or logs that point to the root cause.
+- Test code must follow the same formatting and `#region` conventions as production code.

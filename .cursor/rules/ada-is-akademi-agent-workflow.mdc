@@ -1,0 +1,21 @@
+---
+description: Ada İş Akademi — pre-work analysis, task docs, and safe extension of existing patterns
+alwaysApply: true
+---
+
+# Ada İş Akademi — agent workflow
+
+**Product name:** Ada İş Akademi (historical PRD copies may still say “Worbi”; treat Ada İş Akademi as canonical for new docs and code comments unless migrating legacy text.)
+
+## Before writing or changing code
+
+1. **Re-read context:** Open or skim the relevant layer rules under `.cursor/rules/` (`application-layer`, `domain-layer`, `api-layer`, `persistence-layer`, `static-members`, etc.) for the files you will touch.
+2. **No rote / “ezbere” coding (mandatory):** Do **not** implement, rename, or wire behavior from memory or prior-chat recall alone. **Verify in this repository** before substantive edits: open or search the real files (neighbors, `ServiceRegister`, controllers, shared types, tests). Guessing API names, paths, or patterns without reading/grep is forbidden; if something is uncertain, inspect the codebase first.
+3. **Analyze first** when the change is non-trivial (new feature, new aggregate boundary, cross-layer impact, or more than a few files): briefly note scope, dependencies, affected endpoints, and risks. If the user expects trackable delivery, capture this in `docs/tasks/` (see project skill **ada-is-akademi-plan**).
+4. **Preserve structure:** Match existing CQRS layout (command/query + validator + handler in the same style as neighboring features), `#region` and property ordering where the repo already uses them, and DI registration in `Application/DependencyInjection/ServiceRegister.cs`. Do not refactor unrelated modules or rename public API surfaces unless the user asked.
+5. **Extend safely:** New components should mirror adjacent files (namespaces, handler base classes, validation codes). Prefer additive changes; avoid breaking existing HTTP contracts and domain invariants.
+6. **Track work:** For multi-step work, use the editor todo list and, when useful, a markdown checklist in `docs/tasks/<feature>.md` that you update as items complete.
+
+## Limitations (honest)
+
+The agent does not retain a private memory between chats; persistence is **this repository** (rules, skills, `docs/tasks/`, and committed code). Keeping conventions in `.cursor/rules` and plans in `docs/tasks/` is how “memory” stays reliable.

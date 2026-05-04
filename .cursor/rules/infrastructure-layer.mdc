@@ -1,0 +1,15 @@
+---
+description: AdaIsAkademi Infrastructure layer rules
+globs: src/Infrastructure/**/*.cs
+alwaysApply: false
+---
+
+# Infrastructure layer rules
+
+- Infrastructure is the adapter layer for external systems (tokens, storage, queues, third-party providers).
+- It implements Application contracts; it must not reshape the Domain model.
+- Do not hard-code environment-specific settings (env/config/secrets); read them from configuration.
+- Centralize resilience policies (retry, timeout, circuit breaker) here.
+- Logging and observability carry technical detail only; do not leak sensitive business data.
+- Normalize external service exceptions at the layer boundary; do not bubble raw provider exceptions upward.
+- Keep naming and layout aligned with the project-wide C# conventions.

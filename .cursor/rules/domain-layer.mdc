@@ -1,0 +1,15 @@
+---
+description: AdaIsAkademi Domain layer rules
+globs: src/Domain/**/*.cs
+alwaysApply: false
+---
+
+# Domain layer rules
+
+- The Domain layer may only depend on `Core/src/Core`; do not add references to `Application`, `Persistence`, `Api`, or `Infrastructure`.
+- Do not use `Guard.*` or `DomainException` in entity methods; prefer straightforward assignments and simple control flow.
+- Keep the domain model behavior-centric: business rules live in entities/aggregates; I/O stays in outer layers.
+- Preserve `#region` order: `Fields > Ctors > Utils > Methods > Properties`.
+- Under `#region Properties`, order sub-regions as `Scalar > Computed > Navigation > Collection`; within each group, order members alphabetically.
+- Express nullability explicitly (`string?`, `Type?`); avoid unnecessary `!`.
+- Use concise, meaningful XML summaries on every public/protected member in a single language (English).

@@ -1,0 +1,99 @@
+name: AdaIsAkademi
+
+services:
+  ada-is-akademi-db:
+    image: postgres:17-alpine
+    container_name: ada-is-akademi-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+
+  ada-is-akademi-redis:
+    image: redis:7-alpine
+    container_name: ada-is-akademi-redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping"]
+
+  ada-is-akademi-minio:
+    image: minio/minio:latest
+    container_name: ada-is-akademi-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - ${MINIO_PORT}:9000
+      - ${MINIO_PORT_SECURE}:9001
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:9000/minio/health/live"]
+
+  ada-is-akademi-dbview:
+    image: dpage/pgadmin4:latest
+    container_name: ada-is-akademi-dbview
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DBVIEW_USER}
+      PGADMIN_DEFAULT_PASSWORD: ${DBVIEW_PASSWORD}
+    ports:
+      - ${DBVIEW_PORT}:80
+    volumes:
+      - dbview_data:/var/lib/pgadmin
+
+  ada-is-akademi-api:
+    build:
+      context: ../..
+      dockerfile: AdaIsAkademi/src/Api/Dockerfile
+    image: ada-is-akademi-api:latest
+    container_name: ada-is-akademi-api
+    restart: unless-stopped
+    ports:
+      - ${API_PORT}:8080
+    environment:
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      JwtConfig__Issuer: ${JWT_ISSUER}
+      JwtConfig__Audience: ${JWT_AUDIENCE}
+      JwtConfig__Key: ${JWT_SIGNING_KEY}
+      JwtConfig__ExpireMinutes: ${JWT_EXPIRE_MINUTES}
+      JwtConfig__RefreshTokenExpireDays: ${JWT_REFRESH_TOKEN_EXPIRE_DAYS}
+      DbConfig__Provider: 30
+      DbConfig__Host: ada-is-akademi-db
+      DbConfig__Port: 5432
+      DbConfig__Database: ${DB_NAME}
+      DbConfig__Username: ${DB_USER}
+      DbConfig__Password: ${DB_PASS}
+      RedisConfig__Enabled: ${REDIS_CONFIG_ENABLED}
+      RedisConfig__ConnectionString: ${REDIS_CONFIG_CONNECTION}
+      RedisConfig__InstanceName: ${REDIS_CONFIG_INSTANCE_NAME}
+    depends_on:
+      ada-is-akademi-db:
+        condition: service_healthy
+      ada-is-akademi-redis:
+        condition: service_healthy
+      ada-is-akademi-minio:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  redis_data:
+  minio_data:
+  dbview_data:

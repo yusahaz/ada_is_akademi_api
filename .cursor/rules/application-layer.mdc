@@ -1,0 +1,17 @@
+---
+description: AdaIsAkademi Application layer rules
+globs: src/Application/**/*.cs
+alwaysApply: false
+---
+
+# Application layer rules
+
+- The Application layer builds on `Core/src/Application` and `Domain`; it must not contain infrastructure details.
+- CQRS types (`Command`, `Query`, `Handler`) are clearly separated; handlers only orchestrate.
+- **Create / Add commands** whose primary effect is **persisting a new row** (new aggregate root **or** a new child entity such as a skill line, permission row, etc.) **must** return that row’s **generated primary key** (or another stable id assigned at persistence): inherit **`CommandBase<TId>`**, register **`IRequestHandler<TCommand, TId>`**, implement **`CommandHandlerBase<TCommand, TId>`**, capture the domain `Add*` / factory return value, call **`SaveChangesAsync`**, then **`return childOrAggregate.Id`**. Applies to names like **`Create…`** and **`Add…`** when a new entity is created (including idempotent “get or add” that may return an **existing** row — still return its **id**). Do **not** use `CommandBase` / `Unit` for these unless the spec documents why no id exists.
+- When validation is required, do it in the pipeline/validator layer; do not duplicate manual validation inside handlers.
+- Application services do not perform I/O; work through abstractions such as repository and unit of work.
+- **Read/write shapes**: Do not use ad-hoc `*Dto` types in the Application layer. Use **`ModelBase`-derived `*Model` records** (`Azoxia.Core.Application.Models`) for command payloads, query results, and nested row shapes. Put **each model in its own `.cs` file** in the **same folder** as the related command or query (for example `src/Application/Queries/Employer/EmployerDetailModel.cs` beside `GetEmployerByIdQuery.cs`). Map from domain/EF to models in handlers in one direction; avoid hidden side effects.
+- Keep `#region` layout and property sub-group order (`Scalar > Computed > Navigation > Collection`).
+- Keep cross-layer error handling in one model; do not introduce unrelated exception families.
+- **Caching**: Use `protected ICacheService CacheService` from `CommandHandlerBase` / `QueryHandlerBase`. Centralize logical keys and `CacheDependency` tags in `Caching/AdaIsCacheKeys.cs` (query keys under namespace `query`, dependencies use domain aggregate type names + invariant id strings). Read models: cache-aside (`GetAsync` then DB then `SetAsync` with `DetailReadModelOptions` + aggregate dependencies). Do not cache “not found” responses unless explicitly designed. After successful `SaveChangesAsync`, call `InvalidateByDependencyAsync` for every aggregate whose cached read models may have changed. List/collection queries need a separate invalidation strategy before caching; prefer detail read models first. Cached models must be JSON-serializable for L2.

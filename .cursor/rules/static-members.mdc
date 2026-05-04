@@ -1,0 +1,12 @@
+---
+description: Avoid static classes, methods, and properties unless clearly justified
+alwaysApply: true
+---
+
+# Static members
+
+- **Do not** introduce `static class`, `static` methods, or `static` properties unless there is a clear need.
+- **Prefer** expressing behavior through instances (DI-registered services, entity/value object methods, handler orchestration). Try to satisfy shared-helper needs with existing layer abstractions first.
+- **Acceptable exceptions:** language-required `static` (e.g. extension methods, operator overloads), host entry points (`Program.Main`), framework/contract `static` APIs, generated code, or a **narrowly scoped** pure helper/factory where an instance-based alternative would add needless complexity.
+
+**Summary:** before choosing `static`, check whether the same need can be met with an instance + interface or the existing CQRS/DDD patterns.

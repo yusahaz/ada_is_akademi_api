@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/AdaIsAkademi/">
+    <Project Path="src/Application/Application.csproj" />
+    <Project Path="src/Domain/Domain.csproj" />
+    <Project Path="src/Infrastructure/Infrastructure.csproj" />
+    <Project Path="src/Persistence/Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="../Core/src/Api/Api.csproj" Id="0d281a59-7544-4161-80d5-4d3c22afee67" />
+    <Project Path="../Core/src/Application/Application.csproj" Id="36b7e143-1bbc-46ce-b3cd-eb58542a89e8" />
+    <Project Path="../Core/src/Core/Core.csproj" Id="216c12b9-0572-4ef4-8b69-4160ecabd7a3" />
+    <Project Path="../Core/src/Generators/Generators.csproj" Id="805f32b8-ef93-41e1-a0b7-41d19cce459d" />
+    <Project Path="../Core/src/Infrastructure/Infrastructure.csproj" Id="38c1908e-4850-427b-8a83-a2a732d559ce" />
+    <Project Path="../Core/src/Persistence/Persistence.csproj" Id="46f6dd25-dc4d-408c-a2a9-3d2b9eba51c4" />
+  </Folder>
+  <Folder Name="/docs/" />
+  <Folder Name="/Presentation/">
+    <Project Path="src/Api/Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ApplicationTests/ApplicationTests.csproj" />
+    <Project Path="tests/DomainTests/DomainTests.csproj" />
+  </Folder>
+</Solution>

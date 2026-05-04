@@ -1,0 +1,25 @@
+---
+description: AdaIsAkademi Persistence layer rules
+globs: src/Persistence/**/*.cs
+alwaysApply: false
+---
+
+# Persistence layer rules
+
+- Persistence is limited to data access and mapping; do not implement business rules here.
+- Keep EF Core configuration under `Mapping` (or the project’s equivalent); fluent mappings must stay consistent with entities.
+- Configure tracking, lazy loading, and query behavior in DbContext in a clear, predictable way.
+- Keep SQL/provider-specific code (e.g. Npgsql) inside the Persistence layer only.
+- When adding migrations or schema changes, note backward-compatibility impact.
+- Manage transactions at the unit-of-work boundary; do not spread transaction control into handlers or controllers.
+- Keep `#region` and property sub-group layout consistent with project standards.
+
+## EF Core entity configuration (`src/Persistence/Mapping/*Configuration.cs`)
+
+- Entity type configuration classes inherit `EntityTypeConfigurationBase<T>` from `Azoxia.Core.Persistence.Mapping` unless there is an explicit exception.
+- Override `protected override void Configure(EntityTypeBuilder<T> builder, ref int columnOrder)` when using that base type. When the base member is `protected internal` in another assembly, use `protected override` (not `protected internal override`) so the override compiles.
+- **`HasColumnName`**: use **only** on properties configured **inside** `ComplexProperty` delegates (value types such as `Address`, `Contact`, `Money`, `GeoCoordinate`, and single-string `Value` shapes such as `TaxNumber` / `SkillTag` via `ValueTypeComplexMapping.MapStringValueColumn`). Shared helpers live in **`Azoxia.Core.Persistence.Mapping.ValueTypeComplexMapping`** (`Core/src/Persistence/Mapping/ValueTypeComplexMapping.cs`); do **not** duplicate that class under AdaIs `Persistence/Mapping`. Do **not** call `HasColumnName` on top-level `builder.Property(...)` chains; rely on EF’s default column naming.
+- **`HasColumnOrder`**: continue using `ref int columnOrder` on scalar properties as needed. Do **not** use `HasColumnOrder` inside `ComplexProperty` configuration blocks.
+- **Foreign keys**: when the entity has FK scalars, configure them **first** in `Configure` (before other scalars and before `ComplexProperty` blocks), each with `.HasColumnOrder(columnOrder++)` (and `.IsRequired()`, conversions, max lengths, etc. as appropriate).
+- **Relational extensions**: include `using Microsoft.EntityFrameworkCore;` so `HasColumnName` and other relational APIs resolve for complex nested properties.
+- **Global filters**: do not add default `HasQueryFilter` on entity types unless the product explicitly requires it. Index-level `HasFilter` is a separate concern and should only be used when agreed (e.g. partial unique indexes).
