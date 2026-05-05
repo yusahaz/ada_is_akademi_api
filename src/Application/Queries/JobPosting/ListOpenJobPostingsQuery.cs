@@ -5,6 +5,8 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
+    using Azoxia.Core.Exceptions;
+    using Azoxia.Core.Extensions;
     using System;
 
     /// <summary>
@@ -13,6 +15,7 @@ namespace Azoxia.AdaIsAkademi.Application
     public class ListOpenJobPostingsQuery :
         QueryBase<PagedQueryResultModel<JobPostingSummaryModel>>
     {
+        public string? CountryCode { get; set; }
         public int Limit { get; set; } = 20;
         public int Offset { get; set; }
     }
@@ -35,6 +38,11 @@ namespace Azoxia.AdaIsAkademi.Application
                 failures.Add(ApplicationValidationCodes.ListOpenJobPostingsOffset.ForField(nameof(ListOpenJobPostingsQuery.Offset)));
             }
 
+            if (!request.CountryCode.IsNullOrWhiteSpace() && request.CountryCode.Trim().Length > 16)
+            {
+                failures.Add(AzoxiaErrorCodes.RequestValidationFailed.ForField(nameof(ListOpenJobPostingsQuery.CountryCode)));
+            }
+
             return new ValidationResult(failures);
         }
 
@@ -51,7 +59,7 @@ namespace Azoxia.AdaIsAkademi.Application
             ListOpenJobPostingsQuery query,
             CancellationToken cancellationToken)
         {
-            CacheKey cacheKey = AdaIsCacheKeys.OpenJobPostingListKey(query.Limit, query.Offset);
+            CacheKey cacheKey = AdaIsCacheKeys.OpenJobPostingListKey(query.Limit, query.Offset, query.CountryCode);
             PagedQueryResultModel<JobPostingSummaryModel>? cached =
                 await CacheService.GetAsync<PagedQueryResultModel<JobPostingSummaryModel>>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -63,6 +71,12 @@ namespace Azoxia.AdaIsAkademi.Application
                 .GetRepository<JobPosting>()
                 .Filter(x => x.Status == JobPostingStatus.Open && !x.IsDeleted)
                 .AsNoTracking();
+
+            if (!query.CountryCode.IsNullOrWhiteSpace())
+            {
+                string normalizedCountry = query.CountryCode.Trim().ToUpperInvariant();
+                filter = filter.Filter(x => x.EmployerLocation.Address.Country.ToUpper() == normalizedCountry);
+            }
 
             int totalCount = checked((int)await filter.CountAsync(cancellationToken));
 

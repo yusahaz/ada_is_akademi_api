@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-05 17:34 (UTC+3)
+- Last Updated: 2026-05-05 17:36 (UTC+3)
 - Current Phase: Sprint kapanış hızlı-temizlik
-- Current Task: Sprint 7 monetization guard dilimi tamamlandı (commission receivable için active-employer zorunluluğu)
-- Next Task: Sprint 8 çok bölge/çok dil hazırlığında ülke bazlı open-posting filtre dilimine geçiş
+- Current Task: Sprint 8 regional hazırlık dilimi tamamlandı (open posting country filter)
+- Next Task: Sprint 9 dayanıklılık için worker detail query sözleşmesi ve fallback kapatma adımına geçiş
 - Blockers: Yok
 
 ## Phase Checklist
@@ -51,6 +51,8 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-05 17:28 - Sprint 4 semantic guard: stale worker embedding durumunda semantic listede fallback (open postings, score=0) eklendi; query testi + build geçti.
 - [x] 2026-05-05 17:29 - Sprint 5 metadata: personalized notification preview modeline `FallbackReason` ve `GeneratedAtUtc` alanları eklendi; query testi + build geçti.
 - [x] 2026-05-05 17:30 - Sprint 6 guard: overdue alarm sweep komutunda soft-deleted ilanlar hariç tutuldu; idempotency testi bu senaryoyu kapsayacak şekilde güncellendi.
+- [x] 2026-05-05 17:34 - Sprint 7 guard: commission receivable generation komutuna employer `Active` status zorunluluğu eklendi; non-active employer negatif testi yazıldı.
+- [x] 2026-05-05 17:36 - Sprint 8 regional: `ListOpenJobPostingsQuery` için opsiyonel `CountryCode` filtresi ve cache key varyantı eklendi; query testi + build geçti.
 - [x] 2026-05-05 17:34 - Sprint 7 guard: commission receivable generation komutuna employer `Active` status zorunluluğu eklendi; non-active employer negatif testi yazıldı.
 
 ## Deferred Backlog

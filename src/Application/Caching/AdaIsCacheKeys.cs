@@ -160,8 +160,8 @@ namespace Azoxia.AdaIsAkademi.Application
         /// <summary>
         /// Cache key for open job posting list by paging window.
         /// </summary>
-        internal static CacheKey OpenJobPostingListKey(int limit, int offset) =>
-            new(QueryNamespace, "JobPostingOpenList", $"{limit}:{offset}");
+        internal static CacheKey OpenJobPostingListKey(int limit, int offset, string? countryCode = null) =>
+            new(QueryNamespace, "JobPostingOpenList", $"{limit}:{offset}:{countryCode ?? "all"}");
 
         /// <summary>
         /// Invalidation tag for a <see cref="JobPosting"/> aggregate instance.
@@ -180,6 +180,12 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheKey WorkerDetailKey(int workerId) =>
             new(QueryNamespace, nameof(Worker) + DetailSuffix, workerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Cache key for <see cref="WorkerFullDetailModel"/> by worker id.
+        /// </summary>
+        internal static CacheKey WorkerFullDetailKey(int workerId) =>
+            new(QueryNamespace, "WorkerFullDetail", workerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Cache key for worker-personalized notification preview for a posting.
