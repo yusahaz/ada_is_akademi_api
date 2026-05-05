@@ -1,7 +1,10 @@
 ﻿namespace Azoxia.AdaIsAkademi.Api
 {
+    using Azoxia.AdaIsAkademi.Api.Automation;
     using Azoxia.AdaIsAkademi.Api.DependencyInjection;
     using Azoxia.Core.Api;
+    using Hangfire;
+    using Hangfire.InMemory;
 
     /// <summary>
     /// Host process entry type for the Ada Is Akademi API.
@@ -21,6 +24,21 @@
             startup.OnConfigureServices += (builder) =>
             {
                 builder.Services.AddAzoxiaCore(builder.Configuration);
+                builder.Services.AddHangfire(configuration => configuration
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UseInMemoryStorage());
+                builder.Services.AddHangfireServer();
+                builder.Services.AddScoped<OverdueAlarmRecurringJob>();
+            };
+
+            startup.OnConfigurePipelines += (app) =>
+            {
+                app.UseHangfireDashboard("/automation/jobs");
+                RecurringJob.AddOrUpdate<OverdueAlarmRecurringJob>(
+                    recurringJobId: "overdue-alarm-sweep",
+                    methodCall: x => x.ExecuteAsync(),
+                    cronExpression: "*/30 * * * *");
             };
 
             startup.Run(args);

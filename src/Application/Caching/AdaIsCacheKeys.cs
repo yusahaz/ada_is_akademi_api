@@ -168,6 +168,12 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static CacheDependency ShiftAssignmentAllDependency() =>
             new(nameof(ShiftAssignment), "all");
 
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="OverdueJobAlarm"/> read models.
+        /// </summary>
+        internal static CacheDependency OverdueAlarmAllDependency() =>
+            new(nameof(OverdueJobAlarm), "all");
+
         #endregion Methods
     }
 }

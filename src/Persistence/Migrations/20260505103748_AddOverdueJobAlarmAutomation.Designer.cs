@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Azoxia.AdaIsAkademi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 {
     [DbContext(typeof(AdaIsAkademiDbContext))]
-    partial class AdaIsAkademiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505103748_AddOverdueJobAlarmAutomation")]
+    partial class AddOverdueJobAlarmAutomation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
