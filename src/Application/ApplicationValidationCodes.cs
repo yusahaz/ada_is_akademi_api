@@ -500,6 +500,27 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "EmployerId must be greater than zero.");
 
         /// <summary>
+        /// Commission rate must be between 0 and 1.
+        /// </summary>
+        internal static readonly ErrorCode SetEmployerCommissionRateCommissionRate = new(
+            Code: "AZX_ADA_APP_VAL_903",
+            ErrorMessage: "CommissionRate must be between 0 and 1.");
+
+        /// <summary>
+        /// Employer id must be positive when setting employer commission rate.
+        /// </summary>
+        internal static readonly ErrorCode SetEmployerCommissionRateEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_904",
+            ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
+        /// Employer id must be positive for employer commission policy query.
+        /// </summary>
+        internal static readonly ErrorCode GetEmployerCommissionPolicyEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_905",
+            ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
         /// System user id must be positive when suspending a system user.
         /// </summary>
         internal static readonly ErrorCode SuspendSystemUserSystemUserId = new(

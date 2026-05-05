@@ -51,6 +51,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Gets employer commission policy by employer id.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get employer commission policy")]
+        [EndpointDescription("Returns commission policy detail read model by employer id.")]
+        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionPolicyModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetCommissionPolicy(
+            [FromBody] GetEmployerCommissionPolicyQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Suspends an employer.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -59,6 +70,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> Suspend(
             [FromBody] SuspendEmployerCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Sets employer commission rate policy.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Set employer commission policy")]
+        [EndpointDescription("Sets commission rate for monetization policy management.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> SetCommissionPolicy(
+            [FromBody] SetEmployerCommissionRateCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 

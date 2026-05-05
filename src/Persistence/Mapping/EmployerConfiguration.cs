@@ -26,6 +26,11 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasConversion<int>()
                 .HasColumnOrder(columnOrder++)
                 .IsRequired();
+
+            builder.Property(e => e.CommissionRate)
+                .HasPrecision(5, 4)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired();
         }
 
         #endregion Utils

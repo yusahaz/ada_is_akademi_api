@@ -30,6 +30,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             ErrorMessage: "The specified location does not exist for this employer.");
 
         /// <summary>
+        /// Commission rate must be between 0 and 1 inclusive.
+        /// </summary>
+        public static readonly ErrorCode EmployerCommissionRateOutOfRange = new(
+            Code: "AZX_ADA_DOMAIN_022",
+            ErrorMessage: "Commission rate must be between 0 and 1.");
+
+        /// <summary>
         /// Geofence radius is outside the permitted range.
         /// </summary>
         public static readonly ErrorCode GeofenceRadiusOutOfRange = new(

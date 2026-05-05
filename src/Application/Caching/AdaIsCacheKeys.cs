@@ -85,6 +85,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, nameof(Employer) + DetailSuffix, employerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Cache key for employer commission policy detail.
+        /// </summary>
+        internal static CacheKey EmployerCommissionPolicyKey(int employerId) =>
+            new(QueryNamespace, "EmployerCommissionPolicyDetail", employerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
         /// Invalidation tag for an <see cref="Employer"/> aggregate instance.
         /// </summary>
         internal static CacheDependency EmployerDependency(int employerId) =>
@@ -95,6 +101,12 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheDependency EmployerAllDependency() =>
             new(nameof(Employer), "all");
+
+        /// <summary>
+        /// Invalidation tag for employer commission policy read model.
+        /// </summary>
+        internal static CacheDependency EmployerCommissionPolicyDependency(int employerId) =>
+            new("EmployerCommissionPolicy", employerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Cache key for <see cref="ListJobPostingsByEmployerIdQuery"/> result (summary rows per employer).

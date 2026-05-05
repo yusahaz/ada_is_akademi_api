@@ -28,6 +28,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             string taxNumber) :
             base(name, description)
         {
+            CommissionRate = 0.10m;
             Status = EmployerStatus.Pending;
             TaxNumber = new TaxNumber(taxNumber);
         }
@@ -154,6 +155,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = EmployerStatus.Suspended;
         }
 
+        protected internal void SetCommissionRate(decimal commissionRate)
+        {
+            (commissionRate >= 0m && commissionRate <= 1m)
+                .ThrowIfFalse(DomainErrorCodes.EmployerCommissionRateOutOfRange);
+            CommissionRate = commissionRate;
+        }
+
         protected internal void SetContact(Contact contact)
         {
             Contact = contact;
@@ -177,6 +185,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Primary contact details for the employer.
         /// </summary>
         public Contact Contact { get; private set; }
+
+        /// <summary>
+        /// Commission rate applied for monetization calculations (0..1).
+        /// </summary>
+        public decimal CommissionRate { get; private set; }
 
         /// <summary>
         /// Current lifecycle status of the employer record.

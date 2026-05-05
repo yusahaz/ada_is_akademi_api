@@ -36,6 +36,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<AddSystemUserGroupPermissionCommand, int>, AddSystemUserGroupPermissionCommandHandler>();
             services.AddScoped<IRequestHandler<AddWorkerSkillCommand, int>, AddWorkerSkillCommandHandler>();
             services.AddScoped<IRequestHandler<BanEmployerCommand, Unit>, BanEmployerCommandHandler>();
+            services.AddScoped<IRequestHandler<SetEmployerCommissionRateCommand, Unit>, SetEmployerCommissionRateCommandHandler>();
             services.AddScoped<IRequestHandler<BanSystemUserCommand, Unit>, BanSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<RunOverdueAlarmSweepCommand, int>, RunOverdueAlarmSweepCommandHandler>();
             services.AddScoped<IRequestHandler<CancelJobPostingCommand, Unit>, CancelJobPostingCommandHandler>();
@@ -71,6 +72,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         private void RegisterQueryHandlers(IServiceCollection services)
         {
             services.AddScoped<IRequestHandler<GetEmployerByIdQuery, EmployerDetailModel>, GetEmployerByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetEmployerCommissionPolicyQuery, EmployerCommissionPolicyModel>, GetEmployerCommissionPolicyQueryHandler>();
             services.AddScoped<IRequestHandler<GetDashboardStatisticsQuery, DashboardStatisticsModel>, GetDashboardStatisticsQueryHandler>();
             services.AddScoped<IRequestHandler<ExportOverdueAlarmsCsvQuery, OverdueAlarmExportPackageModel>, ExportOverdueAlarmsCsvQueryHandler>();
             services.AddScoped<IRequestHandler<GetOverdueJobSummaryQuery, OverdueJobSummaryModel>, GetOverdueJobSummaryQueryHandler>();
@@ -98,6 +100,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<AddSystemUserGroupPermissionCommand>, AddSystemUserGroupPermissionCommandValidator>();
             services.AddScoped<IRequestValidator<AddWorkerSkillCommand>, AddWorkerSkillCommandValidator>();
             services.AddScoped<IRequestValidator<BanEmployerCommand>, BanEmployerCommandValidator>();
+            services.AddScoped<IRequestValidator<SetEmployerCommissionRateCommand>, SetEmployerCommissionRateCommandValidator>();
             services.AddScoped<IRequestValidator<BanSystemUserCommand>, BanSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<RunOverdueAlarmSweepCommand>, RunOverdueAlarmSweepCommandValidator>();
             services.AddScoped<IRequestValidator<CancelJobPostingCommand>, CancelJobPostingCommandValidator>();
@@ -108,6 +111,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<CreateJobPostingCommand>, CreateJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<DeactivateSystemUserGroupCommand>, DeactivateSystemUserGroupCommandValidator>();
             services.AddScoped<IRequestValidator<GetEmployerByIdQuery>, GetEmployerByIdQueryValidator>();
+            services.AddScoped<IRequestValidator<GetEmployerCommissionPolicyQuery>, GetEmployerCommissionPolicyQueryValidator>();
             services.AddScoped<IRequestValidator<GetDashboardStatisticsQuery>, GetDashboardStatisticsQueryValidator>();
             services.AddScoped<IRequestValidator<ExportOverdueAlarmsCsvQuery>, ExportOverdueAlarmsCsvQueryValidator>();
             services.AddScoped<IRequestValidator<GetOverdueJobSummaryQuery>, GetOverdueJobSummaryQueryValidator>();
