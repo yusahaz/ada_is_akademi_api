@@ -90,6 +90,7 @@
 - [ ] Çıktı: ticari genişleme omurgası oluşur.
 - [x] Uygulanan dikey dilim: monetization summary query + statistics endpoint + cache + test eklendi.
 - [x] Uygulanan dikey dilim: employer commission policy command/query + employer endpointleri + cache + test eklendi.
+- [x] Uygulanan dikey dilim: employer commission policy CSV export query + employer endpoint + cache + test eklendi.
 
 ### Sprint 8 - Coğrafi ve Üretim Ölçeği
 - [ ] Çok bölge/çok dil hazırlık backlog'u.

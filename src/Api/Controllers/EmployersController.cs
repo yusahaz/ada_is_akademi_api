@@ -62,6 +62,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Exports employer commission policies in CSV format package.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Export employer commission policies CSV")]
+        [EndpointDescription("Returns CSV package payload for employer commission policy records.")]
+        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionPolicyExportPackageModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ExportCommissionPoliciesCsv(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            ExportEmployerCommissionPoliciesCsvQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new ExportEmployerCommissionPoliciesCsvQuery(), cancellationToken);
+
         /// <summary>Suspends an employer.</summary>
         [HttpPost]
         [Consumes("application/json")]

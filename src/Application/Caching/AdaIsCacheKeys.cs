@@ -91,6 +91,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "EmployerCommissionPolicyDetail", employerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Cache key for employer commission policy CSV export package.
+        /// </summary>
+        internal static CacheKey EmployerCommissionPolicyExportPackageKey() =>
+            new(QueryNamespace, "EmployerCommissionPolicyExportPackage", "default");
+
+        /// <summary>
         /// Invalidation tag for an <see cref="Employer"/> aggregate instance.
         /// </summary>
         internal static CacheDependency EmployerDependency(int employerId) =>
