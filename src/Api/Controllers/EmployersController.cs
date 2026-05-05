@@ -5,6 +5,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
     using Azoxia.Core.Api.Responses;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
 
     /// <summary>
     /// Employer read and lifecycle management endpoints.
@@ -95,6 +96,28 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             ExportEmployerCommissionPoliciesCsvQuery? query,
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new ExportEmployerCommissionPoliciesCsvQuery(), cancellationToken);
+
+        /// <summary>Generates idempotent commission receivable for employer period.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Generate commission receivable")]
+        [EndpointDescription("Creates or returns existing commission receivable id for the same employer and period.")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GenerateCommissionReceivable(
+            [FromBody] GenerateCommissionReceivableCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
+        /// <summary>Gets commission receivable detail by employer and period.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get commission receivable by period")]
+        [EndpointDescription("Returns commission receivable detail row for employer and billing period.")]
+        [ProducesResponseType(typeof(ApiResponse<CommissionReceivableDetailModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetCommissionReceivableByPeriod(
+            [FromBody] GetCommissionReceivableByPeriodQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
 
         /// <summary>Suspends an employer.</summary>
         [HttpPost]

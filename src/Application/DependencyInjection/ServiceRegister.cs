@@ -36,6 +36,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<AddSystemUserGroupPermissionCommand, int>, AddSystemUserGroupPermissionCommandHandler>();
             services.AddScoped<IRequestHandler<AddWorkerSkillCommand, int>, AddWorkerSkillCommandHandler>();
             services.AddScoped<IRequestHandler<BanEmployerCommand, Unit>, BanEmployerCommandHandler>();
+            services.AddScoped<IRequestHandler<GenerateCommissionReceivableCommand, int>, GenerateCommissionReceivableCommandHandler>();
             services.AddScoped<IRequestHandler<SetEmployerCommissionRateCommand, Unit>, SetEmployerCommissionRateCommandHandler>();
             services.AddScoped<IRequestHandler<BanSystemUserCommand, Unit>, BanSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<RunOverdueAlarmSweepCommand, int>, RunOverdueAlarmSweepCommandHandler>();
@@ -72,6 +73,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         private void RegisterQueryHandlers(IServiceCollection services)
         {
             services.AddScoped<IRequestHandler<GetEmployerByIdQuery, EmployerDetailModel>, GetEmployerByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetCommissionReceivableByPeriodQuery, CommissionReceivableDetailModel>, GetCommissionReceivableByPeriodQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionEstimateQuery, EmployerCommissionEstimateModel>, GetEmployerCommissionEstimateQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionPolicyQuery, EmployerCommissionPolicyModel>, GetEmployerCommissionPolicyQueryHandler>();
             services.AddScoped<IRequestHandler<ListEmployerCommissionSummariesQuery, IReadOnlyList<EmployerCommissionListItemModel>>, ListEmployerCommissionSummariesQueryHandler>();
@@ -103,6 +105,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<AddSystemUserGroupPermissionCommand>, AddSystemUserGroupPermissionCommandValidator>();
             services.AddScoped<IRequestValidator<AddWorkerSkillCommand>, AddWorkerSkillCommandValidator>();
             services.AddScoped<IRequestValidator<BanEmployerCommand>, BanEmployerCommandValidator>();
+            services.AddScoped<IRequestValidator<GenerateCommissionReceivableCommand>, GenerateCommissionReceivableCommandValidator>();
             services.AddScoped<IRequestValidator<SetEmployerCommissionRateCommand>, SetEmployerCommissionRateCommandValidator>();
             services.AddScoped<IRequestValidator<BanSystemUserCommand>, BanSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<RunOverdueAlarmSweepCommand>, RunOverdueAlarmSweepCommandValidator>();
@@ -114,6 +117,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<CreateJobPostingCommand>, CreateJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<DeactivateSystemUserGroupCommand>, DeactivateSystemUserGroupCommandValidator>();
             services.AddScoped<IRequestValidator<GetEmployerByIdQuery>, GetEmployerByIdQueryValidator>();
+            services.AddScoped<IRequestValidator<GetCommissionReceivableByPeriodQuery>, GetCommissionReceivableByPeriodQueryValidator>();
             services.AddScoped<IRequestValidator<GetEmployerCommissionEstimateQuery>, GetEmployerCommissionEstimateQueryValidator>();
             services.AddScoped<IRequestValidator<GetEmployerCommissionPolicyQuery>, GetEmployerCommissionPolicyQueryValidator>();
             services.AddScoped<IRequestValidator<ListEmployerCommissionSummariesQuery>, ListEmployerCommissionSummariesQueryValidator>();

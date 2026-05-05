@@ -276,6 +276,48 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Limit must be between 1 and 100.");
 
         /// <summary>
+        /// Amount must be non-negative when generating commission receivable.
+        /// </summary>
+        internal static readonly ErrorCode GenerateCommissionReceivableAmount = new(
+            Code: "AZX_ADA_APP_VAL_908",
+            ErrorMessage: "Amount must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Currency is required when generating commission receivable.
+        /// </summary>
+        internal static readonly ErrorCode GenerateCommissionReceivableCurrency = new(
+            Code: "AZX_ADA_APP_VAL_909",
+            ErrorMessage: "Currency cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Employer id must be positive when generating commission receivable.
+        /// </summary>
+        internal static readonly ErrorCode GenerateCommissionReceivableEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_910",
+            ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
+        /// Period end must be on or after period start for commission receivable generation.
+        /// </summary>
+        internal static readonly ErrorCode GenerateCommissionReceivablePeriod = new(
+            Code: "AZX_ADA_APP_VAL_911",
+            ErrorMessage: "PeriodEnd must be on or after PeriodStart.");
+
+        /// <summary>
+        /// Employer id must be positive for commission receivable by period query.
+        /// </summary>
+        internal static readonly ErrorCode GetCommissionReceivableByPeriodEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_912",
+            ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
+        /// Period end must be on or after period start for commission receivable by period query.
+        /// </summary>
+        internal static readonly ErrorCode GetCommissionReceivableByPeriodPeriod = new(
+            Code: "AZX_ADA_APP_VAL_913",
+            ErrorMessage: "PeriodEnd must be on or after PeriodStart.");
+
+        /// <summary>
         /// Device identifier is required when logging in a system user.
         /// </summary>
         internal static readonly ErrorCode LoginSystemUserDeviceIdentifierRequired = new(

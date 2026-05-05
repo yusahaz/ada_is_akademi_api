@@ -37,6 +37,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             ErrorMessage: "Commission rate must be between 0 and 1.");
 
         /// <summary>
+        /// Commission receivable period end must be on or after period start.
+        /// </summary>
+        public static readonly ErrorCode CommissionReceivablePeriodInvalid = new(
+            Code: "AZX_ADA_DOMAIN_023",
+            ErrorMessage: "Commission receivable period is invalid.");
+
+        /// <summary>
         /// Geofence radius is outside the permitted range.
         /// </summary>
         public static readonly ErrorCode GeofenceRadiusOutOfRange = new(

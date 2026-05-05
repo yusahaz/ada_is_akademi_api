@@ -216,6 +216,27 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static CacheDependency OverdueAlarmAllDependency() =>
             new(nameof(OverdueJobAlarm), "all");
 
+        /// <summary>
+        /// Cache key for commission receivable detail by employer and period.
+        /// </summary>
+        internal static CacheKey CommissionReceivableDetailKey(int employerId, DateOnly periodStart, DateOnly periodEnd) =>
+            new(
+                QueryNamespace,
+                "CommissionReceivableDetail",
+                $"{employerId}:{periodStart:yyyyMMdd}:{periodEnd:yyyyMMdd}");
+
+        /// <summary>
+        /// Invalidation tag for employer-scoped commission receivable models.
+        /// </summary>
+        internal static CacheDependency CommissionReceivableDependency(int employerId) =>
+            new(nameof(CommissionReceivable), employerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide commission receivable models.
+        /// </summary>
+        internal static CacheDependency CommissionReceivableAllDependency() =>
+            new(nameof(CommissionReceivable), "all");
+
         #endregion Methods
     }
 }
