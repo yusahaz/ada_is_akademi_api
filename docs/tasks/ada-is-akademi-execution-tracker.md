@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-07 (UTC+3)
-- Current Phase: Faz 2 Sprint 6
-- Current Task: **P2 profil görüntüleme metriği** tamamlandı (`EmployerWorkerProfileViewStat`, `RecordEmployerWorkerProfileViewCommand`, employer-safe read model + cache).
-- Next Task: Ürün backlog (ör. CV pipeline — tracker Deferred) veya teknik borç maddeleri; görev konvansiyonları için `docs/tasks/README.md`.
+- Last Updated: 2026-05-06 (UTC+3)
+- Current Phase: Faz 2 (profil zenginleştirme checklist kapalı)
+- Current Task: —
+- Next Task: **Deferred Backlog** sıradaki seçilebilir iş — birincil ürün kalemi **CV pipeline** (`CvUploadSession`, PRD §5.3); alternatif teknik borç: query splitting uyarıları, DataProtection production politikası.
 - Blockers: Yok
 
 ## Phase Checklist
@@ -71,6 +71,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-07 - Mimari envanter: `/ada-is-akademi-plan` kapsamında katman kurallarıyla hizalı kod yapısı gözden geçirildi; özet ve takip maddeleri `docs/tasks/codebase-structure-review-2026-05.md` dosyasına işlendi.
 - [x] 2026-05-07 - Görev klasörü: `docs/tasks/README.md` eklendi (kebab-case adlandırma, tracker ilişkisi, ne zaman yeni task dosyası açılır).
 - [x] 2026-05-07 - Domain: beklenen maaş kolonlarından `Money` örneklemesi `Worker.GetExpectedSalaryMinMoney` / `GetExpectedSalaryMaxMoney` olarak taşındı; Application `WorkerExpectedSalaryMappings` kaldırıldı; gözden geçirme task checklist güncellendi.
+- [x] 2026-05-06 - Hata modeli + maaş okuma: BCL `ArgumentNullException`/`ArgumentException` kaldırıldı; `GuardExtensions` + `AzoxiaErrorCodes`/`DomainErrorCodes`. Worker üzerinde beklenen maaş `Money` projeksiyonu entity’den çıkarıldı (kurallar: entity’de `public` instance metot yok); `GetWorkerSelfDetail` / `GetWorkerSelfFullDetail` handler’larında `MapWorkerExpectedSalary`; profil tamamlanma maaş kontrolü skalar alanlarla. `WorkerExpectedSalaryProjection` DI sınıfı yok. Katman `.cursor/rules` güncellendi. Commit `f199dbc` push `main`.
 
 ## Profil / medya / eşleştirme (iş planı özeti)
 
@@ -93,7 +94,7 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 ## Session Handoff Template
 Her yeni oturum başında bu blok güncellenir:
 
-- Handoff Summary:
-- Nerede kaldık:
-- Bir sonraki tek adım:
-- Risk/Not:
+- Handoff Summary: Katman kurallarıyla uyumlu Azoxia-only guard’lar; beklenen maaş `Money` eşlemesi yalnızca worker self-detail handler’larında; `main` üzerinde `f199dbc` push edildi.
+- Nerede kaldık: Profil zenginleştirme checklist tamam; sıradaki iş Deferred backlog’dan seçilmeli.
+- Bir sonraki tek adım: CV pipeline epik analizi (domain taslağı + migration ihtiyacı) veya küçük teknik borç (query splitting / DataProtection).
+- Risk/Not: CV pipeline büyük kapsam; başlamadan önce `.cursor/rules/*` ve `docs/tasks/` ile ürün onayı netleştirilmeli.
