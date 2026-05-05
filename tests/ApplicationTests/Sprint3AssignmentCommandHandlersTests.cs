@@ -5,6 +5,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
     using Azoxia.AdaIsAkademi.Persistence;
     using Azoxia.Core.Application;
     using Azoxia.Core.Application.Commands;
+    using Azoxia.Core.Exceptions;
     using Azoxia.Core.ValueTypes;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
@@ -69,6 +70,65 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             assignment.Should().NotBeNull();
             assignment!.Status.Should().Be(ShiftAssignmentStatus.CheckedIn);
             assignment.CheckedInAt.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task CheckOutShiftAssignmentHandler_marks_assignment_checked_out_after_check_in()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+            (_, int assignmentId, int workerId) = await SeedAssignmentAsync(db);
+            executionContext.ReplaceClaim("worker_id", workerId.ToString());
+
+            var checkInHandler = new CheckInShiftAssignmentCommandHandler(sp);
+            await ((IRequestHandler<CheckInShiftAssignmentCommand, Unit>)checkInHandler).HandleAsync(
+                new CheckInShiftAssignmentCommand
+                {
+                    AssignmentId = assignmentId,
+                    CheckInTokenHash = "qr-token-hash",
+                },
+                CancellationToken.None);
+
+            var checkOutHandler = new CheckOutShiftAssignmentCommandHandler(sp);
+            await ((IRequestHandler<CheckOutShiftAssignmentCommand, Unit>)checkOutHandler).HandleAsync(
+                new CheckOutShiftAssignmentCommand
+                {
+                    AssignmentId = assignmentId,
+                },
+                CancellationToken.None);
+
+            ShiftAssignment? assignment = await db.Set<ShiftAssignment>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == assignmentId);
+            assignment.Should().NotBeNull();
+            assignment!.Status.Should().Be(ShiftAssignmentStatus.CheckedOut);
+            assignment.CheckedOutAt.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task CheckInShiftAssignmentHandler_throws_for_non_owner_worker()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+            (_, int assignmentId, _) = await SeedAssignmentAsync(db);
+            executionContext.ReplaceClaim("worker_id", "999999");
+
+            var checkInHandler = new CheckInShiftAssignmentCommandHandler(sp);
+            Func<Task> act = async () =>
+                await ((IRequestHandler<CheckInShiftAssignmentCommand, Unit>)checkInHandler).HandleAsync(
+                    new CheckInShiftAssignmentCommand
+                    {
+                        AssignmentId = assignmentId,
+                        CheckInTokenHash = "qr-token-hash",
+                    },
+                    CancellationToken.None);
+
+            AzoxiaException ex = (await act.Should().ThrowAsync<AzoxiaException>()).Which;
+            ex.Error.Should().Be(ApplicationValidationCodes.ActorResourceAccessDenied);
         }
 
         #endregion Methods
