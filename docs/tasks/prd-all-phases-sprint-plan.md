@@ -95,6 +95,7 @@
 - [x] Uygulanan dikey dilim: employer commission summary list query + employer endpoint + cache + test eklendi.
 - [x] Uygulanan dikey dilim: commission receivable period-idempotent generation command + employer endpoint + query + cache + test eklendi.
 - [x] Uygulanan dikey dilim: commission receivable list query + employer endpoint + cache + test eklendi.
+- [x] Uygulanan dikey dilim: employer/worker/systemusergroup/systemuser filtreli liste query + endpoint + validator testleri eklendi.
 
 ### Sprint 8 - Coğrafi ve Üretim Ölçeği
 - [ ] Çok bölge/çok dil hazırlık backlog'u.

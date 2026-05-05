@@ -51,6 +51,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Lists system user groups with filtering and paging support.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List system user groups")]
+        [EndpointDescription("Returns filtered system-user-group rows by active/system flags and name search.")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<SystemUserGroupListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> List(
+            [FromBody] ListSystemUserGroupsQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         #endregion Methods
     }
 }

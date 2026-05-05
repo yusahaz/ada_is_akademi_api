@@ -40,6 +40,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Lists workers with filtering and paging support.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List workers")]
+        [EndpointDescription("Returns filtered worker rows with account status and email filters.")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<WorkerListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> List(
+            [FromBody] ListWorkersQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Gets personalized notification preview with push/email fallback.</summary>
         [HttpPost]
         [Consumes("application/json")]

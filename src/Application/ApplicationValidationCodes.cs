@@ -290,6 +290,69 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Limit must be between 1 and 100.");
 
         /// <summary>
+        /// Limit must be between 1 and 200 for list employers query.
+        /// </summary>
+        internal static readonly ErrorCode ListEmployersLimit = new(
+            Code: "AZX_ADA_APP_VAL_916",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for list employers query.
+        /// </summary>
+        internal static readonly ErrorCode ListEmployersOffset = new(
+            Code: "AZX_ADA_APP_VAL_917",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Commission range filters must remain between 0 and 1 and max must be greater than or equal to min.
+        /// </summary>
+        internal static readonly ErrorCode ListEmployersCommissionRange = new(
+            Code: "AZX_ADA_APP_VAL_918",
+            ErrorMessage: "Commission range is invalid.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for list workers query.
+        /// </summary>
+        internal static readonly ErrorCode ListWorkersLimit = new(
+            Code: "AZX_ADA_APP_VAL_919",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for list workers query.
+        /// </summary>
+        internal static readonly ErrorCode ListWorkersOffset = new(
+            Code: "AZX_ADA_APP_VAL_920",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for list system users query.
+        /// </summary>
+        internal static readonly ErrorCode ListSystemUsersLimit = new(
+            Code: "AZX_ADA_APP_VAL_921",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for list system users query.
+        /// </summary>
+        internal static readonly ErrorCode ListSystemUsersOffset = new(
+            Code: "AZX_ADA_APP_VAL_922",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for list system user groups query.
+        /// </summary>
+        internal static readonly ErrorCode ListSystemUserGroupsLimit = new(
+            Code: "AZX_ADA_APP_VAL_923",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for list system user groups query.
+        /// </summary>
+        internal static readonly ErrorCode ListSystemUserGroupsOffset = new(
+            Code: "AZX_ADA_APP_VAL_924",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
         /// Amount must be non-negative when generating commission receivable.
         /// </summary>
         internal static readonly ErrorCode GenerateCommissionReceivableAmount = new(

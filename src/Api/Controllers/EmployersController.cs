@@ -52,6 +52,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Lists employers with filtering and paging support.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List employers")]
+        [EndpointDescription("Returns filtered employer rows with paging options.")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EmployerListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> List(
+            [FromBody] ListEmployersQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Gets employer commission policy by employer id.</summary>
         [HttpPost]
         [Consumes("application/json")]

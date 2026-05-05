@@ -112,6 +112,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetSystemUserMeQuery(), cancellationToken);
 
+        /// <summary>Lists system users with filtering and paging support.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List system users")]
+        [EndpointDescription("Returns filtered system-user rows by type, account status, and email.")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<SystemUserListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> List(
+            [FromBody] ListSystemUsersQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Revokes a device-bound refresh token (logout).</summary>
         [AllowAnonymous]
         [HttpPost]

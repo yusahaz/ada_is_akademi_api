@@ -3,6 +3,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application.Caching;
     using System.Globalization;
+    using System.Text.Json;
 
     /// <summary>
     /// Logical <see cref="CacheKey"/> values and <see cref="CacheDependency"/> tags for AdaIs read models.
@@ -103,6 +104,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "EmployerCommissionSummaryList", limit.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Cache key for filtered employer listing queries.
+        /// </summary>
+        internal static CacheKey EmployerListKey(ListEmployersQuery query) =>
+            new(QueryNamespace, "EmployerList", JsonSerializer.Serialize(query));
+
+        /// <summary>
         /// Cache key for employer commission policy CSV export package.
         /// </summary>
         internal static CacheKey EmployerCommissionPolicyExportPackageKey() =>
@@ -175,6 +182,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "WorkerNotificationPreview", $"{workerId}:{jobPostingId}");
 
         /// <summary>
+        /// Cache key for filtered worker listing queries.
+        /// </summary>
+        internal static CacheKey WorkerListKey(ListWorkersQuery query) =>
+            new(QueryNamespace, "WorkerList", JsonSerializer.Serialize(query));
+
+        /// <summary>
         /// Invalidation tag for a <see cref="Worker"/> aggregate instance.
         /// </summary>
         internal static CacheDependency WorkerDependency(int workerId) =>
@@ -191,6 +204,24 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheDependency SystemUserAllDependency() =>
             new(nameof(SystemUser), "all");
+
+        /// <summary>
+        /// Cache key for filtered system-user listing queries.
+        /// </summary>
+        internal static CacheKey SystemUserListKey(ListSystemUsersQuery query) =>
+            new(QueryNamespace, "SystemUserList", JsonSerializer.Serialize(query));
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide <see cref="SystemUserGroup"/> read models.
+        /// </summary>
+        internal static CacheDependency SystemUserGroupAllDependency() =>
+            new(nameof(SystemUserGroup), "all");
+
+        /// <summary>
+        /// Cache key for filtered system-user-group listing queries.
+        /// </summary>
+        internal static CacheKey SystemUserGroupListKey(ListSystemUserGroupsQuery query) =>
+            new(QueryNamespace, "SystemUserGroupList", JsonSerializer.Serialize(query));
 
         /// <summary>
         /// Invalidation tag for aggregate-wide <see cref="JobApplication"/> counters.
