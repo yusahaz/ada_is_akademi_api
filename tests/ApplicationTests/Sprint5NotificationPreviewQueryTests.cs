@@ -38,6 +38,8 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
 
             model.Channel.Should().Be("email");
             model.FallbackApplied.Should().BeTrue();
+            model.FallbackReason.Should().Be("missing_push_token");
+            model.GeneratedAtUtc.Should().BeAfter(DateTimeOffset.UtcNow.AddMinutes(-1));
             model.JobPostingId.Should().Be(postingId);
         }
 

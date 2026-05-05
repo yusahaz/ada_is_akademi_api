@@ -9,6 +9,8 @@ namespace Azoxia.AdaIsAkademi.Application
         int JobPostingId,
         string Channel,
         WorkerNotificationPreviewMessageModel Message,
-        bool FallbackApplied) :
+        bool FallbackApplied,
+        string? FallbackReason,
+        DateTimeOffset GeneratedAtUtc) :
         ModelBase;
 }

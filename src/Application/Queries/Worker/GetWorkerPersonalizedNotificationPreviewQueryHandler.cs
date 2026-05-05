@@ -58,6 +58,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefault();
 
             bool fallbackApplied = pushDevice is null;
+            string? fallbackReason = fallbackApplied ? "missing_push_token" : null;
             string channel = fallbackApplied ? "email" : "push";
             var message = new WorkerNotificationPreviewMessageModel(
                 posting.Title,
@@ -68,7 +69,9 @@ namespace Azoxia.AdaIsAkademi.Application
                 posting.Id,
                 channel,
                 message,
-                fallbackApplied);
+                fallbackApplied,
+                fallbackReason,
+                DateTimeOffset.UtcNow);
 
             await CacheService.SetAsync(
                 cacheKey,
