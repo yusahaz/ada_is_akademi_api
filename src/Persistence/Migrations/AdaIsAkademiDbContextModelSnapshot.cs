@@ -440,6 +440,72 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.ToTable("EmployerLocation", (string)null);
                 });
 
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.EmployerSocialLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnOrder(0);
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployerId")
+                        .HasColumnType("integer")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("Platform")
+                        .HasColumnType("integer")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployerId", "Platform")
+                        .IsUnique();
+
+                    b.ToTable("EmployerSocialLink", (string)null);
+                });
+
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.EmployerWorkerProfileViewStat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnOrder(0);
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployerId")
+                        .HasColumnType("integer")
+                        .HasColumnOrder(1);
+
+                    b.Property<DateTimeOffset?>("LastRecordedUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnOrder(4);
+
+                    b.Property<int>("TotalViews")
+                        .HasColumnType("integer")
+                        .HasColumnOrder(3);
+
+                    b.Property<int>("WorkerId")
+                        .HasColumnType("integer")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkerId");
+
+                    b.HasIndex("EmployerId", "WorkerId")
+                        .IsUnique();
+
+                    b.ToTable("EmployerWorkerProfileViewStat", (string)null);
+                });
+
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.JobApplication", b =>
                 {
                     b.Property<int>("Id")
@@ -2001,6 +2067,32 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.Navigation("Employer");
                 });
 
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.EmployerSocialLink", b =>
+                {
+                    b.HasOne("Azoxia.AdaIsAkademi.Domain.Employer", "Employer")
+                        .WithMany("SocialLinks")
+                        .HasForeignKey("EmployerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employer");
+                });
+
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.EmployerWorkerProfileViewStat", b =>
+                {
+                    b.HasOne("Azoxia.AdaIsAkademi.Domain.Employer", null)
+                        .WithMany()
+                        .HasForeignKey("EmployerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Azoxia.AdaIsAkademi.Domain.Worker", null)
+                        .WithMany()
+                        .HasForeignKey("WorkerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.JobApplication", b =>
                 {
                     b.HasOne("Azoxia.AdaIsAkademi.Domain.JobPosting", "JobPosting")
@@ -2385,6 +2477,8 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.Navigation("JobPostings");
 
                     b.Navigation("Locations");
+
+                    b.Navigation("SocialLinks");
 
                     b.Navigation("Supervisors");
                 });

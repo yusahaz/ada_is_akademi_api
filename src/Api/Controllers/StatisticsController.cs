@@ -19,30 +19,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
     {
         #region Methods
 
-        /// <summary>Returns dashboard summary counters.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Get dashboard statistics")]
-        [EndpointDescription("Returns counters such as total system users, pending approvals, and users activated today.")]
-        [ProducesResponseType(typeof(ApiResponse<DashboardStatisticsModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> Overview(
-            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
-            GetDashboardStatisticsQuery? query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query ?? new GetDashboardStatisticsQuery(), cancellationToken);
-
-        /// <summary>Returns overdue posting and pending-application counters.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Get overdue job summary")]
-        [EndpointDescription("Returns overdue job posting count and pending application count for scheduler/reporting checks.")]
-        [ProducesResponseType(typeof(ApiResponse<OverdueJobSummaryModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> OverdueSummary(
-            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
-            GetOverdueJobSummaryQuery? query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query ?? new GetOverdueJobSummaryQuery(), cancellationToken);
-
         /// <summary>Returns overdue alarms CSV export package.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -78,6 +54,30 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             GetMonetizationSummaryQuery? query,
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetMonetizationSummaryQuery(), cancellationToken);
+
+        /// <summary>Returns dashboard summary counters.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get dashboard statistics")]
+        [EndpointDescription("Returns counters such as total system users, pending approvals, and users activated today.")]
+        [ProducesResponseType(typeof(ApiResponse<DashboardStatisticsModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> Overview(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            GetDashboardStatisticsQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetDashboardStatisticsQuery(), cancellationToken);
+
+        /// <summary>Returns overdue posting and pending-application counters.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get overdue job summary")]
+        [EndpointDescription("Returns overdue job posting count and pending application count for scheduler/reporting checks.")]
+        [ProducesResponseType(typeof(ApiResponse<OverdueJobSummaryModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> OverdueSummary(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            GetOverdueJobSummaryQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetOverdueJobSummaryQuery(), cancellationToken);
 
         #endregion Methods
     }

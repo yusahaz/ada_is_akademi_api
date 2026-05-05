@@ -10,8 +10,16 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected Permission() { }
 
+        /// <summary>
+        /// Creates a permission node with display name.
+        /// </summary>
+        /// <param name="name">Permission name.</param>
+        /// <param name="description">Optional description.</param>
         protected internal Permission(
             string name,
             string? description) :
@@ -23,6 +31,9 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Assigns the parent permission when it does not create a self-cycle.
+        /// </summary>
         protected internal void SetParent(int parentId)
         {
             if (parentId != Id)
@@ -34,6 +45,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// Identifier of the parent permission in the hierarchy, when present.
         /// </summary>
@@ -43,6 +55,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Parent permission, when scoped under another node.
         /// </summary>
         public virtual Permission? Parent { get; private set; }
+
         #endregion Properties
     }
 }

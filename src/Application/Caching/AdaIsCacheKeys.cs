@@ -134,6 +134,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(nameof(Employer), employerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Invalidation tag for a single <see cref="EmployerWorkerProfileViewStat"/> row (employer + worker pair).
+        /// </summary>
+        internal static CacheDependency EmployerWorkerProfileViewStatDependency(int employerId, int workerId) =>
+            new(nameof(EmployerWorkerProfileViewStat), $"{employerId.ToString(CultureInfo.InvariantCulture)}:{workerId.ToString(CultureInfo.InvariantCulture)}");
+
+        /// <summary>
         /// Invalidation tag for aggregate-wide <see cref="Employer"/> counters.
         /// </summary>
         internal static CacheDependency EmployerAllDependency() =>
@@ -188,16 +194,22 @@ namespace Azoxia.AdaIsAkademi.Application
             new(nameof(JobPosting), "all");
 
         /// <summary>
-        /// Cache key for <see cref="WorkerEmployerSafeDetailModel"/> by worker id (employer-scoped endpoints).
+        /// Cache key for <see cref="WorkerEmployerSafeDetailModel"/> scoped by employer and worker identifiers.
         /// </summary>
-        internal static CacheKey WorkerEmployerSafeDetailKey(int workerId) =>
-            new(QueryNamespace, "WorkerEmployerSafeDetail", workerId.ToString(CultureInfo.InvariantCulture));
+        internal static CacheKey WorkerEmployerSafeDetailKey(int employerId, int workerId) =>
+            new(
+                QueryNamespace,
+                "WorkerEmployerSafeDetail",
+                $"{employerId.ToString(CultureInfo.InvariantCulture)}:{workerId.ToString(CultureInfo.InvariantCulture)}");
 
         /// <summary>
-        /// Cache key for <see cref="WorkerEmployerSafeFullDetailModel"/> by worker id (employer-scoped endpoints).
+        /// Cache key for <see cref="WorkerEmployerSafeFullDetailModel"/> scoped by employer and worker identifiers.
         /// </summary>
-        internal static CacheKey WorkerEmployerSafeFullDetailKey(int workerId) =>
-            new(QueryNamespace, "WorkerEmployerSafeFullDetail", workerId.ToString(CultureInfo.InvariantCulture));
+        internal static CacheKey WorkerEmployerSafeFullDetailKey(int employerId, int workerId) =>
+            new(
+                QueryNamespace,
+                "WorkerEmployerSafeFullDetail",
+                $"{employerId.ToString(CultureInfo.InvariantCulture)}:{workerId.ToString(CultureInfo.InvariantCulture)}");
 
         /// <summary>
         /// Cache key for <see cref="WorkerSelfDetailModel"/> for the authenticated worker actor.

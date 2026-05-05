@@ -6,11 +6,12 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
     using Amazon.S3.Model;
 
     using Azoxia.AdaIsAkademi.Application.Services;
+    using Azoxia.AdaIsAkademi.Infrastructure.Configuration;
 
-    using Microsoft.Extensions.Options;
+    using Azoxia.Core.Extensions;
 
     /// <summary>
-    /// AWS S3 veya MinIO uçlarına presigned istek adresleri üretir.
+    /// Issues presigned request URLs against AWS S3 or MinIO-compatible endpoints.
     /// </summary>
     internal sealed class AwsS3CompatibleObjectStoragePresigner :
         IObjectStoragePresigner,
@@ -20,21 +21,21 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
 
         private readonly AmazonS3Client _amazonS3Client;
 
-        private readonly ObjectStoragePresignerOptions _options;
+        private readonly ObjectStorageConfig _options;
 
         #endregion Fields
 
         #region Ctors
 
         /// <summary>
-        /// Bağlı yapılandırmayla <see cref="AmazonS3Client"/> ömrünü yönetir.
+        /// Configures and owns the underlying <see cref="AmazonS3Client"/> lifetime.
         /// </summary>
-        public AwsS3CompatibleObjectStoragePresigner(IOptions<ObjectStoragePresignerOptions> optionsBinding)
+        /// <param name="optionsBinding">MinIO/S3-compatible storage settings used for the client and presign operations.</param>
+        public AwsS3CompatibleObjectStoragePresigner(ObjectStorageConfig optionsBinding)
         {
             ArgumentNullException.ThrowIfNull(optionsBinding);
 
-            _options =
-                optionsBinding.Value ?? throw new ArgumentNullException(nameof(optionsBinding.Value));
+            _options = optionsBinding;
 
             ArgumentException.ThrowIfNullOrWhiteSpace(_options.ServiceUrl);
             ArgumentException.ThrowIfNullOrWhiteSpace(_options.AccessKey);
@@ -48,7 +49,7 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
                     ForcePathStyle = _options.ForcePathStyle,
                 };
 
-            if (!string.IsNullOrWhiteSpace(_options.RegionName))
+            if (!_options.RegionName.IsNullOrWhiteSpace())
             {
                 config.RegionEndpoint =
                     RegionEndpoint.GetBySystemName(_options.RegionName);

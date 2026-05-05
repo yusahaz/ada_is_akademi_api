@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application.Tests
 {
+    using Azoxia.AdaIsAkademi.Application;
     using Azoxia.AdaIsAkademi.Application.Tests.Support;
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.AdaIsAkademi.Persistence;
@@ -81,8 +82,80 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 CancellationToken.None);
 
             model.Id.Should().Be(seed.WorkerId);
+            model.EmployerSourcedProfileViewCount.Should().Be(0);
             model.GetType().GetProperty("ExpectedSalaryMin").Should().BeNull();
             model.GetType().GetProperty("InterestedJobCategories").Should().BeNull();
+        }
+
+        [Fact]
+        public async Task RecordEmployerWorkerProfileView_then_GetWorkerById_reflects_count_and_dedupes_same_utc_day()
+        {
+            var employerContext = new TestExecutionContext(isAuthenticated: true);
+
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(employerContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            SeedEmployerWorkerApplicationResult seed = await SeedEmployerWorkerApplicationAsync(db);
+            employerContext.ReplaceClaim("employer_id", seed.EmployerId.ToString());
+
+            var recordHandler = new RecordEmployerWorkerProfileViewCommandHandler(sp);
+            RecordEmployerWorkerProfileViewResultModel first =
+                await ((IRequestHandler<RecordEmployerWorkerProfileViewCommand, RecordEmployerWorkerProfileViewResultModel>)recordHandler).HandleAsync(
+                    new RecordEmployerWorkerProfileViewCommand { WorkerId = seed.WorkerId },
+                    CancellationToken.None);
+
+            first.ViewCounted.Should().BeTrue();
+            first.TotalEmployerSourcedProfileViews.Should().Be(1);
+
+            var getHandler = new GetWorkerByIdQueryHandler(sp);
+            WorkerEmployerSafeDetailModel model =
+                await ((IRequestHandler<GetWorkerByIdQuery, WorkerEmployerSafeDetailModel>)getHandler).HandleAsync(
+                    new GetWorkerByIdQuery { WorkerId = seed.WorkerId },
+                    CancellationToken.None);
+
+            model.EmployerSourcedProfileViewCount.Should().Be(1);
+
+            RecordEmployerWorkerProfileViewResultModel second =
+                await ((IRequestHandler<RecordEmployerWorkerProfileViewCommand, RecordEmployerWorkerProfileViewResultModel>)recordHandler).HandleAsync(
+                    new RecordEmployerWorkerProfileViewCommand { WorkerId = seed.WorkerId },
+                    CancellationToken.None);
+
+            second.ViewCounted.Should().BeFalse();
+            second.TotalEmployerSourcedProfileViews.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task RecordEmployerWorkerProfileView_denies_employer_without_shared_application()
+        {
+            var employerContext = new TestExecutionContext(isAuthenticated: true);
+
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(employerContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            SeedEmployerWorkerApplicationResult seed = await SeedEmployerWorkerApplicationAsync(db);
+
+            Employer other = new("Other Co", null, "9876543210");
+            other.SetAddress(new Address("X", "Istanbul", "TR"));
+            other.SetContact(new Contact("A", "B", "other-record@test.local", "+905550000002"));
+            db.Set<Employer>().Add(other);
+            await db.SaveChangesAsync();
+            other.SetAsActive();
+            await db.SaveChangesAsync();
+
+            employerContext.ReplaceClaim("employer_id", other.Id.ToString());
+
+            var recordHandler = new RecordEmployerWorkerProfileViewCommandHandler(sp);
+            Func<Task> act = async () =>
+                await ((IRequestHandler<RecordEmployerWorkerProfileViewCommand, RecordEmployerWorkerProfileViewResultModel>)recordHandler).HandleAsync(
+                    new RecordEmployerWorkerProfileViewCommand { WorkerId = seed.WorkerId },
+                    CancellationToken.None);
+
+            AzoxiaException ex = (await act.Should().ThrowAsync<AzoxiaException>()).Which;
+            ex.Error.Should().Be(ApplicationValidationCodes.ActorResourceAccessDenied);
         }
 
         [Fact]

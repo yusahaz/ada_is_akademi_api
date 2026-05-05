@@ -1,5 +1,9 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     using Azoxia.Core.Domain;
     using Azoxia.Core.Extensions;
     using Azoxia.Core.ValueTypes;
@@ -12,16 +16,26 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Fields
 
-        private readonly List<EmployerLocation> _locations = new();
         private readonly List<JobPosting> _jobPostings = new();
+        private readonly List<EmployerLocation> _locations = new();
+        private readonly List<EmployerSocialLink> _socialLinks = new();
         private readonly List<ShiftSupervisor> _supervisors = new();
 
         #endregion Fields
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected Employer() { }
 
+        /// <summary>
+        /// Creates a new employer with tax identifier and initial lifecycle state.
+        /// </summary>
+        /// <param name="name">Display name.</param>
+        /// <param name="description">Optional description.</param>
+        /// <param name="taxNumber">Tax number text.</param>
         protected internal Employer(
             string name,
             string? description,
@@ -36,20 +50,6 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Utils
-
-        protected internal EmployerLocation AddLocation(string name, string? description = null)
-        {
-            EmployerLocation? location = Locations
-                .FirstOrDefault(x => x.Name == name);
-
-            if (location is null)
-            {
-                location = new(Id, name, description);
-                _locations.Add(location);
-            }
-
-            return location;
-        }
 
         /// <summary>
         /// Creates a new draft job posting owned by this employer at the given location.
@@ -104,6 +104,26 @@ namespace Azoxia.AdaIsAkademi.Domain
             return posting;
         }
 
+        /// <summary>
+        /// Adds or returns an existing location with the same display name.
+        /// </summary>
+        protected internal EmployerLocation AddLocation(string name, string? description = null)
+        {
+            EmployerLocation? location = Locations
+                .FirstOrDefault(x => x.Name == name);
+
+            if (location is null)
+            {
+                location = new(Id, name, description);
+                _locations.Add(location);
+            }
+
+            return location;
+        }
+
+        /// <summary>
+        /// Adds or returns an existing shift supervisor link for the user.
+        /// </summary>
         protected internal ShiftSupervisor AddShiftSupervisor(int systemUserId, int? locationId = null)
         {
             ShiftSupervisor? existing = Supervisors
@@ -119,9 +139,15 @@ namespace Azoxia.AdaIsAkademi.Domain
             return existing;
         }
 
+        /// <summary>
+        /// Soft-deletes this employer through the base lifecycle API.
+        /// </summary>
         protected internal void DeleteEmployer()
             => base.Delete();
 
+        /// <summary>
+        /// Deactivates a supervisor assignment for the given user when present.
+        /// </summary>
         protected internal void RemoveShiftSupervisor(int systemUserId)
         {
             ShiftSupervisor? supervisor = Supervisors
@@ -133,11 +159,34 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Replaces outbound social links, keeping the last URL per platform.
+        /// </summary>
+        protected internal void ReplaceSocialLinks(IReadOnlyList<EmployerSocialLinkInput> links)
+        {
+            ArgumentNullException.ThrowIfNull(links);
+            _socialLinks.Clear();
+            IEnumerable<EmployerSocialLinkInput> distinctByPlatform =
+                links
+                    .GroupBy(x => x.Platform)
+                    .Select(g => g.Last());
+            foreach (EmployerSocialLinkInput row in distinctByPlatform)
+            {
+                _socialLinks.Add(new EmployerSocialLink(Id, row.Platform, row.Url));
+            }
+        }
+
+        /// <summary>
+        /// Replaces the embedded postal or legal address.
+        /// </summary>
         protected internal void SetAddress(Address address)
         {
             Address = address;
         }
 
+        /// <summary>
+        /// Transitions the employer to active when not banned.
+        /// </summary>
         protected internal void SetAsActive()
         {
             (Status != EmployerStatus.Banned)
@@ -145,9 +194,15 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = EmployerStatus.Active;
         }
 
+        /// <summary>
+        /// Permanently bans the employer organization.
+        /// </summary>
         protected internal void SetAsBanned()
             => Status = EmployerStatus.Banned;
 
+        /// <summary>
+        /// Suspends the employer when not banned.
+        /// </summary>
         protected internal void SetAsSuspended()
         {
             (Status != EmployerStatus.Banned)
@@ -155,6 +210,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = EmployerStatus.Suspended;
         }
 
+        /// <summary>
+        /// Updates commission rate within the inclusive 0..1 bounds.
+        /// </summary>
         protected internal void SetCommissionRate(decimal commissionRate)
         {
             (commissionRate >= 0m && commissionRate <= 1m)
@@ -162,17 +220,17 @@ namespace Azoxia.AdaIsAkademi.Domain
             CommissionRate = commissionRate;
         }
 
+        /// <summary>
+        /// Replaces primary employer contact details.
+        /// </summary>
         protected internal void SetContact(Contact contact)
         {
             Contact = contact;
         }
 
-        protected internal void UpdateEmployer(string name, string taxNumber, string? description = null)
-        {
-            UpdateName(name, description);
-            TaxNumber = new TaxNumber(taxNumber);
-        }
-
+        /// <summary>
+        /// Sets or clears the logo object key after trimming.
+        /// </summary>
         protected internal void SetLogoObjectKey(string? objectKey)
         {
             LogoObjectKey = objectKey.IsNullOrWhiteSpace()
@@ -180,13 +238,28 @@ namespace Azoxia.AdaIsAkademi.Domain
                 : objectKey.Trim();
         }
 
+        /// <summary>
+        /// Updates display name, tax number, and optional description.
+        /// </summary>
+        protected internal void UpdateEmployer(string name, string taxNumber, string? description = null)
+        {
+            UpdateName(name, description);
+            TaxNumber = new TaxNumber(taxNumber);
+        }
+
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// Postal or legal address of the employer.
         /// </summary>
         public Address Address { get; private set; }
+
+        /// <summary>
+        /// Commission rate applied for monetization calculations (0..1).
+        /// </summary>
+        public decimal CommissionRate { get; private set; }
 
         /// <summary>
         /// Primary contact details for the employer.
@@ -194,9 +267,9 @@ namespace Azoxia.AdaIsAkademi.Domain
         public Contact Contact { get; private set; }
 
         /// <summary>
-        /// Commission rate applied for monetization calculations (0..1).
+        /// MinIO / S3 object key for employer logo, when configured.
         /// </summary>
-        public decimal CommissionRate { get; private set; }
+        public string? LogoObjectKey { get; private set; }
 
         /// <summary>
         /// Current lifecycle status of the employer record.
@@ -208,15 +281,6 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public TaxNumber TaxNumber { get; private set; }
 
-        /// <summary>
-        /// MinIO / S3 object key for employer logo, when configured.
-        /// </summary>
-        public string? LogoObjectKey { get; private set; }
-
-        /// <summary>
-        /// Registered locations under this employer.
-        /// </summary>
-        public virtual IReadOnlyList<EmployerLocation> Locations => _locations.AsReadOnly();
 
         /// <summary>
         /// Job postings created by this employer.
@@ -224,9 +288,21 @@ namespace Azoxia.AdaIsAkademi.Domain
         public virtual IReadOnlyList<JobPosting> JobPostings => _jobPostings.AsReadOnly();
 
         /// <summary>
+        /// Registered locations under this employer.
+        /// </summary>
+        public virtual IReadOnlyList<EmployerLocation> Locations => _locations.AsReadOnly();
+
+        /// <summary>
+        /// Outbound social/profile links maintained by the employer on employer-facing read models.
+        /// </summary>
+        public virtual IReadOnlyList<EmployerSocialLink> SocialLinks =>
+            _socialLinks.AsReadOnly();
+
+        /// <summary>
         /// Shift supervisors assigned to this employer.
         /// </summary>
         public virtual IReadOnlyList<ShiftSupervisor> Supervisors => _supervisors.AsReadOnly();
+
         #endregion Properties
     }
 }

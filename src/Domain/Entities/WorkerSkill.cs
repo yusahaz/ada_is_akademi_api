@@ -10,8 +10,16 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerSkill() { }
 
+        /// <summary>
+        /// Creates a skill tag row for a worker.
+        /// </summary>
+        /// <param name="workerId">Owning worker key.</param>
+        /// <param name="tag">Skill tag text.</param>
         protected internal WorkerSkill(
             int workerId,
             string tag)
@@ -24,6 +32,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// UTC timestamp when this skill tag was created.
         /// </summary>
@@ -39,10 +48,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int WorkerId { get; private set; }
 
+
         /// <summary>
         /// Owning worker aggregate.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }

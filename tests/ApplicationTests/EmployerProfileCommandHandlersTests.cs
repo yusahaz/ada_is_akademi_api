@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application.Tests
 {
+    using Azoxia.AdaIsAkademi.Application;
     using Azoxia.AdaIsAkademi.Application.Tests.Support;
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.AdaIsAkademi.Persistence;
@@ -102,6 +103,42 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 .FirstOrDefaultAsync(x => x.Id == supervisorId);
             removed.Should().NotBeNull();
             removed!.IsActive.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task UpdateEmployerSocialLinksCommandHandler_replaces_links_for_actor_employer()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            Employer employer = await SeedEmployerAsync(db);
+            executionContext.ReplaceClaim("employer_id", employer.Id.ToString());
+
+            var handler = new UpdateEmployerSocialLinksCommandHandler(sp);
+            await ((IRequestHandler<UpdateEmployerSocialLinksCommand, Unit>)handler).HandleAsync(
+                new UpdateEmployerSocialLinksCommand
+                {
+                    Links =
+                    [
+                        new EmployerSocialLinkUpdateItem
+                        {
+                            Platform = SocialMediaPlatform.LinkedIn,
+                            Url = "https://example.com/company",
+                        },
+                    ],
+                },
+                CancellationToken.None);
+
+            List<EmployerSocialLink> rows = await db.Set<EmployerSocialLink>()
+                .AsNoTracking()
+                .Where(x => x.EmployerId == employer.Id)
+                .ToListAsync();
+            rows.Should().ContainSingle();
+            rows[0].Platform.Should().Be(SocialMediaPlatform.LinkedIn);
+            rows[0].Url.Should().Be("https://example.com/company");
         }
 
         [Fact]

@@ -8,7 +8,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
     /// <summary>
-    /// EF mapping for worker social/outbound profile links.
+    /// EF Core mapping for <see cref="WorkerSocialLink"/> (columns and relationships).
     /// </summary>
     internal sealed class WorkerSocialLinkConfiguration :
         EntityTypeConfigurationBase<WorkerSocialLink>

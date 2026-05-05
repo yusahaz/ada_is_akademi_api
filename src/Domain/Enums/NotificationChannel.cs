@@ -6,11 +6,6 @@ namespace Azoxia.AdaIsAkademi.Domain
     public enum NotificationChannel
     {
         /// <summary>
-        /// Mobile push channel (FCM/APNS).
-        /// </summary>
-        Push = 10,
-
-        /// <summary>
         /// Email channel.
         /// </summary>
         Email = 20,
@@ -19,5 +14,10 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// In-app inbox channel.
         /// </summary>
         InApp = 30,
+
+        /// <summary>
+        /// Mobile push channel (FCM/APNS).
+        /// </summary>
+        Push = 10,
     }
 }

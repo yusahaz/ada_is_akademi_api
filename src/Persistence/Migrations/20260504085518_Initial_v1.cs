@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -9,6 +9,81 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
     /// <inheritdoc />
     public partial class Initial_v1 : Migration
     {
+        #region Utils
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "AppLogs");
+
+            migrationBuilder.DropTable(
+                name: "JobApplication");
+
+            migrationBuilder.DropTable(
+                name: "JobPostingSkill");
+
+            migrationBuilder.DropTable(
+                name: "ShiftSupervisor");
+
+            migrationBuilder.DropTable(
+                name: "SystemUserGroupMembership");
+
+            migrationBuilder.DropTable(
+                name: "SystemUserGroupPermission");
+
+            migrationBuilder.DropTable(
+                name: "SystemUserRefreshToken");
+
+            migrationBuilder.DropTable(
+                name: "WorkerAvailability");
+
+            migrationBuilder.DropTable(
+                name: "WorkerCertificate");
+
+            migrationBuilder.DropTable(
+                name: "WorkerEducation");
+
+            migrationBuilder.DropTable(
+                name: "WorkerExperience");
+
+            migrationBuilder.DropTable(
+                name: "WorkerLanguage");
+
+            migrationBuilder.DropTable(
+                name: "WorkerReference");
+
+            migrationBuilder.DropTable(
+                name: "WorkerSkill");
+
+            migrationBuilder.DropTable(
+                name: "JobPosting");
+
+            migrationBuilder.DropTable(
+                name: "Permission");
+
+            migrationBuilder.DropTable(
+                name: "SystemUserGroup");
+
+            migrationBuilder.DropTable(
+                name: "SystemUserDevice");
+
+            migrationBuilder.DropTable(
+                name: "Worker");
+
+            migrationBuilder.DropTable(
+                name: "EmployerLocation");
+
+            migrationBuilder.DropTable(
+                name: "JobCategory");
+
+            migrationBuilder.DropTable(
+                name: "SystemUser");
+
+            migrationBuilder.DropTable(
+                name: "Employer");
+        }
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -878,77 +953,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                 column: "WorkerId");
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "AppLogs");
-
-            migrationBuilder.DropTable(
-                name: "JobApplication");
-
-            migrationBuilder.DropTable(
-                name: "JobPostingSkill");
-
-            migrationBuilder.DropTable(
-                name: "ShiftSupervisor");
-
-            migrationBuilder.DropTable(
-                name: "SystemUserGroupMembership");
-
-            migrationBuilder.DropTable(
-                name: "SystemUserGroupPermission");
-
-            migrationBuilder.DropTable(
-                name: "SystemUserRefreshToken");
-
-            migrationBuilder.DropTable(
-                name: "WorkerAvailability");
-
-            migrationBuilder.DropTable(
-                name: "WorkerCertificate");
-
-            migrationBuilder.DropTable(
-                name: "WorkerEducation");
-
-            migrationBuilder.DropTable(
-                name: "WorkerExperience");
-
-            migrationBuilder.DropTable(
-                name: "WorkerLanguage");
-
-            migrationBuilder.DropTable(
-                name: "WorkerReference");
-
-            migrationBuilder.DropTable(
-                name: "WorkerSkill");
-
-            migrationBuilder.DropTable(
-                name: "JobPosting");
-
-            migrationBuilder.DropTable(
-                name: "Permission");
-
-            migrationBuilder.DropTable(
-                name: "SystemUserGroup");
-
-            migrationBuilder.DropTable(
-                name: "SystemUserDevice");
-
-            migrationBuilder.DropTable(
-                name: "Worker");
-
-            migrationBuilder.DropTable(
-                name: "EmployerLocation");
-
-            migrationBuilder.DropTable(
-                name: "JobCategory");
-
-            migrationBuilder.DropTable(
-                name: "SystemUser");
-
-            migrationBuilder.DropTable(
-                name: "Employer");
-        }
+        #endregion Utils
     }
 }

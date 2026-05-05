@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -9,6 +9,76 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
     /// <inheritdoc />
     public partial class AddWorkerPayoutAndCommissionAudit : Migration
     {
+        #region Utils
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "CommissionAuditLog");
+
+            migrationBuilder.DropTable(
+                name: "WorkerPayout");
+
+            migrationBuilder.DropColumn(
+                name: "AnomalyCode",
+                table: "ShiftAssignment");
+
+            migrationBuilder.DropColumn(
+                name: "IsAnomalyFlagged",
+                table: "ShiftAssignment");
+
+            migrationBuilder.DropColumn(
+                name: "SupervisorCheckInTokenHash",
+                table: "ShiftAssignment");
+
+            migrationBuilder.DropColumn(
+                name: "SupervisorCheckedInAt",
+                table: "ShiftAssignment");
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Status",
+                table: "ShiftAssignment",
+                type: "integer",
+                nullable: false,
+                oldClrType: typeof(int),
+                oldType: "integer")
+                .Annotation("Relational:ColumnOrder", 5)
+                .OldAnnotation("Relational:ColumnOrder", 6);
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "CheckedOutAt",
+                table: "ShiftAssignment",
+                type: "timestamp with time zone",
+                nullable: true,
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "timestamp with time zone",
+                oldNullable: true)
+                .Annotation("Relational:ColumnOrder", 8)
+                .OldAnnotation("Relational:ColumnOrder", 9);
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "CheckedInAt",
+                table: "ShiftAssignment",
+                type: "timestamp with time zone",
+                nullable: true,
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "timestamp with time zone",
+                oldNullable: true)
+                .Annotation("Relational:ColumnOrder", 7)
+                .OldAnnotation("Relational:ColumnOrder", 8);
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "AssignedAt",
+                table: "ShiftAssignment",
+                type: "timestamp with time zone",
+                nullable: false,
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "timestamp with time zone")
+                .Annotation("Relational:ColumnOrder", 6)
+                .OldAnnotation("Relational:ColumnOrder", 7);
+        }
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -212,72 +282,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                 columns: new[] { "WorkerId", "Status" });
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "CommissionAuditLog");
-
-            migrationBuilder.DropTable(
-                name: "WorkerPayout");
-
-            migrationBuilder.DropColumn(
-                name: "AnomalyCode",
-                table: "ShiftAssignment");
-
-            migrationBuilder.DropColumn(
-                name: "IsAnomalyFlagged",
-                table: "ShiftAssignment");
-
-            migrationBuilder.DropColumn(
-                name: "SupervisorCheckInTokenHash",
-                table: "ShiftAssignment");
-
-            migrationBuilder.DropColumn(
-                name: "SupervisorCheckedInAt",
-                table: "ShiftAssignment");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "Status",
-                table: "ShiftAssignment",
-                type: "integer",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "integer")
-                .Annotation("Relational:ColumnOrder", 5)
-                .OldAnnotation("Relational:ColumnOrder", 6);
-
-            migrationBuilder.AlterColumn<DateTimeOffset>(
-                name: "CheckedOutAt",
-                table: "ShiftAssignment",
-                type: "timestamp with time zone",
-                nullable: true,
-                oldClrType: typeof(DateTimeOffset),
-                oldType: "timestamp with time zone",
-                oldNullable: true)
-                .Annotation("Relational:ColumnOrder", 8)
-                .OldAnnotation("Relational:ColumnOrder", 9);
-
-            migrationBuilder.AlterColumn<DateTimeOffset>(
-                name: "CheckedInAt",
-                table: "ShiftAssignment",
-                type: "timestamp with time zone",
-                nullable: true,
-                oldClrType: typeof(DateTimeOffset),
-                oldType: "timestamp with time zone",
-                oldNullable: true)
-                .Annotation("Relational:ColumnOrder", 7)
-                .OldAnnotation("Relational:ColumnOrder", 8);
-
-            migrationBuilder.AlterColumn<DateTimeOffset>(
-                name: "AssignedAt",
-                table: "ShiftAssignment",
-                type: "timestamp with time zone",
-                nullable: false,
-                oldClrType: typeof(DateTimeOffset),
-                oldType: "timestamp with time zone")
-                .Annotation("Relational:ColumnOrder", 6)
-                .OldAnnotation("Relational:ColumnOrder", 7);
-        }
+        #endregion Utils
     }
 }

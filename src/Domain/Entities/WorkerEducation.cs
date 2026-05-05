@@ -10,8 +10,14 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerEducation() { }
 
+        /// <summary>
+        /// Creates an education history row.
+        /// </summary>
         protected internal WorkerEducation(
             int workerId,
             string school,
@@ -33,6 +39,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// Academic department or program name.
         /// </summary>
@@ -68,10 +75,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int WorkerId { get; private set; }
 
+
         /// <summary>
         /// Owning worker aggregate.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }

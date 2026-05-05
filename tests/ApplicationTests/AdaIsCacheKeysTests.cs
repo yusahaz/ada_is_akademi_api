@@ -51,16 +51,19 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
         }
 
         /// <summary>
-        /// Employer-safe worker detail key must remain consistent with dependency invalidation tag.
+        /// Employer-safe worker detail key pairs employer + worker ids; profile-view counters use a dedicated dependency tag.
         /// </summary>
         [Fact]
-        public void Worker_employer_safe_detail_key_and_dependency_use_invariant_id()
+        public void Worker_employer_safe_detail_key_and_profile_view_dependency_use_invariant_ids()
         {
-            var key = AdaIsCacheKeys.WorkerEmployerSafeDetailKey(99);
-            var dep = AdaIsCacheKeys.WorkerDependency(99);
+            var key = AdaIsCacheKeys.WorkerEmployerSafeDetailKey(5, 99);
+            var workerDep = AdaIsCacheKeys.WorkerDependency(99);
+            var viewDep = AdaIsCacheKeys.EmployerWorkerProfileViewStatDependency(5, 99);
 
             key.ToStorageKey().Should().Contain("WorkerEmployerSafeDetail");
-            dep.ToIndexSegment().Should().Be("Worker:99");
+            key.ToStorageKey().Should().Contain("5:99");
+            workerDep.ToIndexSegment().Should().Be("Worker:99");
+            viewDep.ToIndexSegment().Should().Be("EmployerWorkerProfileViewStat:5:99");
         }
 
         #endregion Methods

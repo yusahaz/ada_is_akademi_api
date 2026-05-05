@@ -8,7 +8,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
     /// <summary>
-    /// EF Core mapping for worker-to-category interest links.
+    /// EF Core mapping for <see cref="WorkerInterestedJobCategory"/> (columns and relationships).
     /// </summary>
     internal sealed class WorkerInterestedJobCategoryConfiguration :
         EntityTypeConfigurationBase<WorkerInterestedJobCategory>

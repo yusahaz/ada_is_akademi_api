@@ -10,8 +10,14 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerExperience() { }
 
+        /// <summary>
+        /// Creates an experience segment with optional end date.
+        /// </summary>
         protected internal WorkerExperience(
             int workerId,
             string companyName,
@@ -31,6 +37,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// Employer or organization name.
         /// </summary>
@@ -61,15 +68,18 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int WorkerId { get; private set; }
 
+
         /// <summary>
         /// True when no end date is set (treated as current role).
         /// </summary>
         public bool IsCurrent => EndDate is null;
 
+
         /// <summary>
         /// Owning worker aggregate.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }

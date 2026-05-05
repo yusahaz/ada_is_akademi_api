@@ -38,14 +38,15 @@ namespace Azoxia.AdaIsAkademi.Domain
         public int JobCategoryId { get; private set; }
 
         /// <summary>
-        /// Referenced classification node.
-        /// </summary>
-        public virtual JobCategory JobCategory { get; private set; }
-
-        /// <summary>
         /// Foreign key to <see cref="Worker"/>.
         /// </summary>
         public int WorkerId { get; private set; }
+
+
+        /// <summary>
+        /// Referenced classification node.
+        /// </summary>
+        public virtual JobCategory JobCategory { get; private set; }
 
         /// <summary>
         /// Owning worker aggregate root.

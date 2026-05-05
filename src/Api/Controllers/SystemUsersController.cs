@@ -42,6 +42,59 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Lists system users with filtering and paging support.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List system users")]
+        [EndpointDescription("Returns filtered system-user rows by type, account status, and email.")]
+        [ProducesResponseType(typeof(PageableApiResponse<SystemUserListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> List(
+            [FromBody] ListSystemUsersQuery query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<SystemUserListItemModel, PagedQueryResultModel<SystemUserListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
+        /// <summary>Authenticates the user and returns an access/refresh token pair.</summary>
+        [AllowAnonymous]
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Login system user")]
+        [EndpointDescription("Authenticates credentials and returns JWT access token with refresh token.")]
+        [ProducesResponseType(typeof(ApiResponse<SystemUserTokenModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> Login(
+            [FromBody] LoginSystemUserCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Revokes a device-bound refresh token (logout).</summary>
+        [AllowAnonymous]
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Logout system user")]
+        [EndpointDescription("Revokes the provided active refresh token for the given device session.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> Logout(
+            [FromBody] LogoutSystemUserCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Returns the authenticated user's profile summary.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get current system user")]
+        [EndpointDescription("Returns profile information for the currently authenticated user derived from JWT claims.")]
+        [ProducesResponseType(typeof(ApiResponse<SystemUserMeModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> Me(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            GetSystemUserMeQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetSystemUserMeQuery(), cancellationToken);
+
         /// <summary>Reactivates a banned system user.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -50,6 +103,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> Reactivate(
             [FromBody] ReactivateSystemUserCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Rotates access and refresh tokens for a valid refresh token.</summary>
+        [AllowAnonymous]
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Refresh system user token")]
+        [EndpointDescription("Validates refresh token for the device session and issues a fresh token pair.")]
+        [ProducesResponseType(typeof(ApiResponse<SystemUserTokenModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> RefreshToken(
+            [FromBody] RefreshSystemUserTokenCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
@@ -88,71 +153,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
-        /// <summary>Authenticates the user and returns an access/refresh token pair.</summary>
-        [AllowAnonymous]
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Login system user")]
-        [EndpointDescription("Authenticates credentials and returns JWT access token with refresh token.")]
-        [ProducesResponseType(typeof(ApiResponse<SystemUserTokenModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> Login(
-            [FromBody] LoginSystemUserCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Returns the authenticated user's profile summary.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Get current system user")]
-        [EndpointDescription("Returns profile information for the currently authenticated user derived from JWT claims.")]
-        [ProducesResponseType(typeof(ApiResponse<SystemUserMeModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> Me(
-            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
-            GetSystemUserMeQuery? query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query ?? new GetSystemUserMeQuery(), cancellationToken);
-
-        /// <summary>Lists system users with filtering and paging support.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("List system users")]
-        [EndpointDescription("Returns filtered system-user rows by type, account status, and email.")]
-        [ProducesResponseType(typeof(PageableApiResponse<SystemUserListItemModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> List(
-            [FromBody] ListSystemUsersQuery query,
-            CancellationToken cancellationToken)
-            => ExecutePageQuery<SystemUserListItemModel, PagedQueryResultModel<SystemUserListItemModel>>(
-                query,
-                result => result.Items,
-                result => result.TotalCount,
-                result => result.Limit,
-                result => result.Offset,
-                cancellationToken);
-
-        /// <summary>Revokes a device-bound refresh token (logout).</summary>
-        [AllowAnonymous]
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Logout system user")]
-        [EndpointDescription("Revokes the provided active refresh token for the given device session.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> Logout(
-            [FromBody] LogoutSystemUserCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Rotates access and refresh tokens for a valid refresh token.</summary>
-        [AllowAnonymous]
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Refresh system user token")]
-        [EndpointDescription("Validates refresh token for the device session and issues a fresh token pair.")]
-        [ProducesResponseType(typeof(ApiResponse<SystemUserTokenModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> RefreshToken(
-            [FromBody] RefreshSystemUserTokenCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
         /// <summary>Stores a new email verification token for the user.</summary>
         [AllowAnonymous]
         [HttpPost]
@@ -162,17 +162,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> RequestEmailVerification(
             [FromBody] RequestSystemUserEmailVerificationCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Suspends a system user account.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Suspend system user")]
-        [EndpointDescription("Suspends a non-banned system user account.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> Suspend(
-            [FromBody] SuspendSystemUserCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
@@ -186,6 +175,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             [FromBody] SendSystemUserNotificationCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand<int>(command, cancellationToken);
+
+        /// <summary>Suspends a system user account.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Suspend system user")]
+        [EndpointDescription("Suspends a non-banned system user account.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> Suspend(
+            [FromBody] SuspendSystemUserCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
 
         /// <summary>Marks email verified when the token hash matches.</summary>
         [AllowAnonymous]

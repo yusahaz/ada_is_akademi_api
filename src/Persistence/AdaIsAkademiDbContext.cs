@@ -1,6 +1,7 @@
 ﻿namespace Azoxia.AdaIsAkademi.Persistence
 {
     using Azoxia.Core.Persistence;
+
     using Microsoft.EntityFrameworkCore;
 
     /// <summary>

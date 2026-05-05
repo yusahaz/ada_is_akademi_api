@@ -21,10 +21,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// Normalized tax number text.
         /// </summary>
         public string Value { get; }
+
         #endregion Properties
 
         #region Operators

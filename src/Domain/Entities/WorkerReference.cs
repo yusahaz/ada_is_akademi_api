@@ -11,8 +11,18 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerReference() { }
 
+        /// <summary>
+        /// Creates a reference row with contact details.
+        /// </summary>
+        /// <param name="workerId">Owning worker key.</param>
+        /// <param name="company">Company name.</param>
+        /// <param name="position">Role title.</param>
+        /// <param name="contact">Contact value object.</param>
         protected internal WorkerReference(
             int workerId,
             string company,
@@ -28,6 +38,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// Organization name for this reference.
         /// </summary>
@@ -48,10 +59,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int WorkerId { get; private set; }
 
+
         /// <summary>
         /// Owning worker aggregate.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }

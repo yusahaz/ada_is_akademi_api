@@ -6,6 +6,7 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
     /// <summary>
     /// Placeholder push sender adapter; can be replaced by FCM implementation.
     /// </summary>
+    /// <param name="logger">Logger used when recording fake notification sends.</param>
     internal class FakePushNotificationSender(ILogger<FakePushNotificationSender> logger) : IPushNotificationSender
     {
         #region Methods

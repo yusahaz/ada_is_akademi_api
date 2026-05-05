@@ -18,6 +18,10 @@
 
 ## Öncelik sırası (uygulama sırası)
 
+### P1 öncelik — Employer sosyal linkler (ürün isteği)
+
+- [x] Employer: **kurumsal sosyal / web linkleri** — `EmployerSocialLink` + `SocialMediaPlatform` (worker ile aynı enum); tam liste değişimi `UpdateEmployerSocialLinksCommand`; JWT `employer_id` ile self; `EmployerDetailModel` / `EmployerFullDetailModel` içinde `SocialLinks`; API `Employers/UpdateSocialLinks` (POST); migration `AddEmployerSocialLinks`.
+
 ### P0 — Gizlilik + eşleştirme çerçevesi
 
 - [x] Worker “hassas eşleştirme” alanları için **read model ayrımı**: `WorkerSelfDetailModel` / `WorkerSelfFullDetailModel` (worker JWT) vs `WorkerEmployerSafeDetailModel` / `WorkerEmployerSafeFullDetailModel` (işveren JWT + ortak başvuru). Maaş ve ilgi kategorileri işveren uçlarında yok; `Workers/GetById` ve `GetDetail` artık `employer_id` + başvuru bağı gerektirir; worker self: `GetSelfSummary`, `GetSelfFullDetail`.
@@ -35,11 +39,12 @@
 - [x] Worker: **About / Bio** (`UpdateWorkerBioCommand`, `Worker.Bio`, EF max 3000).
 - [x] Worker: **sosyal medya** — `WorkerSocialLink` + `SocialMediaPlatform`; `UpdateWorkerSocialLinksCommand` (tam liste değişimi).
 - [x] Employer: **logo** — `Employer.LogoObjectKey`, `InitEmployerLogoUploadCommand` / `ConfirmEmployerLogoUploadCommand` / `GetEmployerLogoViewUrlQuery`; `IObjectStoragePresigner` (S3 uyumlu + dev stub).
+- [x] Employer: **sosyal medya linkleri** — `EmployerSocialLink`; `UpdateEmployerSocialLinksCommand`; özet ve tam detay read modellerinde listelenir.
 - [x] Worker: **profil fotoğrafı** — `Worker.ProfilePhotoObjectKey`, init/confirm/view URL komutları (`InitWorkerProfilePhotoUploadCommand` vb.); aynı presigner hattı.
 
 ### P2 — Metrikler
 
-- [ ] Employer tarafından worker profil **görüntülenme sayısı** — entity veya `WorkerProfileStats`, increment komutu/query (yetki: yalnız employer + geçerli bağlam); abuse için basit throttle/dedup stratejisi notu.
+- [x] Employer tarafından worker profil **görüntülenme sayısı** — `EmployerWorkerProfileViewStat` (işveren+işçi tekil, UTC takvim günü başına en fazla bir artış), `RecordEmployerWorkerProfileViewCommand` + `Workers/RecordEmployerWorkerProfileView`; işveren güvenli read modellerinde `EmployerSourcedProfileViewCount`; cache anahtarı işveren kimliği ile kapsüllendi ve görüntüleme sayacı için `EmployerWorkerProfileViewStat` bağımlılık etiketi ile invalidation. Ortak başvuru/sayaç okuma: **`IWorkerEmployerProfileAccess`** + `WorkerEmployerProfileAccess` (scoped DI); `GetWorkerById` / `GetDetail` / `RecordEmployerWorkerProfileView` handler’ları ctor’da yalnız `IServiceProvider`, servis çağrıda `GetRequiredService<IWorkerEmployerProfileAccess>()`.
 
 ### Deferred (sonraki faz)
 

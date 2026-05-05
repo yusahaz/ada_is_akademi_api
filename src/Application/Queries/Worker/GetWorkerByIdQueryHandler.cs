@@ -1,6 +1,7 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
     using Azoxia.AdaIsAkademi.Application.Identity;
+    using Azoxia.AdaIsAkademi.Application.Services;
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application;
     using Azoxia.Core.Application.Caching;
@@ -19,11 +20,17 @@ namespace Azoxia.AdaIsAkademi.Application
         /// <inheritdoc />
         protected override async Task<WorkerEmployerSafeDetailModel> HandleAsync(GetWorkerByIdQuery query, CancellationToken cancellationToken)
         {
+            IWorkerEmployerProfileAccess workerEmployerProfileAccess =
+                ServiceProvider.GetRequiredService<IWorkerEmployerProfileAccess>();
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
             int employerId = executionContext.RequireAdaIsEmployerActorId();
-            await EnsureEmployerSharesJobApplicationWithWorkerAsync(employerId, query.WorkerId, cancellationToken);
+            await workerEmployerProfileAccess.EnsureEmployerSharesJobApplicationWithWorkerAsync(
+                UnitOfWork,
+                employerId,
+                query.WorkerId,
+                cancellationToken);
 
-            CacheKey cacheKey = AdaIsCacheKeys.WorkerEmployerSafeDetailKey(query.WorkerId);
+            CacheKey cacheKey = AdaIsCacheKeys.WorkerEmployerSafeDetailKey(employerId, query.WorkerId);
             WorkerEmployerSafeDetailModel? cached =
                 await CacheService.GetAsync<WorkerEmployerSafeDetailModel>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -40,6 +47,13 @@ namespace Azoxia.AdaIsAkademi.Application
 
             entity = entity.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
+            int employerViews =
+                await workerEmployerProfileAccess.GetEmployerSourcedProfileViewCountAsync(
+                    UnitOfWork,
+                    employerId,
+                    entity.Id,
+                    cancellationToken);
+
             IReadOnlyList<string> tags = entity.Skills
                 .Select(x => x.Tag.Value)
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
@@ -51,29 +65,18 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.Nationality,
                 entity.University,
                 entity.EmbeddingUpdatedAt,
-                tags);
+                tags,
+                employerViews);
 
             await CacheService.SetAsync(
                 cacheKey,
                 model,
-                AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.WorkerDependency(entity.Id)),
+                AdaIsCacheKeys.DetailReadModelOptions(
+                    AdaIsCacheKeys.WorkerDependency(entity.Id),
+                    AdaIsCacheKeys.EmployerWorkerProfileViewStatDependency(employerId, entity.Id)),
                 cancellationToken);
 
             return model;
-        }
-
-        private async Task EnsureEmployerSharesJobApplicationWithWorkerAsync(
-            int employerId,
-            int workerId,
-            CancellationToken cancellationToken)
-        {
-            bool shared = await UnitOfWork
-                .GetRepository<JobApplication>()
-                .Filter(ja => ja.WorkerId == workerId && ja.JobPosting.EmployerId == employerId)
-                .AsNoTracking()
-                .AnyAsync(cancellationToken);
-
-            shared.ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
         }
 
         #endregion Utils

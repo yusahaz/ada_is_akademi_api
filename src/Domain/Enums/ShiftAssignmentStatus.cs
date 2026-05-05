@@ -6,11 +6,6 @@ namespace Azoxia.AdaIsAkademi.Domain
     public enum ShiftAssignmentStatus
     {
         /// <summary>
-        /// Assignment is active and waiting for worker check-in.
-        /// </summary>
-        Pending = 10,
-
-        /// <summary>
         /// One side of mutual QR has scanned; waiting for counterpart scan.
         /// </summary>
         AwaitingMutualQr = 15,
@@ -24,5 +19,10 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Worker has checked out and assignment is closed.
         /// </summary>
         CheckedOut = 30,
+
+        /// <summary>
+        /// Assignment is active and waiting for worker check-in.
+        /// </summary>
+        Pending = 10,
     }
 }

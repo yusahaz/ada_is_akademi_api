@@ -20,6 +20,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         public void Register(IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IWorkerProfileCompletionEvaluator, WorkerProfileCompletionEvaluator>();
+            services.AddScoped<IWorkerEmployerProfileAccess, WorkerEmployerProfileAccess>();
             services.AddScoped<IEmbeddingVectorizer, HashEmbeddingVectorizer>();
             RegisterCommandHandlers(services);
             RegisterQueryHandlers(services);
@@ -82,6 +83,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<RegisterWorkerCommand, int>, RegisterWorkerCommandHandler>();
             services.AddScoped<IRequestHandler<RefreshSystemUserTokenCommand, SystemUserTokenModel>, RefreshSystemUserTokenCommandHandler>();
             services.AddScoped<IRequestHandler<RejectJobPostingApplicationCommand, Unit>, RejectJobPostingApplicationCommandHandler>();
+            services.AddScoped<IRequestHandler<RecordEmployerWorkerProfileViewCommand, RecordEmployerWorkerProfileViewResultModel>, RecordEmployerWorkerProfileViewCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveEmployerSupervisorCommand, Unit>, RemoveEmployerSupervisorCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveWorkerAvailabilityCommand, Unit>, RemoveWorkerAvailabilityCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveWorkerCertificateCommand, Unit>, RemoveWorkerCertificateCommandHandler>();
@@ -99,6 +101,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<SubmitJobPostingApplicationCommand, int>, SubmitJobPostingApplicationCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateWorkerMatchingPreferencesCommand, Unit>, UpdateWorkerMatchingPreferencesCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateWorkerBioCommand, Unit>, UpdateWorkerBioCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateEmployerSocialLinksCommand, Unit>, UpdateEmployerSocialLinksCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateWorkerSocialLinksCommand, Unit>, UpdateWorkerSocialLinksCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateWorkerProfileCommand, Unit>, UpdateWorkerProfileCommandHandler>();
             services.AddScoped<IRequestHandler<SendWorkerNotificationCommand, int>, SendWorkerNotificationCommandHandler>();
@@ -240,6 +243,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<RegisterWorkerCommand>, RegisterWorkerCommandValidator>();
             services.AddScoped<IRequestValidator<RefreshSystemUserTokenCommand>, RefreshSystemUserTokenCommandValidator>();
             services.AddScoped<IRequestValidator<RejectJobPostingApplicationCommand>, RejectJobPostingApplicationCommandValidator>();
+            services.AddScoped<IRequestValidator<RecordEmployerWorkerProfileViewCommand>, RecordEmployerWorkerProfileViewCommandValidator>();
             services.AddScoped<IRequestValidator<RemoveEmployerSupervisorCommand>, RemoveEmployerSupervisorCommandValidator>();
             services.AddScoped<IRequestValidator<RemoveWorkerAvailabilityCommand>, RemoveWorkerAvailabilityCommandValidator>();
             services.AddScoped<IRequestValidator<RemoveWorkerCertificateCommand>, RemoveWorkerCertificateCommandValidator>();
@@ -255,6 +259,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<SubmitJobPostingApplicationCommand>, SubmitJobPostingApplicationCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateWorkerMatchingPreferencesCommand>, UpdateWorkerMatchingPreferencesCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateWorkerBioCommand>, UpdateWorkerBioCommandValidator>();
+            services.AddScoped<IRequestValidator<UpdateEmployerSocialLinksCommand>, UpdateEmployerSocialLinksCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateWorkerSocialLinksCommand>, UpdateWorkerSocialLinksCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateWorkerProfileCommand>, UpdateWorkerProfileCommandValidator>();
             services.AddScoped<IRequestValidator<SendWorkerNotificationCommand>, SendWorkerNotificationCommandValidator>();

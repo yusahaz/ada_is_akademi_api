@@ -1,16 +1,43 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
     /// <summary>
-    /// Normalized worker social profile buckets for outbound links (display + validation).
+    /// Normalized social profile buckets for worker and employer outbound links (display + validation).
     /// </summary>
     public enum SocialMediaPlatform
     {
-        Website = 0,
-        LinkedIn = 10,
-        GitHub = 20,
-        X = 30,
-        Instagram = 40,
+        /// <summary>
+        /// Facebook profile or page.
+        /// </summary>
         Facebook = 50,
+
+        /// <summary>
+        /// GitHub profile.
+        /// </summary>
+        GitHub = 20,
+
+        /// <summary>
+        /// Instagram profile.
+        /// </summary>
+        Instagram = 40,
+
+        /// <summary>
+        /// LinkedIn profile.
+        /// </summary>
+        LinkedIn = 10,
+
+        /// <summary>
+        /// Platform not covered by a specific bucket.
+        /// </summary>
         Other = 99,
+
+        /// <summary>
+        /// General website URL.
+        /// </summary>
+        Website = 0,
+
+        /// <summary>
+        /// X (formerly Twitter) profile.
+        /// </summary>
+        X = 30,
     }
 }

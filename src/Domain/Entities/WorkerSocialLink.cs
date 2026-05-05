@@ -36,19 +36,20 @@ namespace Azoxia.AdaIsAkademi.Domain
         #region Properties
 
         /// <summary>
-        /// Normalized outbound link.
-        /// </summary>
-        public string Url { get; private set; }
-
-        /// <summary>
         /// Bucket used for UX grouping and uniqueness per worker/platform.
         /// </summary>
         public SocialMediaPlatform Platform { get; private set; }
 
         /// <summary>
+        /// Normalized outbound link.
+        /// </summary>
+        public string Url { get; private set; }
+
+        /// <summary>
         /// Foreign key to <see cref="Worker"/>.
         /// </summary>
         public int WorkerId { get; private set; }
+
 
         /// <summary>
         /// Owning worker aggregate root.

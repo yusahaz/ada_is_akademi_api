@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -9,6 +9,15 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
     /// <inheritdoc />
     public partial class AddSystemUserNotificationDispatch : Migration
     {
+        #region Utils
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "SystemUserNotificationDispatch");
+        }
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -72,11 +81,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                 columns: new[] { "WorkerId", "Status", "CreatedAt" });
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "SystemUserNotificationDispatch");
-        }
+        #endregion Utils
     }
 }

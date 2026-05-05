@@ -1,14 +1,22 @@
 namespace Azoxia.AdaIsAkademi.Infrastructure
 {
-    using Azoxia.AdaIsAkademi.Application.Services;
     using System;
 
+    using Azoxia.AdaIsAkademi.Application.Services;
+
     /// <summary>
-    /// Yerel ortam ya da yapılandırılmamış MinIO için deterministik stub URL üretimi (geri dönüş: üretim dışı).
+    /// Deterministic stub URLs for local dev or incomplete MinIO configuration (non-production fallback).
     /// </summary>
     internal sealed class DevelopmentObjectStoragePresigner :
         IObjectStoragePresigner
     {
+        #region Utils
+
+        private static string BuildStub(string tail, TimeSpan timeToLive) =>
+            $"https://localhost/object-storage/dev/{tail}&ttl={(int)timeToLive.TotalSeconds}";
+
+        #endregion Utils
+
         #region Methods
 
         /// <inheritdoc />
@@ -28,9 +36,6 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
                 new PresignedBlobUploadResult(
                     Url: BuildStub($"put/{Uri.EscapeDataString(objectKey)}&ct={Uri.EscapeDataString(contentType)}", timeToLive),
                     ExpiresAtUtc: DateTimeOffset.UtcNow.Add(timeToLive)));
-
-        private static string BuildStub(string tail, TimeSpan timeToLive) =>
-            $"https://localhost/object-storage/dev/{tail}&ttl={(int)timeToLive.TotalSeconds}";
 
         #endregion Methods
     }

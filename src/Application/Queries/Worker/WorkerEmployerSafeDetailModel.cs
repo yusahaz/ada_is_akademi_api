@@ -13,6 +13,7 @@ namespace Azoxia.AdaIsAkademi.Application
         string? Nationality,
         string? University,
         DateTimeOffset? EmbeddingUpdatedAt,
-        IReadOnlyList<string> SkillTags) :
+        IReadOnlyList<string> SkillTags,
+        int EmployerSourcedProfileViewCount) :
         ModelBase;
 }

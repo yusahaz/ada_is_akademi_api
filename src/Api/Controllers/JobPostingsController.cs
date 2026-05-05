@@ -9,7 +9,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
     using Microsoft.AspNetCore.Mvc.ModelBinding;
 
     /// <summary>
-    /// Job posting commands and queries; public catalog uçları (<see cref="GetById"/>, <see cref="ListOpen"/>) kimliksiz; yönetim uçları JWT + <c>employer_id</c> iddiası.
+    /// Job-posting commands and queries; anonymous public catalog endpoints (<see cref="GetById"/>, <see cref="ListOpen"/>); management endpoints require JWT with <c>employer_id</c>.
     /// </summary>
     [Tags("Job postings")]
     [Produces("application/json")]

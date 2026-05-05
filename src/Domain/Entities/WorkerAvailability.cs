@@ -10,8 +10,18 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerAvailability() { }
 
+        /// <summary>
+        /// Creates an availability window for a worker.
+        /// </summary>
+        /// <param name="workerId">Owning worker key.</param>
+        /// <param name="dayOfWeek">Weekday.</param>
+        /// <param name="timeFrom">Start time.</param>
+        /// <param name="timeTo">End time.</param>
         protected internal WorkerAvailability(
             int workerId,
             DayOfWeek dayOfWeek,
@@ -27,6 +37,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// Calendar weekday for this availability window.
         /// </summary>
@@ -47,10 +58,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int WorkerId { get; private set; }
 
+
         /// <summary>
         /// Owning worker aggregate.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }

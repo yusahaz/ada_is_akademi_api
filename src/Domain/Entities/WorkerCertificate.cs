@@ -10,8 +10,14 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerCertificate() { }
 
+        /// <summary>
+        /// Creates a certificate row with optional document URL.
+        /// </summary>
         protected internal WorkerCertificate(
             int workerId,
             string name,
@@ -32,6 +38,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// UTC timestamp when this certificate row was created.
         /// </summary>
@@ -67,10 +74,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int WorkerId { get; private set; }
 
+
         /// <summary>
         /// Owning worker aggregate.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }

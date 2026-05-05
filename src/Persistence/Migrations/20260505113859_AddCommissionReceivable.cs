@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -9,6 +9,15 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
     /// <inheritdoc />
     public partial class AddCommissionReceivable : Migration
     {
+        #region Utils
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "CommissionReceivable");
+        }
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -43,11 +52,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                 unique: true);
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "CommissionReceivable");
-        }
+        #endregion Utils
     }
 }

@@ -12,8 +12,8 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 ## Current Status
 - Last Updated: 2026-05-06 (UTC+3)
 - Current Phase: Faz 2 Sprint 6
-- Current Task: P1 profil medya (bio, sosyal link, logo, profil foto + `IObjectStoragePresigner`) tamamlandı; profil tamamlanma ağırlıkları güncellendi
-- Next Task: **P2** — `docs/tasks/worker-employer-profile-enrichment.md` içinde işveren kaynaklı worker profil görüntülenme sayısı
+- Current Task: **P2 profil görüntüleme metriği** tamamlandı (`EmployerWorkerProfileViewStat`, `RecordEmployerWorkerProfileViewCommand`, employer-safe read model + cache).
+- Next Task: Backlog / bir sonraki sprint seçimi (`docs/tasks/worker-employer-profile-enrichment.md` deferred veya yeni epic).
 - Blockers: Yok
 
 ## Phase Checklist
@@ -65,6 +65,9 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-06 01:07 - Sprint 6 raporlama: `ExportSystemUserNotificationDispatchesCsvQuery` + `StatisticsController` export endpointi + cache + test eklendi.
 - [x] 2026-05-06 - Profil P0: işçi maaş beklentisi + ilgi `JobCategory` listesi (domain + migration), `WorkerEmployerSafe*` vs `WorkerSelf*` read modelleri, işveren görünümü yalnız ortak başvuru ile, `UpdateWorkerMatchingPreferencesCommand`, semantic eşleştirmede kategori filtresi, ApplicationTests + görev dosyası güncellendi.
 - [x] 2026-05-06 - Profil P1: worker `Bio` + `WorkerSocialLink`, `ProfilePhotoObjectKey`; employer `LogoObjectKey`; EF migration `AddWorkerProfileBioSocialAndMediaKeys`; `IObjectStoragePresigner` + MinIO/S3 uyumlu `AwsS3CompatibleObjectStoragePresigner` ve dev stub; API uçları (`UpdateBio`, sosyal liste, foto init/confirm/view, logo init/confirm/view); profil tamamlanma ağırlıkları 100’e rebalance; Application + Domain testleri yeşil.
+- [x] 2026-05-06 - Employer sosyal linkler: `EmployerSocialLink` + `EmployerSocialLinkInput`, `ReplaceSocialLinks`, migration `AddEmployerSocialLinks`, `UpdateEmployerSocialLinksCommand` + validator/handler/DI, `EmployerDetailModel` / `EmployerFullDetailModel` `SocialLinks`, `Employers/UpdateSocialLinks`, ApplicationTests; PRD v6.2 ve iş planı güncellendi.
+- [x] 2026-05-06 - Profil P2 metrik: `EmployerWorkerProfileViewStat` + migration, `IWorkerEmployerProfileAccess` / `WorkerEmployerProfileAccess` (scoped DI), employer-safe cache anahtarları (`employerId`+`workerId`) ve `EmployerWorkerProfileViewStatDependency`, `EmployerSourcedProfileViewCount` read model alanı, `RecordEmployerWorkerProfileViewCommand` + `Workers/RecordEmployerWorkerProfileView`, ApplicationTests + görev dosyası güncellendi.
+- [x] 2026-05-06 - Profil P2 teknik: işveren-worker erişim servisi static değil; ilgili handler’lar ctor’da yalnız `IServiceProvider`, `IWorkerEmployerProfileAccess` `ServiceProvider.GetRequiredService` ile çözülüyor (`GetWorkerById` / `GetDetail` / `RecordEmployerWorkerProfileView`).
 
 ## Profil / medya / eşleştirme (iş planı özeti)
 
@@ -72,12 +75,12 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 
 - **P0:** İşverene kapalı alanlar (maaş aralığı, ilgi pozisyonları) + read model ayrımı; ardından alanların domain/API ekleri.
 - **P0–P1:** Profil tamamlanma oranı (deterministik formül).
-- **P1:** Worker hakkında (bio), sosyal link VO listesi, employer şirket logosu, worker profil foto (MinIO — aşağıdaki madde ile birleşik hat).
+- **P1:** Worker hakkında (bio), sosyal link VO listesi, employer şirket logosu, employer kurumsal sosyal link listesi, worker profil foto (MinIO — aşağıdaki madde ile birleşik hat).
 - **P2:** İşveren kaynaklı profil görüntülenme sayısı.
 - **Sonraki faz:** AI profil analizi (deferred — üstteki task dosyasında).
 
 ## Deferred Backlog
-- [x] **(Öncelik — ürün)** Worker profil fotoğrafı + employer logo: API’de presigned PUT init + confirm + presigned GET görüntüleme; kalıcı object key alanları (`Worker.ProfilePhotoObjectKey`, `Employer.LogoObjectKey`); `IObjectStoragePresigner` ile MinIO/S3 uçları (`ObjectStorage` yapılandırması). *İstemci Flutter/web bu repoda yok; URL sözleşmesi `Workers` / `Employers` controller açıklamalarında.*
+- [x] **(Öncelik — ürün)** Worker profil fotoğrafı + employer logo: API’de presigned PUT init + confirm + presigned GET görüntüleme; kalıcı object key alanları (`Worker.ProfilePhotoObjectKey`, `Employer.LogoObjectKey`); `IObjectStoragePresigner` ile MinIO/S3 uçları (`ObjectStorageConfig` — Azoxia Core `IConfig` bölümü). *İstemci Flutter/web bu repoda yok; URL sözleşmesi `Workers` / `Employers` controller açıklamalarında.*
 - [ ] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): `CvUploadSession`, MinIO’ya dosya, Hangfire ile extraction, worker onay ekranı — şu an domain/API’de yok; worker profili yapılandırılmış CRUD ile dolduruluyor.
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)
 - [ ] Query splitting/performance warning cleanup (Sprint 1/2 sonrası teknik borç)

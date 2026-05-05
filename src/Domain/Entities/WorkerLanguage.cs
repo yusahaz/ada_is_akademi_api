@@ -10,8 +10,17 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerLanguage() { }
 
+        /// <summary>
+        /// Creates a language proficiency row.
+        /// </summary>
+        /// <param name="workerId">Owning worker key.</param>
+        /// <param name="language">Language name.</param>
+        /// <param name="level">Proficiency level.</param>
         protected internal WorkerLanguage(
             int workerId,
             string language,
@@ -25,6 +34,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
         /// <summary>
         /// ISO-style or display name of the language.
         /// </summary>
@@ -40,10 +50,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int WorkerId { get; private set; }
 
+
         /// <summary>
         /// Owning worker aggregate.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }

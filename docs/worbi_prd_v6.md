@@ -1,6 +1,6 @@
 # Worbi — Platform Gereksinimleri Dokümanı (PRD)
 
-**Versiyon:** v6.1  
+**Versiyon:** v6.2  
 **Hazırlayan:** Azoxia  
 **Tarih:** Haziran 2025  
 **Durum:** Aktif Geliştirme  
@@ -22,6 +22,7 @@
 | v5.1 | Tasarım sistemi eklendi |
 | v6.0 | Email doğrulama ile aktivasyon · Multi-device session · Race condition analizleri ve çözümleri · pgvector semantic matching · Agentic personalized notification · CV destekli profil oluşturma |
 | v6.1 | Worker: hakkında metni, sosyal medya linkleri (platform+URL), profil fotoğrafı, ilgilendiği pozisyonlar, beklenen maaş aralığı (**işveren API’lerinde dönülmez**), profil tamamlanma oranı, işveren kaynaklı profil görüntülenme sayısı · Employer: şirket logosu (MinIO) · PRD↔iş planı (`docs/tasks/*`) hizalama · Uygulama durumu notları (CV pipeline / `CvUploadSession`) |
+| v6.2 | Employer: kurumsal sosyal / web linkleri (platform + HTTPS URL; worker ile aynı platform kümesi); JWT ile self güncelleme ve işveren özet/tam detay read modellerinde listelenmesi · API: `Employers/UpdateSocialLinks` |
 
 ---
 
@@ -275,16 +276,18 @@ Worker profili aşağıdaki bölümlerden oluşur:
 | Gereksinim | Kod durumu (özet) |
 |------------|-------------------|
 | Yapılandırılmış profil bölümleri (eğitim, deneyim, skill, …) | Uygulanmış |
-| Bio, sosyal linkler, foto, maaş aralığı, ilgi pozisyonları, tamamlanma %, görüntülenme sayısı | İş planına alındı; entity/API ekleri bekiyor (`worker-employer-profile-enrichment.md`) |
+| Worker: bio, sosyal linkler, foto, maaş aralığı, ilgi pozisyonları, tamamlanma % | Kodda uygulandı (`worker-employer-profile-enrichment.md`) · **Görüntülenme sayısı** (P2) beklemede |
+| Employer: logo + kurumsal sosyal linkler | Kodda uygulandı (`Employers/*`, `EmployerSocialLink`) |
 | `CvUploadSession` + CV pipeline (§5.4) | Hedefleniyor; **henüz** domain'de yok — PRD hedefi ile kod arasında bilinçli fark |
 
-### 5.3 İşveren — Kurumsal profil ve şirket logosu
+### 5.3 İşveren — Kurumsal profil, şirket logosu ve sosyal linkler
 
 - **Şirket logosu:** `Employer` aggregate üzerinde kalıcı **MinIO object key** (veya eşdeğeri); yükleme presigned PUT, görüntüleme presigned GET veya CDN politikası.
+- **Kurumsal sosyal / web linkleri:** Platform + HTTPS URL listesi (`SocialMediaPlatform` ile worker outbound linkleri ile aynı küme); işveren JWT (`employer_id`) ile tam liste değiştirme; işveren özet ve tam detay read modellerinde döner (aday ve işveren yüzleri için veri sözleşmesi).
 - Logo, işveren dashboard ve aday tarafında görünen işveren kartlarında kullanılır (UI ayrı teslim).
 - Worker profil fotoğrafı ile **aynı dosya depolama soyutlaması** (`IFileStorageService` / MinIO) kullanılır.
 
-**Uygulama durumu:** Logo alanı ve API uçları iş planında; kodda henüz yok — bkz. `worker-employer-profile-enrichment.md`.
+**Uygulama durumu (v6.2):** Logo ve sosyal link entity/komut/API akışları kod tabanında (`IObjectStoragePresigner`, `EmployerSocialLink`, `UpdateEmployerSocialLinksCommand`) — bkz. `worker-employer-profile-enrichment.md`.
 
 ### 5.4 CV Destekli Profil Oluşturma
 
@@ -1006,7 +1009,7 @@ Modules/
 │                        UserSession (multi-device), PermissionResolver
 ├── WorkerProfile/     ← Profil, skill+embedding, eğitim, deneyim, sertifika, referans, dil,
 │                        müsaitlik, rating, bio/sosyal/maaş(p)/ilgi pozisyonları, CvUploadSession, CvImportPreview
-├── EmployerProfile/   ← İşveren, lokasyon/geofence, supervisor, şirket logosu (MinIO key)
+├── EmployerProfile/   ← İşveren, lokasyon/geofence, supervisor, şirket logosu (MinIO key), kurumsal sosyal linkler
 ├── JobPosting/        ← İlan+embedding, başvuru, şablon, JobCategory
 ├── Matching/          ← pgvector cosine search, müsaitlik filtresi, agentic bildirim
 ├── Assignment/        ← Görevlendirme, Mutual QR (clock drift + grace period), anomali
@@ -1047,7 +1050,7 @@ Modules/
 | `UserSession` | Identity | `EntityBase` | Multi-device, FCM token per device |
 | `Worker` | WorkerProfile | `StatableEntityBase` | skill_embedding vector(1536); v6.1: bio, sosyal linkler VO, maaş/ilgi (işverene kapalı alanlar), görüntülenme sayısı vb. — iş planına göre genişler |
 | `CvUploadSession` | WorkerProfile | `AuditableEntityBase` | Pipeline state machine (**hedef** — kodda henüz yok) |
-| `Employer` | EmployerProfile | `StatableEntityBase` | v6.1: şirket logosu object key (MinIO) — iş planında |
+| `Employer` | EmployerProfile | `StatableEntityBase` | v6.1–v6.2: şirket logosu object key (MinIO); kurumsal sosyal link owned collection (`EmployerSocialLink`) |
 | `JobCategory` | JobPosting | `CodedNamedEntityBase` | Runtime yönetilen |
 | `JobPosting` | JobPosting | `AuditableEntityBase` | description_embedding vector(1536) |
 | `JobPostingTemplate` | JobPosting | `AuditableEntityBase` | |
@@ -1073,6 +1076,7 @@ Modules/
 | `WorkerLanguage` | Worker | ISO 639-1, LanguageLevel |
 | `WorkerAvailability` | Worker | TimeSlot value object |
 | `WorkerRating` | Worker | 1–5, assignment başına 1 |
+| `EmployerSocialLink` | Employer | Platform + URL; employer başına platform tekil (unique index) |
 | `EmployerLocation` | Employer | GeoCoordinate, GeofenceRadiusMetres |
 | `ShiftSupervisor` | Employer | AssignedLocationIds JSON array |
 | `JobApplication` | JobPosting | Unique constraint (posting, worker, Pending) |
@@ -1092,7 +1096,7 @@ Modules/
 | `WorkPermit` | Worker (opsiyonel) | Owned, encrypted DocumentNumber |
 | `CommissionCalculationResult` | CommissionAuditLog | Immutable snapshot |
 | `CvImportPreview` | CvUploadSession | JSONB, PreviewField<T> confidence wrapper |
-| `WorkerSocialLink` (veya eşdeğer liste VO) | Worker | v6.1: platform + URL; persistence JSON/owned |
+| `WorkerSocialLink` / `EmployerSocialLink` (owned rows) | Worker / Employer | v6.1+: platform + URL; EF owned tablolar |
 | `ExpectedSalaryExpectation` (adlandırma ürün) | Worker | Opsiyonel min/max + para birimi; işveren read modelinden hariç |
 | `ProfileCompletionSnapshot` | Read-side / hesaplanan | Oran 0–100; kaynak alan seti dokümante |
 

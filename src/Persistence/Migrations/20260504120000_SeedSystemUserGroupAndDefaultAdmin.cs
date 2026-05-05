@@ -10,6 +10,39 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
     [Migration("20260504120000_SeedSystemUserGroupAndDefaultAdmin")]
     public partial class SeedSystemUserGroupAndDefaultAdmin : Migration
     {
+        #region Utils
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.Sql(
+                """
+                DELETE FROM "SystemUserGroupMembership"
+                WHERE "SystemUserId" IN (
+                          SELECT "Id"
+                          FROM "SystemUser"
+                          WHERE "Email" = 'admin@adaisakademi.local'
+                      )
+                  AND "SystemUserGroupId" IN (
+                          SELECT "Id"
+                          FROM "SystemUserGroup"
+                          WHERE "Name" = 'Default Admin'
+                      );
+                """);
+
+            migrationBuilder.Sql(
+                """
+                DELETE FROM "SystemUser"
+                WHERE "Email" = 'admin@adaisakademi.local';
+                """);
+
+            migrationBuilder.Sql(
+                """
+                DELETE FROM "SystemUserGroup"
+                WHERE "Name" = 'Default Admin';
+                """);
+        }
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -96,35 +129,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                 """);
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql(
-                """
-                DELETE FROM "SystemUserGroupMembership"
-                WHERE "SystemUserId" IN (
-                          SELECT "Id"
-                          FROM "SystemUser"
-                          WHERE "Email" = 'admin@adaisakademi.local'
-                      )
-                  AND "SystemUserGroupId" IN (
-                          SELECT "Id"
-                          FROM "SystemUserGroup"
-                          WHERE "Name" = 'Default Admin'
-                      );
-                """);
-
-            migrationBuilder.Sql(
-                """
-                DELETE FROM "SystemUser"
-                WHERE "Email" = 'admin@adaisakademi.local';
-                """);
-
-            migrationBuilder.Sql(
-                """
-                DELETE FROM "SystemUserGroup"
-                WHERE "Name" = 'Default Admin';
-                """);
-        }
+        #endregion Utils
     }
 }

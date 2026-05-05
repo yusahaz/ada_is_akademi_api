@@ -30,17 +30,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
-        /// <summary>Bans an employer.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Ban employer")]
-        [EndpointDescription("Transitions employer account into banned state.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> Ban(
-            [FromBody] BanEmployerCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
         /// <summary>Adds employer location for authenticated employer.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -61,15 +50,47 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand<int>(command, cancellationToken);
 
-        /// <summary>Removes employer supervisor for authenticated employer.</summary>
+        /// <summary>Bans an employer.</summary>
         [HttpPost]
         [Consumes("application/json")]
-        [EndpointSummary("Remove employer supervisor")]
+        [EndpointSummary("Ban employer")]
+        [EndpointDescription("Transitions employer account into banned state.")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> RemoveSupervisor(
-            [FromBody] RemoveEmployerSupervisorCommand command,
+        public Task<IActionResult> Ban(
+            [FromBody] BanEmployerCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Clears employer logo metadata.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Clear employer logo")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ClearLogo(
+            [FromBody] ClearEmployerLogoCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Persists employer logo object key after upload.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Confirm employer logo")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ConfirmLogoUpload(
+            [FromBody] ConfirmEmployerLogoUploadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Creates worker payout from checked-out assignment.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Create worker payout")]
+        [EndpointDescription("Creates or returns existing worker payout row for a checked-out assignment.")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> CreateWorkerPayout(
+            [FromBody] CreateWorkerPayoutCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
 
         /// <summary>Soft deletes an employer and linked employer users.</summary>
         [HttpPost]
@@ -82,6 +103,40 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Exports employer commission policies in CSV format package.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Export employer commission policies CSV")]
+        [EndpointDescription("Returns CSV package payload for employer commission policy records.")]
+        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionPolicyExportPackageModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ExportCommissionPoliciesCsv(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            ExportEmployerCommissionPoliciesCsvQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new ExportEmployerCommissionPoliciesCsvQuery(), cancellationToken);
+
+        /// <summary>Marks worker payout as failed.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Fail worker payout")]
+        [EndpointDescription("Marks payout as failed and increments retry counter.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> FailWorkerPayout(
+            [FromBody] FailWorkerPayoutCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Generates idempotent commission receivable for employer period.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Generate commission receivable")]
+        [EndpointDescription("Creates or returns existing commission receivable id for the same employer and period.")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GenerateCommissionReceivable(
+            [FromBody] GenerateCommissionReceivableCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
         /// <summary>Gets an employer detail model by id.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -90,6 +145,39 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse<EmployerDetailModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> GetById(
             [FromBody] GetEmployerByIdQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Gets employer-specific commission estimate metrics.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get employer commission estimate")]
+        [EndpointDescription("Returns accepted volume and estimated commission amounts for the given employer.")]
+        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionEstimateModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetCommissionEstimate(
+            [FromBody] GetEmployerCommissionEstimateQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Gets employer commission policy by employer id.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get employer commission policy")]
+        [EndpointDescription("Returns commission policy detail read model by employer id.")]
+        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionPolicyModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetCommissionPolicy(
+            [FromBody] GetEmployerCommissionPolicyQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Gets commission receivable detail by employer and period.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get commission receivable by period")]
+        [EndpointDescription("Returns commission receivable detail row for employer and billing period.")]
+        [ProducesResponseType(typeof(ApiResponse<CommissionReceivableDetailModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetCommissionReceivableByPeriod(
+            [FromBody] GetCommissionReceivableByPeriodQuery query,
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
@@ -104,6 +192,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Returns short-lived logo GET URL.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get employer logo URL")]
+        [ProducesResponseType(typeof(ApiResponse<MediaBlobViewUrlModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetLogoViewUrl(
+            [FromBody] GetEmployerLogoViewUrlQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Begins employer logo upload.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -114,36 +212,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             [FromBody] InitEmployerLogoUploadCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand<ObjectStorageUploadInitModel>(command, cancellationToken);
-
-        /// <summary>Persists employer logo object key after upload.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Confirm employer logo")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> ConfirmLogoUpload(
-            [FromBody] ConfirmEmployerLogoUploadCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Clears employer logo metadata.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Clear employer logo")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> ClearLogo(
-            [FromBody] ClearEmployerLogoCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Returns short-lived logo GET URL.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Get employer logo URL")]
-        [ProducesResponseType(typeof(ApiResponse<MediaBlobViewUrlModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> GetLogoViewUrl(
-            [FromBody] GetEmployerLogoViewUrlQuery query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
 
         /// <summary>Lists employers with filtering and paging support.</summary>
         [HttpPost]
@@ -162,117 +230,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
                 result => result.Offset,
                 cancellationToken);
 
-        /// <summary>Gets employer commission policy by employer id.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Get employer commission policy")]
-        [EndpointDescription("Returns commission policy detail read model by employer id.")]
-        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionPolicyModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> GetCommissionPolicy(
-            [FromBody] GetEmployerCommissionPolicyQuery query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
-
-        /// <summary>Gets employer-specific commission estimate metrics.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Get employer commission estimate")]
-        [EndpointDescription("Returns accepted volume and estimated commission amounts for the given employer.")]
-        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionEstimateModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> GetCommissionEstimate(
-            [FromBody] GetEmployerCommissionEstimateQuery query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
-
-        /// <summary>Lists employer commission summaries for monetization management.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("List employer commission summaries")]
-        [EndpointDescription("Returns active employers ordered by monetization estimate metrics.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EmployerCommissionListItemModel>>), StatusCodes.Status200OK)]
-        public Task<IActionResult> ListCommissionSummaries(
-            [FromBody] ListEmployerCommissionSummariesQuery query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
-
-        /// <summary>Exports employer commission policies in CSV format package.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Export employer commission policies CSV")]
-        [EndpointDescription("Returns CSV package payload for employer commission policy records.")]
-        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionPolicyExportPackageModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> ExportCommissionPoliciesCsv(
-            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
-            ExportEmployerCommissionPoliciesCsvQuery? query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query ?? new ExportEmployerCommissionPoliciesCsvQuery(), cancellationToken);
-
-        /// <summary>Generates idempotent commission receivable for employer period.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Generate commission receivable")]
-        [EndpointDescription("Creates or returns existing commission receivable id for the same employer and period.")]
-        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
-        public Task<IActionResult> GenerateCommissionReceivable(
-            [FromBody] GenerateCommissionReceivableCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand<int>(command, cancellationToken);
-
-        /// <summary>Creates worker payout from checked-out assignment.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Create worker payout")]
-        [EndpointDescription("Creates or returns existing worker payout row for a checked-out assignment.")]
-        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
-        public Task<IActionResult> CreateWorkerPayout(
-            [FromBody] CreateWorkerPayoutCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand<int>(command, cancellationToken);
-
-        /// <summary>Marks worker payout as processing.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Mark worker payout as processing")]
-        [EndpointDescription("Employer marks payout as paid and waits for worker confirmation.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> MarkWorkerPayoutAsProcessing(
-            [FromBody] MarkWorkerPayoutAsProcessingCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Marks worker payout as failed.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Fail worker payout")]
-        [EndpointDescription("Marks payout as failed and increments retry counter.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> FailWorkerPayout(
-            [FromBody] FailWorkerPayoutCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Retries a failed worker payout.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Retry worker payout")]
-        [EndpointDescription("Moves failed payout back to pending when retry threshold allows.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> RetryWorkerPayout(
-            [FromBody] RetryWorkerPayoutCommand command,
-            CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
-
-        /// <summary>Gets commission receivable detail by employer and period.</summary>
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Get commission receivable by period")]
-        [EndpointDescription("Returns commission receivable detail row for employer and billing period.")]
-        [ProducesResponseType(typeof(ApiResponse<CommissionReceivableDetailModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> GetCommissionReceivableByPeriod(
-            [FromBody] GetCommissionReceivableByPeriodQuery query,
-            CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
-
         /// <summary>Lists commission receivable rows for an employer.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -290,14 +247,46 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
                 result => result.Offset,
                 cancellationToken);
 
-        /// <summary>Suspends an employer.</summary>
+        /// <summary>Lists employer commission summaries for monetization management.</summary>
         [HttpPost]
         [Consumes("application/json")]
-        [EndpointSummary("Suspend employer")]
-        [EndpointDescription("Suspends an employer account when policy allows.")]
+        [EndpointSummary("List employer commission summaries")]
+        [EndpointDescription("Returns active employers ordered by monetization estimate metrics.")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EmployerCommissionListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListCommissionSummaries(
+            [FromBody] ListEmployerCommissionSummariesQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Marks worker payout as processing.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Mark worker payout as processing")]
+        [EndpointDescription("Employer marks payout as paid and waits for worker confirmation.")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> Suspend(
-            [FromBody] SuspendEmployerCommand command,
+        public Task<IActionResult> MarkWorkerPayoutAsProcessing(
+            [FromBody] MarkWorkerPayoutAsProcessingCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Removes employer supervisor for authenticated employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove employer supervisor")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveSupervisor(
+            [FromBody] RemoveEmployerSupervisorCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Retries a failed worker payout.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Retry worker payout")]
+        [EndpointDescription("Moves failed payout back to pending when retry threshold allows.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RetryWorkerPayout(
+            [FromBody] RetryWorkerPayoutCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
@@ -309,6 +298,28 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> SetCommissionPolicy(
             [FromBody] SetEmployerCommissionRateCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Suspends an employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Suspend employer")]
+        [EndpointDescription("Suspends an employer account when policy allows.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> Suspend(
+            [FromBody] SuspendEmployerCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Replaces company outbound social profile links for the authenticated employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update employer social links")]
+        [EndpointDescription("Replaces the HTTPS company profile link list; empty list clears all.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateSocialLinks(
+            [FromBody] UpdateEmployerSocialLinksCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 

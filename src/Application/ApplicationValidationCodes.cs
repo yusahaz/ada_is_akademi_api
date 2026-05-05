@@ -129,6 +129,34 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Bio length cannot exceed 3000 characters.");
 
         /// <summary>
+        /// Employer social links list exceeds supported count.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerSocialLinksCount = new(
+            Code: "AZX_ADA_APP_VAL_953",
+            ErrorMessage: "Too many social links.");
+
+        /// <summary>
+        /// Duplicate platforms are not supported when replacing employer social links.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerSocialLinksDuplicatePlatform = new(
+            Code: "AZX_ADA_APP_VAL_954",
+            ErrorMessage: "Each social platform must appear only once.");
+
+        /// <summary>
+        /// Social link URL is required for each employer link row.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerSocialLinksUrlRequired = new(
+            Code: "AZX_ADA_APP_VAL_955",
+            ErrorMessage: "Social link URL is required.");
+
+        /// <summary>
+        /// Social link URL must be an absolute HTTPS address within length limits for employer links.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerSocialLinksUrlInvalid = new(
+            Code: "AZX_ADA_APP_VAL_956",
+            ErrorMessage: "Social link URL must be a valid HTTPS address.");
+
+        /// <summary>
         /// Worker social links list exceeds supported count.
         /// </summary>
         internal static readonly ErrorCode UpdateWorkerSocialLinksCount = new(

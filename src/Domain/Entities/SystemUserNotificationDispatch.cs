@@ -17,8 +17,14 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected SystemUserNotificationDispatch() { }
 
+        /// <summary>
+        /// Creates a pending dispatch row with template payload.
+        /// </summary>
         protected internal SystemUserNotificationDispatch(
             int systemUserId,
             NotificationChannel channel,
@@ -41,8 +47,11 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #endregion Ctors
 
-        #region Methods
+        #region Utils
 
+        /// <summary>
+        /// Records a failed delivery attempt with retry accounting when allowed.
+        /// </summary>
         protected internal void MarkAsFailed(string? reason = null)
         {
             (Status == NotificationDispatchStatus.Pending || Status == NotificationDispatchStatus.Failed)
@@ -56,6 +65,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             LastAttemptAt = DateTimeOffset.UtcNow;
         }
 
+        /// <summary>
+        /// Returns a failed dispatch to pending when retries remain.
+        /// </summary>
         protected internal void MarkAsPendingRetry()
         {
             (Status == NotificationDispatchStatus.Failed)
@@ -67,6 +79,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             FailureReason = null;
         }
 
+        /// <summary>
+        /// Marks the dispatch as successfully sent and updates channel metadata.
+        /// </summary>
         protected internal void MarkAsSent(NotificationChannel deliveredChannel, string? fallbackReason = null)
         {
             (Status == NotificationDispatchStatus.Pending || Status == NotificationDispatchStatus.Failed)
@@ -80,7 +95,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             FailureReason = null;
         }
 
-        #endregion Methods
+        #endregion Utils
 
         #region Properties
 
@@ -120,6 +135,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         public DateTimeOffset? LastAttemptAt { get; private set; }
 
         /// <summary>
+        /// Number of failed attempts.
+        /// </summary>
+        public int RetryCount { get; private set; }
+
+        /// <summary>
         /// Delivery completion instant.
         /// </summary>
         public DateTimeOffset? SentAt { get; private set; }
@@ -145,14 +165,10 @@ namespace Azoxia.AdaIsAkademi.Domain
         public string Title { get; private set; }
 
         /// <summary>
-        /// Number of failed attempts.
-        /// </summary>
-        public int RetryCount { get; private set; }
-
-        /// <summary>
         /// Linked worker id.
         /// </summary>
         public int? WorkerId { get; private set; }
+
 
         /// <summary>
         /// Related posting navigation.

@@ -20,6 +20,7 @@ namespace Azoxia.AdaIsAkademi.Application
         IReadOnlyList<WorkerEducationDetailModel> Educations,
         IReadOnlyList<WorkerExperienceDetailModel> Experiences,
         IReadOnlyList<WorkerLanguageDetailModel> Languages,
-        IReadOnlyList<WorkerReferenceDetailModel> References) :
+        IReadOnlyList<WorkerReferenceDetailModel> References,
+        int EmployerSourcedProfileViewCount) :
         ModelBase;
 }

@@ -10,8 +10,17 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected SystemUserDevice() { }
 
+        /// <summary>
+        /// Creates a device registration row for a user.
+        /// </summary>
+        /// <param name="systemUserId">Owning user key.</param>
+        /// <param name="deviceIdentifier">Stable device id.</param>
+        /// <param name="platform">Client platform.</param>
         protected internal SystemUserDevice(
             int systemUserId,
             string deviceIdentifier,
@@ -27,15 +36,22 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Updates last activity timestamp to the current UTC instant.
+        /// </summary>
         protected internal void RecordActivity()
             => LastActiveAt = DateTimeOffset.UtcNow;
 
+        /// <summary>
+        /// Replaces the optional push or device token snapshot.
+        /// </summary>
         protected internal void UpdateDeviceToken(string? deviceToken)
             => DeviceToken = deviceToken;
 
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// Stable identifier for the physical or logical device.
         /// </summary>
@@ -61,10 +77,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int SystemUserId { get; private set; }
 
+
         /// <summary>
         /// Owning system user aggregate.
         /// </summary>
         public virtual SystemUser SystemUser { get; private set; }
+
         #endregion Properties
     }
 }

@@ -29,8 +29,15 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected Worker() { }
 
+        /// <summary>
+        /// Creates a worker profile linked to a system user account.
+        /// </summary>
+        /// <param name="systemUserId">Owning system user key.</param>
         protected internal Worker(int systemUserId)
         {
             SystemUserId = systemUserId;
@@ -40,23 +47,9 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
-        protected internal WorkerSkill AddSkill(string tag)
-        {
-            SkillTag normalizedTag = new(tag);
-
-            WorkerSkill? skill = Skills
-                .FirstOrDefault(x => x.Tag == normalizedTag);
-
-            if (skill is null)
-            {
-                skill = new(Id, normalizedTag);
-                _skills.Add(skill);
-                return skill;
-            }
-
-            return skill;
-        }
-
+        /// <summary>
+        /// Adds or returns an existing identical weekly availability window.
+        /// </summary>
         protected internal WorkerAvailability AddAvailability(DayOfWeek dayOfWeek, TimeOnly timeFrom, TimeOnly timeTo)
         {
             WorkerAvailability? existing = Availabilities.FirstOrDefault(x =>
@@ -73,13 +66,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return availability;
         }
 
-        protected internal void RemoveAvailability(int availabilityId)
-        {
-            WorkerAvailability? availability = Availabilities.FirstOrDefault(x => x.Id == availabilityId);
-            availability = availability.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
-            _availabilities.Remove(availability);
-        }
-
+        /// <summary>
+        /// Adds or returns an existing certificate with the same issuer and issue date.
+        /// </summary>
         protected internal WorkerCertificate AddCertificate(
             string name,
             string issuingOrganization,
@@ -104,13 +93,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return certificate;
         }
 
-        protected internal void RemoveCertificate(int certificateId)
-        {
-            WorkerCertificate? certificate = Certificates.FirstOrDefault(x => x.Id == certificateId);
-            certificate = certificate.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
-            _certificates.Remove(certificate);
-        }
-
+        /// <summary>
+        /// Adds or returns an existing education row matching the supplied academic details.
+        /// </summary>
         protected internal WorkerEducation AddEducation(
             string school,
             string department,
@@ -139,13 +124,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return education;
         }
 
-        protected internal void RemoveEducation(int educationId)
-        {
-            WorkerEducation? education = Educations.FirstOrDefault(x => x.Id == educationId);
-            education = education.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
-            _educations.Remove(education);
-        }
-
+        /// <summary>
+        /// Adds or returns an existing experience segment with the same company, role, and dates.
+        /// </summary>
         protected internal WorkerExperience AddExperience(
             string companyName,
             string position,
@@ -171,13 +152,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return experience;
         }
 
-        protected internal void RemoveExperience(int experienceId)
-        {
-            WorkerExperience? experience = Experiences.FirstOrDefault(x => x.Id == experienceId);
-            experience = experience.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
-            _experiences.Remove(experience);
-        }
-
+        /// <summary>
+        /// Adds or returns an existing language row with the same name and proficiency.
+        /// </summary>
         protected internal WorkerLanguage AddLanguage(string language, LanguageLevel level)
         {
             string normalizedLanguage = language.Trim();
@@ -195,13 +172,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return workerLanguage;
         }
 
-        protected internal void RemoveLanguage(int languageId)
-        {
-            WorkerLanguage? language = Languages.FirstOrDefault(x => x.Id == languageId);
-            language = language.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
-            _languages.Remove(language);
-        }
-
+        /// <summary>
+        /// Adds or returns an existing reference with the same company, role, and contact identity.
+        /// </summary>
         protected internal WorkerReference AddReference(string company, string position, Contact contact)
         {
             string normalizedCompany = company.Trim();
@@ -224,6 +197,85 @@ namespace Azoxia.AdaIsAkademi.Domain
             return reference;
         }
 
+        /// <summary>
+        /// Adds or returns the skill tag for the normalized label.
+        /// </summary>
+        protected internal WorkerSkill AddSkill(string tag)
+        {
+            SkillTag normalizedTag = new(tag);
+
+            WorkerSkill? skill = Skills
+                .FirstOrDefault(x => x.Tag == normalizedTag);
+
+            if (skill is null)
+            {
+                skill = new(Id, normalizedTag);
+                _skills.Add(skill);
+                return skill;
+            }
+
+            return skill;
+        }
+
+        /// <summary>
+        /// Soft-deletes this worker through the base lifecycle API.
+        /// </summary>
+        protected internal void DeleteWorker()
+            => base.Delete();
+
+        /// <summary>
+        /// Removes a weekly availability row by identifier.
+        /// </summary>
+        protected internal void RemoveAvailability(int availabilityId)
+        {
+            WorkerAvailability? availability = Availabilities.FirstOrDefault(x => x.Id == availabilityId);
+            availability = availability.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _availabilities.Remove(availability);
+        }
+
+        /// <summary>
+        /// Removes a certificate row by identifier.
+        /// </summary>
+        protected internal void RemoveCertificate(int certificateId)
+        {
+            WorkerCertificate? certificate = Certificates.FirstOrDefault(x => x.Id == certificateId);
+            certificate = certificate.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _certificates.Remove(certificate);
+        }
+
+        /// <summary>
+        /// Removes an education history row by identifier.
+        /// </summary>
+        protected internal void RemoveEducation(int educationId)
+        {
+            WorkerEducation? education = Educations.FirstOrDefault(x => x.Id == educationId);
+            education = education.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _educations.Remove(education);
+        }
+
+        /// <summary>
+        /// Removes a work experience row by identifier.
+        /// </summary>
+        protected internal void RemoveExperience(int experienceId)
+        {
+            WorkerExperience? experience = Experiences.FirstOrDefault(x => x.Id == experienceId);
+            experience = experience.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _experiences.Remove(experience);
+        }
+
+        /// <summary>
+        /// Removes a language row by identifier.
+        /// </summary>
+        protected internal void RemoveLanguage(int languageId)
+        {
+            WorkerLanguage? language = Languages.FirstOrDefault(x => x.Id == languageId);
+            language = language.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _languages.Remove(language);
+        }
+
+        /// <summary>
+        /// Removes a reference row by identifier.
+        /// </summary>
         protected internal void RemoveReference(int referenceId)
         {
             WorkerReference? reference = References.FirstOrDefault(x => x.Id == referenceId);
@@ -231,6 +283,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             _references.Remove(reference);
         }
 
+        /// <summary>
+        /// Removes a skill tag row by identifier.
+        /// </summary>
         protected internal void RemoveSkill(int skillId)
         {
             WorkerSkill? skill = Skills.FirstOrDefault(x => x.Id == skillId);
@@ -238,6 +293,24 @@ namespace Azoxia.AdaIsAkademi.Domain
             _skills.Remove(skill);
         }
 
+        /// <summary>
+        /// Replaces interested job categories with the supplied distinct category identifiers.
+        /// </summary>
+        protected internal void ReplaceInterestedJobCategories(IEnumerable<int> jobCategoryIds)
+        {
+            ArgumentNullException.ThrowIfNull(jobCategoryIds);
+            _interestedJobCategories.Clear();
+            foreach (int categoryId in jobCategoryIds
+                         .Distinct()
+                         .OrderBy(x => x))
+            {
+                _interestedJobCategories.Add(new WorkerInterestedJobCategory(Id, categoryId));
+            }
+        }
+
+        /// <summary>
+        /// Replaces outbound social links, keeping the last URL per platform.
+        /// </summary>
         protected internal void ReplaceSocialLinks(IReadOnlyList<WorkerSocialLinkInput> links)
         {
             ArgumentNullException.ThrowIfNull(links);
@@ -252,6 +325,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Sets or clears the profile photo object key after trimming.
+        /// </summary>
         protected internal void SetProfilePhotoObjectKey(string? objectKey)
         {
             ProfilePhotoObjectKey = objectKey.IsNullOrWhiteSpace()
@@ -259,6 +335,9 @@ namespace Azoxia.AdaIsAkademi.Domain
                 : objectKey.Trim();
         }
 
+        /// <summary>
+        /// Updates optional biography text after trimming.
+        /// </summary>
         protected internal void UpdateBio(string? bio)
         {
             Bio = bio.IsNullOrWhiteSpace()
@@ -266,16 +345,9 @@ namespace Azoxia.AdaIsAkademi.Domain
                 : bio.Trim();
         }
 
-        protected internal void UpdateProfile(string? nationality, string? university)
-        {
-            Nationality = nationality.IsNullOrWhiteSpace()
-                ? null
-                : nationality.Trim();
-            University = university.IsNullOrWhiteSpace()
-                ? null
-                : university.Trim();
-        }
-
+        /// <summary>
+        /// Updates stored inclusive salary bounds using money snapshots.
+        /// </summary>
         protected internal void UpdateExpectedSalaryRange(
             Money? minimum,
             Money? maximum)
@@ -305,18 +377,22 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
-        protected internal void ReplaceInterestedJobCategories(IEnumerable<int> jobCategoryIds)
+        /// <summary>
+        /// Updates nationality and university fields after trimming.
+        /// </summary>
+        protected internal void UpdateProfile(string? nationality, string? university)
         {
-            ArgumentNullException.ThrowIfNull(jobCategoryIds);
-            _interestedJobCategories.Clear();
-            foreach (int categoryId in jobCategoryIds
-                         .Distinct()
-                         .OrderBy(x => x))
-            {
-                _interestedJobCategories.Add(new WorkerInterestedJobCategory(Id, categoryId));
-            }
+            Nationality = nationality.IsNullOrWhiteSpace()
+                ? null
+                : nationality.Trim();
+            University = university.IsNullOrWhiteSpace()
+                ? null
+                : university.Trim();
         }
 
+        /// <summary>
+        /// Replaces the skill embedding vector and stamps refresh metadata.
+        /// </summary>
         protected internal void UpdateSkillEmbedding(float[]? skillEmbedding)
         {
             if (skillEmbedding is null || skillEmbedding.Length == 0)
@@ -330,12 +406,15 @@ namespace Azoxia.AdaIsAkademi.Domain
             EmbeddingUpdatedAt = DateTimeOffset.UtcNow;
         }
 
-        protected internal void DeleteWorker()
-            => base.Delete();
-
         #endregion Utils
 
         #region Properties
+
+        /// <summary>
+        /// Short “about” text shown on worker-owned surfaces only.
+        /// </summary>
+        public string? Bio { get; private set; }
+
         /// <summary>
         /// UTC timestamp of the last skill-embedding refresh, if any.
         /// </summary>
@@ -367,11 +446,6 @@ namespace Azoxia.AdaIsAkademi.Domain
         public string? Nationality { get; private set; }
 
         /// <summary>
-        /// Short “about” text shown on worker-owned surfaces only.
-        /// </summary>
-        public string? Bio { get; private set; }
-
-        /// <summary>
         /// MinIO / S3 object key for the worker profile portrait, if uploaded.
         /// </summary>
         public string? ProfilePhotoObjectKey { get; private set; }
@@ -391,10 +465,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public string? University { get; private set; }
 
+
         /// <summary>
         /// Linked application user account for this worker profile.
         /// </summary>
         public virtual SystemUser SystemUser { get; private set; }
+
 
         /// <summary>
         /// Weekly availability slots linked to this worker.
@@ -428,12 +504,6 @@ namespace Azoxia.AdaIsAkademi.Domain
         public virtual IReadOnlyList<WorkerLanguage> Languages => _languages.AsReadOnly();
 
         /// <summary>
-        /// Outbound social/profile links surfaced on worker-owned read models only.
-        /// </summary>
-        public virtual IReadOnlyList<WorkerSocialLink> SocialLinks =>
-            _socialLinks.AsReadOnly();
-
-        /// <summary>
         /// External references (contacts) supplied for this worker.
         /// </summary>
         public virtual IReadOnlyList<WorkerReference> References => _references.AsReadOnly();
@@ -442,6 +512,13 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Skill tags associated with this worker.
         /// </summary>
         public virtual IReadOnlyList<WorkerSkill> Skills => _skills.AsReadOnly();
+
+        /// <summary>
+        /// Outbound social/profile links surfaced on worker-owned read models only.
+        /// </summary>
+        public virtual IReadOnlyList<WorkerSocialLink> SocialLinks =>
+            _socialLinks.AsReadOnly();
+
         #endregion Properties
     }
 }

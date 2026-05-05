@@ -18,8 +18,14 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected ShiftAssignment() { }
 
+        /// <summary>
+        /// Creates an assignment with hashed check-in tokens.
+        /// </summary>
         protected internal ShiftAssignment(
             int jobPostingId,
             int jobApplicationId,
@@ -40,6 +46,9 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Records worker check-in and advances mutual QR flow when valid.
+        /// </summary>
         protected internal void CheckIn(string checkInTokenHash)
         {
             (Status == ShiftAssignmentStatus.Pending || Status == ShiftAssignmentStatus.AwaitingMutualQr)
@@ -54,20 +63,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             TryCompleteMutualCheckIn(now);
         }
 
-        protected internal void SupervisorCheckIn(string supervisorCheckInTokenHash)
-        {
-            (Status == ShiftAssignmentStatus.Pending || Status == ShiftAssignmentStatus.AwaitingMutualQr)
-                .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
-            (SupervisorCheckInTokenHash == supervisorCheckInTokenHash)
-                .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentCheckInTokenInvalid);
-            (!SupervisorCheckedInAt.HasValue).ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
-
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-            SupervisorCheckedInAt = now;
-            Status = ShiftAssignmentStatus.AwaitingMutualQr;
-            TryCompleteMutualCheckIn(now);
-        }
-
+        /// <summary>
+        /// Completes checkout and flags early anomalies when thresholds trigger.
+        /// </summary>
         protected internal void CheckOut()
         {
             (Status == ShiftAssignmentStatus.CheckedIn)
@@ -85,6 +83,26 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = ShiftAssignmentStatus.CheckedOut;
         }
 
+        /// <summary>
+        /// Records supervisor-side mutual QR check-in when tokens and status allow.
+        /// </summary>
+        protected internal void SupervisorCheckIn(string supervisorCheckInTokenHash)
+        {
+            (Status == ShiftAssignmentStatus.Pending || Status == ShiftAssignmentStatus.AwaitingMutualQr)
+                .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
+            (SupervisorCheckInTokenHash == supervisorCheckInTokenHash)
+                .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentCheckInTokenInvalid);
+            (!SupervisorCheckedInAt.HasValue).ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
+
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            SupervisorCheckedInAt = now;
+            Status = ShiftAssignmentStatus.AwaitingMutualQr;
+            TryCompleteMutualCheckIn(now);
+        }
+
+        /// <summary>
+        /// Finalizes mutual QR confirmation when both sides are present within the grace window.
+        /// </summary>
         private void TryCompleteMutualCheckIn(DateTimeOffset now)
         {
             if (!CheckedInAt.HasValue || !SupervisorCheckedInAt.HasValue)
@@ -104,19 +122,19 @@ namespace Azoxia.AdaIsAkademi.Domain
         #region Properties
 
         /// <summary>
+        /// Machine-friendly anomaly code when <see cref="IsAnomalyFlagged"/> is true.
+        /// </summary>
+        public string? AnomalyCode { get; private set; }
+
+        /// <summary>
         /// Assignment creation timestamp.
         /// </summary>
         public DateTimeOffset AssignedAt { get; private set; }
 
         /// <summary>
-        /// True when assignment lifecycle contains an anomaly marker.
+        /// Hash value expected during QR check-in verification.
         /// </summary>
-        public bool IsAnomalyFlagged { get; private set; }
-
-        /// <summary>
-        /// Machine-friendly anomaly code when <see cref="IsAnomalyFlagged"/> is true.
-        /// </summary>
-        public string? AnomalyCode { get; private set; }
+        public string CheckInTokenHash { get; private set; }
 
         /// <summary>
         /// Timestamp recorded when worker check-in succeeds.
@@ -129,19 +147,9 @@ namespace Azoxia.AdaIsAkademi.Domain
         public DateTimeOffset? CheckedOutAt { get; private set; }
 
         /// <summary>
-        /// Hash value expected during QR check-in verification.
+        /// True when assignment lifecycle contains an anomaly marker.
         /// </summary>
-        public string CheckInTokenHash { get; private set; }
-
-        /// <summary>
-        /// Hash value expected during supervisor-side QR mutual confirmation.
-        /// </summary>
-        public string SupervisorCheckInTokenHash { get; private set; }
-
-        /// <summary>
-        /// Timestamp recorded when supervisor-side check-in succeeds.
-        /// </summary>
-        public DateTimeOffset? SupervisorCheckedInAt { get; private set; }
+        public bool IsAnomalyFlagged { get; private set; }
 
         /// <summary>
         /// Source job application identifier.
@@ -157,6 +165,16 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Current assignment lifecycle status.
         /// </summary>
         public ShiftAssignmentStatus Status { get; private set; }
+
+        /// <summary>
+        /// Hash value expected during supervisor-side QR mutual confirmation.
+        /// </summary>
+        public string SupervisorCheckInTokenHash { get; private set; }
+
+        /// <summary>
+        /// Timestamp recorded when supervisor-side check-in succeeds.
+        /// </summary>
+        public DateTimeOffset? SupervisorCheckedInAt { get; private set; }
 
         /// <summary>
         /// Worker identifier for this assignment.

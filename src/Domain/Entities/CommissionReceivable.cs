@@ -12,8 +12,18 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected CommissionReceivable() { }
 
+        /// <summary>
+        /// Creates a receivable for the given employer and billing window.
+        /// </summary>
+        /// <param name="amount">Receivable amount.</param>
+        /// <param name="employerId">Owning employer key.</param>
+        /// <param name="periodEnd">Period end (inclusive).</param>
+        /// <param name="periodStart">Period start (inclusive).</param>
         protected internal CommissionReceivable(
             Money amount,
             int employerId,

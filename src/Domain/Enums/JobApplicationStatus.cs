@@ -11,6 +11,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         Accepted = 20,
 
         /// <summary>
+        /// Application automatically expired without an employer decision.
+        /// </summary>
+        Expired = 50,
+
+        /// <summary>
         /// Submitted and awaiting employer decision.
         /// </summary>
         Pending = 10,
@@ -24,10 +29,5 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Applicant retracted before acceptance.
         /// </summary>
         Withdrawn = 40,
-
-        /// <summary>
-        /// Application automatically expired without an employer decision.
-        /// </summary>
-        Expired = 50,
     }
 }

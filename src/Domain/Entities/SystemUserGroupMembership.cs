@@ -10,8 +10,18 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected SystemUserGroupMembership() { }
 
+        /// <summary>
+        /// Creates a membership row with scope semantics.
+        /// </summary>
+        /// <param name="systemUserGroupId">Group key.</param>
+        /// <param name="systemUserId">User key.</param>
+        /// <param name="scopeType">Scope breadth.</param>
+        /// <param name="scopeId">Optional scope discriminator.</param>
         protected internal SystemUserGroupMembership(
             int systemUserGroupId,
             int systemUserId,
@@ -31,15 +41,22 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Marks membership as participating in permission evaluations.
+        /// </summary>
         protected internal void SetAsActive()
             => IsActive = true;
 
+        /// <summary>
+        /// Marks membership as excluded from permission evaluations.
+        /// </summary>
         protected internal void SetAsPassive()
             => IsActive = false;
 
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// True while membership participates in evaluations.
         /// </summary>
@@ -65,6 +82,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int SystemUserId { get; private set; }
 
+
         /// <summary>
         /// Group definition row for this junction.
         /// </summary>
@@ -74,6 +92,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// User linked to group membership evaluation.
         /// </summary>
         public virtual SystemUser SystemUser { get; private set; }
+
         #endregion Properties
     }
 }

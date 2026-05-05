@@ -12,6 +12,7 @@
 - [x] **P0 / P1** Worker: profil tamamlanma oranı — ağırlıklı, dokümante algoritma + API alanı.
 - [x] **P1** Worker: kısa “hakkında” (bio) + sosyal medya linkleri (platform + URL listesi, value object / JSON).
 - [x] **P1** Employer: şirket logosu (MinIO, worker profil foto ile ortak dosya hattı).
+- [x] **P1** Employer: sosyal medya / kurumsal web linkleri (platform + HTTPS URL listesi; worker ile aynı platform enum’u).
 - [x] **P1** Worker: profil fotoğrafı (MinIO; execution tracker Deferred ile aynı epik hattı).
 - [ ] **P2** Worker: işveren tarafından profil görüntülenme sayısı (tanım + kötüye kullanım notu).
 - [ ] **Sonraki faz (deferred)** AI ile profil analizi çıkarımı — ayrı onay; üstteki task dosyasında işaretlenecek.

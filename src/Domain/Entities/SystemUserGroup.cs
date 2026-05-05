@@ -16,8 +16,17 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected SystemUserGroup() { }
 
+        /// <summary>
+        /// Creates a group with optional system-seeded semantics.
+        /// </summary>
+        /// <param name="name">Group name.</param>
+        /// <param name="description">Optional description.</param>
+        /// <param name="isSystem">Whether the group is system-seeded.</param>
         protected internal SystemUserGroup(
             string name,
             string? description,
@@ -33,6 +42,9 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Ensures the group participates in permission evaluations.
+        /// </summary>
         protected internal void Activate()
         {
             if (!IsActive)
@@ -41,6 +53,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Adds or updates a permission rule for this group.
+        /// </summary>
         protected internal SystemUserGroupPermission AddPermission(int permissionId, PermissionEffect effect)
         {
             SystemUserGroupPermission? permission = Permissions
@@ -66,6 +81,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return permission;
         }
 
+        /// <summary>
+        /// Excludes the group from permission evaluations.
+        /// </summary>
         protected internal void Deactivate()
         {
             if (IsActive)
@@ -74,6 +92,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Soft-deletes non-system groups through the base lifecycle API.
+        /// </summary>
         protected override void Delete()
         {
             if (!IsSystem)
@@ -82,6 +103,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Removes a permission junction row when it exists.
+        /// </summary>
         protected internal void RemovePermission(int permissionId)
         {
             SystemUserGroupPermission? permission = Permissions
@@ -95,11 +119,17 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         }
 
+        /// <summary>
+        /// Updates the relative ordering weight for permission stacking.
+        /// </summary>
         protected internal void SetLevel(int level)
         {
             Level = level;
         }
 
+        /// <summary>
+        /// Renames the group and optionally refreshes its description.
+        /// </summary>
         protected internal void UpdateSystemUserGroupName(string name, string? description = null)
         {
             base.UpdateName(name, description);
@@ -108,6 +138,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// True while evaluations should honor group membership-derived rules.
         /// </summary>
@@ -123,10 +154,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public int Level { get; private set; }
 
+
         /// <summary>
         /// Allow/deny permission rows linked to this group.
         /// </summary>
         public virtual IReadOnlyList<SystemUserGroupPermission> Permissions => _permissions.AsReadOnly();
+
         #endregion Properties
     }
 }

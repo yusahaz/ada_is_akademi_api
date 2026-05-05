@@ -12,9 +12,9 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Fields
 
-        private readonly List<SystemUserDevice> _devices = new();
-        private readonly List<SystemUserRefreshToken> _refreshTokens = new();
-
+        /// <summary>
+        /// PBKDF2 hash algorithm used when deriving password material.
+        /// </summary>
         private static readonly HashAlgorithmName HashAlgorithm = HashAlgorithmName.SHA256;
 
         /// <summary>
@@ -37,12 +37,24 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         private const byte SaltSize = 16;
 
+        private readonly List<SystemUserDevice> _devices = new();
+        private readonly List<SystemUserRefreshToken> _refreshTokens = new();
+
         #endregion Fields
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected SystemUser() { }
 
+        /// <summary>
+        /// Creates a pending user with hashed password material.
+        /// </summary>
+        /// <param name="email">Login email.</param>
+        /// <param name="password">Plaintext password to hash.</param>
+        /// <param name="type">User type classification.</param>
         protected internal SystemUser(
             string email,
             string password,
@@ -59,6 +71,9 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Registers or updates a device row and optionally refreshes its push token.
+        /// </summary>
         protected internal SystemUserDevice AddOrUpdateDevice(
             string deviceIdentifier,
             DevicePlatform platform,
@@ -83,12 +98,18 @@ namespace Azoxia.AdaIsAkademi.Domain
             return device;
         }
 
+        /// <summary>
+        /// Bans the account and revokes all refresh tokens.
+        /// </summary>
         protected internal void Ban()
         {
             AccountStatus = AccountStatus.Banned;
             RevokeAllRefreshTokens();
         }
 
+        /// <summary>
+        /// Rotates password material and revokes outstanding refresh tokens.
+        /// </summary>
         protected internal void ChangePassword(string password)
         {
             PasswordSalt = GeneratePasswordSalt();
@@ -97,6 +118,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             RevokeAllRefreshTokens();
         }
 
+        /// <summary>
+        /// Verifies a plaintext password against stored PBKDF2 hash material.
+        /// </summary>
         protected internal Task<bool> CheckPassword(string password)
         {
             return Task.Run(() =>
@@ -114,6 +138,15 @@ namespace Azoxia.AdaIsAkademi.Domain
             });
         }
 
+        /// <summary>
+        /// Soft-deletes this user through the base lifecycle API.
+        /// </summary>
+        protected internal void DeleteSystemUser()
+            => base.Delete();
+
+        /// <summary>
+        /// Derives a Base64 password hash using the current salt and iteration settings.
+        /// </summary>
         private string GeneratePasswordHash(string password)
         {
             byte[] saltBytes = Convert.FromBase64String(PasswordSalt);
@@ -127,12 +160,15 @@ namespace Azoxia.AdaIsAkademi.Domain
             return hashBytes.ToBase64String();
         }
 
+        /// <summary>
+        /// Generates a new random salt encoded as Base64.
+        /// </summary>
         private string GeneratePasswordSalt()
             => RandomNumberGenerator.GetBytes(SaltSize).ToBase64String();
 
-        protected internal void DeleteSystemUser()
-            => base.Delete();
-
+        /// <summary>
+        /// Issues or extends a refresh token for the device pairing.
+        /// </summary>
         protected internal SystemUserRefreshToken IssueRefreshToken(string tokenHash, int deviceId, DateTimeOffset expiresAt)
         {
             SystemUserRefreshToken? token = RefreshTokens
@@ -151,6 +187,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return token;
         }
 
+        /// <summary>
+        /// Restores an active account status when policy allows.
+        /// </summary>
         protected internal void Reactivate()
         {
             (AccountStatus != AccountStatus.Banned)
@@ -158,18 +197,27 @@ namespace Azoxia.AdaIsAkademi.Domain
             AccountStatus = AccountStatus.Active;
         }
 
+        /// <summary>
+        /// Increments failed login counters after an unsuccessful attempt.
+        /// </summary>
         protected internal void RecordFailedLoginAttempt()
         {
             FailedLoginAttempts++;
             LastFailedLoginAt = DateTimeOffset.UtcNow;
         }
 
+        /// <summary>
+        /// Clears failed-login counters after a successful authentication.
+        /// </summary>
         protected internal void RecordSuccessfulLogin()
         {
             FailedLoginAttempts = 0;
             LastSuccessfulLoginAt = DateTimeOffset.UtcNow;
         }
 
+        /// <summary>
+        /// Stores email verification token hash and expiry for outbound activation flows.
+        /// </summary>
         protected internal void RequestEmailVerification(string tokenHash, DateTimeOffset expiresAt)
         {
             tokenHash.ThrowIfNullOrWhiteSpace();
@@ -179,6 +227,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             EmailVerificationExpiresAt = expiresAt;
         }
 
+        /// <summary>
+        /// Revokes every active refresh token row for this user.
+        /// </summary>
         protected internal void RevokeAllRefreshTokens()
         {
             foreach (SystemUserRefreshToken token in RefreshTokens.Where(x => x.IsActive))
@@ -187,6 +238,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Revokes a single refresh token matched by hash.
+        /// </summary>
         protected internal void RevokeRefreshToken(string tokenHash)
         {
             tokenHash.ThrowIfNullOrWhiteSpace();
@@ -197,6 +251,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             token.Revoke();
         }
 
+        /// <summary>
+        /// Suspends the account when policy allows.
+        /// </summary>
         protected internal void Suspend()
         {
             (AccountStatus != AccountStatus.Banned)
@@ -204,6 +261,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             AccountStatus = AccountStatus.Suspended;
         }
 
+        /// <summary>
+        /// Updates profile name and optional phone fields.
+        /// </summary>
         protected internal void Update(
             string firstName,
             string lastName,
@@ -214,6 +274,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             Phone = phone;
         }
 
+        /// <summary>
+        /// Completes email verification when token and expiry are valid.
+        /// </summary>
         protected internal void VerifyEmail(string tokenHash)
         {
             tokenHash.ThrowIfNullOrWhiteSpace();
@@ -231,6 +294,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// Account activation status (Pending, Active, Suspended, Banned).
         /// </summary>
@@ -306,10 +370,12 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public SystemUserType Type { get; private set; }
 
+
         /// <summary>
         /// True when failed login threshold matches policy lock rules.
         /// </summary>
         public bool IsLocked => FailedLoginAttempts >= MaxFailedLoginAttempts;
+
 
         /// <summary>
         /// Known devices registered for this account.
@@ -320,6 +386,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Active and historical refresh token rows for session continuity.
         /// </summary>
         public virtual IReadOnlyList<SystemUserRefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
+
         #endregion Properties
     }
 }

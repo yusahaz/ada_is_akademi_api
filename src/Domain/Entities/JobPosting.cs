@@ -19,8 +19,14 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected JobPosting() { }
 
+        /// <summary>
+        /// Creates a draft posting with shift and wage details.
+        /// </summary>
         protected internal JobPosting(
             int employerId,
             int employerLocationId,
@@ -50,6 +56,9 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Accepts an application and may transition posting to filled when capacity is reached.
+        /// </summary>
         protected internal void AcceptApplication(int applicationId)
         {
             (Status == JobPostingStatus.Open || Status == JobPostingStatus.Filled)
@@ -71,6 +80,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Creates or returns an existing application when posting is open and rules pass.
+        /// </summary>
         protected internal JobApplication AddApplication(int workerId, bool hasConflictingShift, string? note = null)
         {
             (Status == JobPostingStatus.Open)
@@ -89,6 +101,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return application;
         }
 
+        /// <summary>
+        /// Adds or returns a skill requirement row for the posting.
+        /// </summary>
         protected internal JobPostingSkill AddSkill(string tag, bool isRequired)
         {
             SkillTag normalizedTag = new(tag);
@@ -106,6 +121,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             return skill;
         }
 
+        /// <summary>
+        /// Cancels the posting from draft, open, or filled states.
+        /// </summary>
         protected internal void Cancel()
         {
             (Status == JobPostingStatus.Draft
@@ -115,6 +133,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = JobPostingStatus.Cancelled;
         }
 
+        /// <summary>
+        /// Completes the posting from open or filled states.
+        /// </summary>
         protected internal void Complete()
         {
             (Status == JobPostingStatus.Open || Status == JobPostingStatus.Filled)
@@ -122,11 +143,17 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = JobPostingStatus.Completed;
         }
 
+        /// <summary>
+        /// Soft-deletes this posting through the base lifecycle API.
+        /// </summary>
         protected internal void DeleteJobPosting()
         {
             base.Delete();
         }
 
+        /// <summary>
+        /// Publishes a draft posting to the open state.
+        /// </summary>
         protected internal void Publish()
         {
             (Status == JobPostingStatus.Draft)
@@ -134,6 +161,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = JobPostingStatus.Open;
         }
 
+        /// <summary>
+        /// Rejects an application and may reopen a filled posting when appropriate.
+        /// </summary>
         protected internal void RejectApplication(int applicationId, string? reason = null)
         {
             (Status == JobPostingStatus.Open || Status == JobPostingStatus.Filled)
@@ -152,6 +182,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Removes a skill requirement by identifier.
+        /// </summary>
         protected internal void RemoveSkill(int skillId)
         {
             JobPostingSkill? skill = Skills
@@ -160,6 +193,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             _skills.Remove(skill);
         }
 
+        /// <summary>
+        /// Updates posting copy, shift schedule, wage, and head count in draft state.
+        /// </summary>
         protected internal void Update(
             string title,
             string description,
@@ -181,6 +217,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             HeadCount = headCount;
         }
 
+        /// <summary>
+        /// Stores a non-empty description embedding vector when provided.
+        /// </summary>
         protected internal void UpdateEmbedding(float[] descriptionEmbedding)
         {
             if (descriptionEmbedding is not null && descriptionEmbedding.Length > 0)
@@ -189,6 +228,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             }
         }
 
+        /// <summary>
+        /// Withdraws an application and may reopen a filled posting when appropriate.
+        /// </summary>
         protected internal void WithdrawApplication(int applicationId)
         {
             (Status == JobPostingStatus.Open || Status == JobPostingStatus.Filled)
@@ -210,6 +252,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// Posting description text shown to applicants.
         /// </summary>
@@ -270,6 +313,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public Money Wage { get; private set; }
 
+
         /// <summary>
         /// Employer that created the posting.
         /// </summary>
@@ -285,6 +329,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public virtual JobCategory JobCategory { get; private set; }
 
+
         /// <summary>
         /// Worker applications submitted to this posting.
         /// </summary>
@@ -294,6 +339,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Skill requirements associated with this posting.
         /// </summary>
         public virtual IReadOnlyList<JobPostingSkill> Skills => _skills.AsReadOnly();
+
         #endregion Properties
     }
 }

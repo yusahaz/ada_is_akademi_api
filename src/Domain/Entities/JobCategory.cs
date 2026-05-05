@@ -58,6 +58,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// Foreign key to the parent category, when present.
         /// </summary>
@@ -67,6 +68,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Parent category in the hierarchy, if any.
         /// </summary>
         public virtual JobCategory? Parent { get; private set; }
+
         #endregion Properties
     }
 }

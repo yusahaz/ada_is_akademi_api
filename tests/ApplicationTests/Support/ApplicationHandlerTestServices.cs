@@ -30,6 +30,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests.Support
                 options.UseSqlite(holder.Connection));
             services.AddScoped<IUnitOfWork, UnitOfWork<AdaIsAkademiDbContext>>();
             services.AddScoped<IWorkerProfileCompletionEvaluator, WorkerProfileCompletionEvaluator>();
+            services.AddScoped<IWorkerEmployerProfileAccess, WorkerEmployerProfileAccess>();
             services.AddSingleton<IObjectStoragePresigner, TestObjectStoragePresigner>();
             services.AddSingleton<ICacheService, NullCacheService>();
             services.AddSingleton<IExecutionContext>(executionContext ?? new TestExecutionContext());

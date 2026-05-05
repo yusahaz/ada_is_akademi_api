@@ -1,6 +1,7 @@
 namespace Azoxia.AdaIsAkademi.Persistence.Mapping
 {
     using Azoxia.AdaIsAkademi.Domain;
+
     using Azoxia.Core.Persistence.Mapping;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;

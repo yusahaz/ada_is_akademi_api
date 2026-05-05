@@ -8,7 +8,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
     using Microsoft.AspNetCore.Mvc.ModelBinding;
 
     /// <summary>
-    /// Job application commands and list query for a posting (Bearer JWT: <c>employer_id</c> işveren uçları, <c>worker_id</c> başvuru/çekme).
+    /// Job-application commands plus posting-scoped queries (Bearer JWT maps <c>employer_id</c> employer flows and <c>worker_id</c> worker apply/withdraw flows).
     /// </summary>
     [Tags("Job applications")]
     [Produces("application/json")]

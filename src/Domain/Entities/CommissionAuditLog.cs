@@ -11,8 +11,21 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected CommissionAuditLog() { }
 
+        /// <summary>
+        /// Creates an audit log entry for commission or payout lifecycle events.
+        /// </summary>
+        /// <param name="employerId">Owning employer key.</param>
+        /// <param name="eventType">Recorded event type.</param>
+        /// <param name="amount">Monetary snapshot.</param>
+        /// <param name="assignmentId">Optional assignment key.</param>
+        /// <param name="commissionReceivableId">Optional receivable key.</param>
+        /// <param name="workerPayoutId">Optional payout key.</param>
+        /// <param name="note">Optional note.</param>
         protected internal CommissionAuditLog(
             int employerId,
             CommissionAuditEventType eventType,
@@ -35,6 +48,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Ctors
 
         #region Properties
+
+        /// <summary>
+        /// Monetary snapshot for this audit event.
+        /// </summary>
+        public Money Amount { get; private set; }
 
         /// <summary>
         /// Source assignment id for payout/commission snapshot.
@@ -72,19 +90,14 @@ namespace Azoxia.AdaIsAkademi.Domain
         public int? WorkerPayoutId { get; private set; }
 
         /// <summary>
-        /// Monetary snapshot for this audit event.
+        /// Linked receivable navigation.
         /// </summary>
-        public Money Amount { get; private set; }
+        public virtual CommissionReceivable? CommissionReceivable { get; private set; }
 
         /// <summary>
         /// Employer navigation.
         /// </summary>
         public virtual Employer Employer { get; private set; }
-
-        /// <summary>
-        /// Linked receivable navigation.
-        /// </summary>
-        public virtual CommissionReceivable? CommissionReceivable { get; private set; }
 
         /// <summary>
         /// Linked assignment navigation.

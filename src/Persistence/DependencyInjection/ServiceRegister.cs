@@ -4,6 +4,7 @@
     using Azoxia.Core.DependencyInjection;
     using Azoxia.Core.Persistence;
     using Azoxia.Core.Persistence.Configs;
+
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;

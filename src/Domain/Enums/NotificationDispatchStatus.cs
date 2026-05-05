@@ -6,6 +6,11 @@ namespace Azoxia.AdaIsAkademi.Domain
     public enum NotificationDispatchStatus
     {
         /// <summary>
+        /// Delivery attempt failed.
+        /// </summary>
+        Failed = 30,
+
+        /// <summary>
         /// Row created and waiting to be processed.
         /// </summary>
         Pending = 10,
@@ -14,10 +19,5 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Notification successfully delivered through selected channel.
         /// </summary>
         Sent = 20,
-
-        /// <summary>
-        /// Delivery attempt failed.
-        /// </summary>
-        Failed = 30,
     }
 }

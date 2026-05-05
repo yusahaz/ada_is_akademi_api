@@ -19,8 +19,14 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected WorkerPayout() { }
 
+        /// <summary>
+        /// Creates a payout row in pending status with computed net amount.
+        /// </summary>
         protected internal WorkerPayout(
             int assignmentId,
             int employerId,
@@ -41,8 +47,11 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #endregion Ctors
 
-        #region Methods
+        #region Utils
 
+        /// <summary>
+        /// Marks payout as paid after worker confirmation when status allows.
+        /// </summary>
         protected internal void ConfirmPaid()
         {
             (Status == WorkerPayoutStatus.Processing)
@@ -52,6 +61,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             PaidAt = DateTimeOffset.UtcNow;
         }
 
+        /// <summary>
+        /// Records a failed processing attempt with optional reason and retry counter update.
+        /// </summary>
         protected internal void Fail(string? reason = null)
         {
             (Status == WorkerPayoutStatus.Processing)
@@ -63,6 +75,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             LastFailureReason = reason;
         }
 
+        /// <summary>
+        /// Moves payout into processing when assignment is not disputed and retry rules pass.
+        /// </summary>
         protected internal void MarkAsProcessing(bool assignmentIsDisputed)
         {
             (!assignmentIsDisputed)
@@ -77,6 +92,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             ConfirmationDueAt = ProcessingMarkedAt.Value.AddHours(WorkerConfirmationWindowHours);
         }
 
+        /// <summary>
+        /// Resets a failed payout back to pending when retries remain.
+        /// </summary>
         protected internal void Retry()
         {
             (Status == WorkerPayoutStatus.Failed)
@@ -89,7 +107,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             LastFailureReason = null;
         }
 
-        #endregion Methods
+        #endregion Utils
 
         #region Properties
 
@@ -164,14 +182,14 @@ namespace Azoxia.AdaIsAkademi.Domain
         public int WorkerId { get; private set; }
 
         /// <summary>
-        /// Linked assignment navigation.
-        /// </summary>
-        public virtual ShiftAssignment ShiftAssignment { get; private set; }
-
-        /// <summary>
         /// Linked employer navigation.
         /// </summary>
         public virtual Employer Employer { get; private set; }
+
+        /// <summary>
+        /// Linked assignment navigation.
+        /// </summary>
+        public virtual ShiftAssignment ShiftAssignment { get; private set; }
 
         /// <summary>
         /// Linked worker navigation.

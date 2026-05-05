@@ -3,10 +3,12 @@ namespace Azoxia.AdaIsAkademi.Infrastructure.DependencyInjection
     using Azoxia.AdaIsAkademi.Application;
     using Azoxia.AdaIsAkademi.Application.Services;
     using Azoxia.AdaIsAkademi.Infrastructure;
+    using Azoxia.AdaIsAkademi.Infrastructure.Configuration;
+    using Azoxia.Core.Configuration;
     using Azoxia.Core.DependencyInjection;
+    using Azoxia.Core.Extensions;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
 
     /// <summary>
     /// Registers infrastructure adapters for external providers.
@@ -19,24 +21,20 @@ namespace Azoxia.AdaIsAkademi.Infrastructure.DependencyInjection
         /// <inheritdoc />
         public void Register(IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<ObjectStoragePresignerOptions>(
-                configuration.GetSection(ObjectStoragePresignerOptions.ConfigurationSectionName));
+            ObjectStorageConfig objectStorage =
+                Config.GetOrCreateConfig<ObjectStorageConfig>(configuration);
 
-            services.AddScoped<IObjectStoragePresigner>(serviceProvider =>
+            services.AddScoped<IObjectStoragePresigner>(_ =>
             {
-                ObjectStoragePresignerOptions optionsSnapshot =
-                    serviceProvider.GetRequiredService<IOptions<ObjectStoragePresignerOptions>>().Value;
-
                 bool fullyConfigured =
-                    !string.IsNullOrWhiteSpace(optionsSnapshot.ServiceUrl) &&
-                    !string.IsNullOrWhiteSpace(optionsSnapshot.AccessKey) &&
-                    !string.IsNullOrWhiteSpace(optionsSnapshot.SecretKey) &&
-                    !string.IsNullOrWhiteSpace(optionsSnapshot.BucketName);
+                    !objectStorage.ServiceUrl.IsNullOrWhiteSpace() &&
+                    !objectStorage.AccessKey.IsNullOrWhiteSpace() &&
+                    !objectStorage.SecretKey.IsNullOrWhiteSpace() &&
+                    !objectStorage.BucketName.IsNullOrWhiteSpace();
 
                 if (fullyConfigured)
                 {
-                    return new AwsS3CompatibleObjectStoragePresigner(
-                        serviceProvider.GetRequiredService<IOptions<ObjectStoragePresignerOptions>>());
+                    return new AwsS3CompatibleObjectStoragePresigner(objectStorage);
                 }
 
                 return new DevelopmentObjectStoragePresigner();

@@ -31,7 +31,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             Worker worker = new(user.Id);
             worker.AddSkill("cooking");
 
-            evaluator.CompletionPercentOf(worker).Should().Be(18);
+            evaluator.CompletionPercentOf(worker).Should().Be(15);
         }
 
         [Fact]

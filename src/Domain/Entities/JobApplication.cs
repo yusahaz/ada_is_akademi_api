@@ -11,8 +11,17 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
+        /// <summary>
+        /// Blank row initializer for EF Core.
+        /// </summary>
         protected JobApplication() { }
 
+        /// <summary>
+        /// Creates a pending application for the given posting and worker.
+        /// </summary>
+        /// <param name="jobPostingId">Target posting key.</param>
+        /// <param name="workerId">Applicant worker key.</param>
+        /// <param name="note">Optional applicant note.</param>
         protected internal JobApplication(
             int jobPostingId,
             int workerId,
@@ -29,6 +38,9 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Utils
 
+        /// <summary>
+        /// Transitions a pending application to accepted when rules allow.
+        /// </summary>
         protected internal void Accept()
         {
             (Status == JobApplicationStatus.Pending)
@@ -36,6 +48,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = JobApplicationStatus.Accepted;
         }
 
+        /// <summary>
+        /// Marks a pending application as expired when rules allow.
+        /// </summary>
         protected internal void Expire()
         {
             (Status == JobApplicationStatus.Pending)
@@ -43,6 +58,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = JobApplicationStatus.Expired;
         }
 
+        /// <summary>
+        /// Rejects a pending application and optionally records a reason.
+        /// </summary>
         protected internal void Reject(string? reason = null)
         {
             (Status == JobApplicationStatus.Pending)
@@ -51,6 +69,9 @@ namespace Azoxia.AdaIsAkademi.Domain
             RejectionReason = reason;
         }
 
+        /// <summary>
+        /// Withdraws a pending application when rules allow.
+        /// </summary>
         protected internal void Withdraw()
         {
             (Status == JobApplicationStatus.Pending)
@@ -61,6 +82,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #endregion Utils
 
         #region Properties
+
         /// <summary>
         /// Timestamp when the worker submitted the application.
         /// </summary>
@@ -100,6 +122,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Worker who created the application.
         /// </summary>
         public virtual Worker Worker { get; private set; }
+
         #endregion Properties
     }
 }
