@@ -80,6 +80,7 @@
 - [ ] Overdue alarm mekaniği.
 - [ ] CQRS rapor query/export paketleri.
 - [ ] Çıktı: Faz 2 operasyonel otomasyon + raporlama tabanı tamam.
+- [x] Uygulanan dikey dilim: overdue summary query + statistics endpoint + cache + test eklendi.
 
 ### Sprint 7 - Monetization Başlangıcı
 - [ ] Employer abonelik domain modeli.

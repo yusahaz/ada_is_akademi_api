@@ -61,6 +61,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "DashboardJobApplicationStatistics", "default");
 
         /// <summary>
+        /// Cache key for overdue posting/application summary used by scheduler/reporting.
+        /// </summary>
+        internal static CacheKey DashboardOverdueJobSummaryKey() =>
+            new(QueryNamespace, "DashboardOverdueJobSummary", "default");
+
+        /// <summary>
         /// Cache key for <see cref="EmployerDetailModel"/> by employer id.
         /// </summary>
         internal static CacheKey EmployerDetailKey(int employerId) =>

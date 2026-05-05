@@ -31,6 +31,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetDashboardStatisticsQuery(), cancellationToken);
 
+        /// <summary>Returns overdue posting and pending-application counters.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get overdue job summary")]
+        [EndpointDescription("Returns overdue job posting count and pending application count for scheduler/reporting checks.")]
+        [ProducesResponseType(typeof(ApiResponse<OverdueJobSummaryModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> OverdueSummary(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            GetOverdueJobSummaryQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetOverdueJobSummaryQuery(), cancellationToken);
+
         #endregion Methods
     }
 }
