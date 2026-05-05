@@ -70,8 +70,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.ProfilePhotoObjectKey,
                 entity.EmbeddingUpdatedAt,
                 tags,
-                entity.ExpectedSalaryMinMoney(),
-                entity.ExpectedSalaryMaxMoney(),
+                entity.GetExpectedSalaryMinMoney(),
+                entity.GetExpectedSalaryMaxMoney(),
                 profileCompletionPercent,
                 categories);
 

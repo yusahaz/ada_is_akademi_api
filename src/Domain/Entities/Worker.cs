@@ -378,6 +378,18 @@ namespace Azoxia.AdaIsAkademi.Domain
         }
 
         /// <summary>
+        /// Projects stored maximum salary columns into <see cref="Money"/> when both amount and currency exist (read-model helper; EF cannot materialize nullable Money composites).
+        /// </summary>
+        public Money? GetExpectedSalaryMaxMoney() =>
+            MapExpectedSalaryBound(ExpectedSalaryMaxAmount, ExpectedSalaryMaxCurrency);
+
+        /// <summary>
+        /// Projects stored minimum salary columns into <see cref="Money"/> when both amount and currency exist.
+        /// </summary>
+        public Money? GetExpectedSalaryMinMoney() =>
+            MapExpectedSalaryBound(ExpectedSalaryMinAmount, ExpectedSalaryMinCurrency);
+
+        /// <summary>
         /// Updates nationality and university fields after trimming.
         /// </summary>
         protected internal void UpdateProfile(string? nationality, string? university)
@@ -404,6 +416,16 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             SkillEmbedding = skillEmbedding;
             EmbeddingUpdatedAt = DateTimeOffset.UtcNow;
+        }
+
+        private static Money? MapExpectedSalaryBound(decimal? amount, string? currency)
+        {
+            if (!amount.HasValue || currency.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            return new Money(amount.Value, currency.Trim().ToUpperInvariant());
         }
 
         #endregion Utils

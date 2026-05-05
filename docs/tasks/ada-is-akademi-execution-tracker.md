@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-06 (UTC+3)
+- Last Updated: 2026-05-07 (UTC+3)
 - Current Phase: Faz 2 Sprint 6
 - Current Task: **P2 profil görüntüleme metriği** tamamlandı (`EmployerWorkerProfileViewStat`, `RecordEmployerWorkerProfileViewCommand`, employer-safe read model + cache).
-- Next Task: Backlog / bir sonraki sprint seçimi (`docs/tasks/worker-employer-profile-enrichment.md` deferred veya yeni epic).
+- Next Task: Ürün backlog (ör. CV pipeline — tracker Deferred) veya teknik borç maddeleri; görev konvansiyonları için `docs/tasks/README.md`.
 - Blockers: Yok
 
 ## Phase Checklist
@@ -68,6 +68,9 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-06 - Employer sosyal linkler: `EmployerSocialLink` + `EmployerSocialLinkInput`, `ReplaceSocialLinks`, migration `AddEmployerSocialLinks`, `UpdateEmployerSocialLinksCommand` + validator/handler/DI, `EmployerDetailModel` / `EmployerFullDetailModel` `SocialLinks`, `Employers/UpdateSocialLinks`, ApplicationTests; PRD v6.2 ve iş planı güncellendi.
 - [x] 2026-05-06 - Profil P2 metrik: `EmployerWorkerProfileViewStat` + migration, `IWorkerEmployerProfileAccess` / `WorkerEmployerProfileAccess` (scoped DI), employer-safe cache anahtarları (`employerId`+`workerId`) ve `EmployerWorkerProfileViewStatDependency`, `EmployerSourcedProfileViewCount` read model alanı, `RecordEmployerWorkerProfileViewCommand` + `Workers/RecordEmployerWorkerProfileView`, ApplicationTests + görev dosyası güncellendi.
 - [x] 2026-05-06 - Profil P2 teknik: işveren-worker erişim servisi static değil; ilgili handler’lar ctor’da yalnız `IServiceProvider`, `IWorkerEmployerProfileAccess` `ServiceProvider.GetRequiredService` ile çözülüyor (`GetWorkerById` / `GetDetail` / `RecordEmployerWorkerProfileView`).
+- [x] 2026-05-07 - Mimari envanter: `/ada-is-akademi-plan` kapsamında katman kurallarıyla hizalı kod yapısı gözden geçirildi; özet ve takip maddeleri `docs/tasks/codebase-structure-review-2026-05.md` dosyasına işlendi.
+- [x] 2026-05-07 - Görev klasörü: `docs/tasks/README.md` eklendi (kebab-case adlandırma, tracker ilişkisi, ne zaman yeni task dosyası açılır).
+- [x] 2026-05-07 - Domain: beklenen maaş kolonlarından `Money` örneklemesi `Worker.GetExpectedSalaryMinMoney` / `GetExpectedSalaryMaxMoney` olarak taşındı; Application `WorkerExpectedSalaryMappings` kaldırıldı; gözden geçirme task checklist güncellendi.
 
 ## Profil / medya / eşleştirme (iş planı özeti)
 

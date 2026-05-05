@@ -64,8 +64,8 @@ namespace Azoxia.AdaIsAkademi.Application.Services
                 earned += WeightNationalityOrUniversity;
             }
 
-            bool salaryComplete = worker.ExpectedSalaryMinMoney() is not null
-                && worker.ExpectedSalaryMaxMoney() is not null;
+            bool salaryComplete = worker.GetExpectedSalaryMinMoney() is not null
+                && worker.GetExpectedSalaryMaxMoney() is not null;
 
             if (salaryComplete)
             {

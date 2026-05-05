@@ -142,8 +142,8 @@ namespace Azoxia.AdaIsAkademi.Application
                         x.Contact.Phone))
                     .ToList(),
                 socialLinks,
-                entity.ExpectedSalaryMinMoney(),
-                entity.ExpectedSalaryMaxMoney(),
+                entity.GetExpectedSalaryMinMoney(),
+                entity.GetExpectedSalaryMaxMoney(),
                 profileCompletionPercent,
                 categories);
 
