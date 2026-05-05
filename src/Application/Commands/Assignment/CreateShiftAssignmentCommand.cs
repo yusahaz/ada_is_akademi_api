@@ -25,6 +25,11 @@ namespace Azoxia.AdaIsAkademi.Application
         public string CheckInTokenHash { get; set; }
 
         /// <summary>
+        /// Token hash expected during supervisor-side QR confirmation.
+        /// </summary>
+        public string SupervisorCheckInTokenHash { get; set; }
+
+        /// <summary>
         /// Accepted job application identifier.
         /// </summary>
         public int JobApplicationId { get; set; }
@@ -49,6 +54,11 @@ namespace Azoxia.AdaIsAkademi.Application
             if (request.CheckInTokenHash.IsNullOrWhiteSpace())
             {
                 failures.Add(ApplicationValidationCodes.CreateShiftAssignmentCheckInTokenHashRequired.ForField(nameof(CreateShiftAssignmentCommand.CheckInTokenHash)));
+            }
+
+            if (request.SupervisorCheckInTokenHash.IsNullOrWhiteSpace())
+            {
+                failures.Add(ApplicationValidationCodes.CreateShiftAssignmentSupervisorCheckInTokenHashRequired.ForField(nameof(CreateShiftAssignmentCommand.SupervisorCheckInTokenHash)));
             }
 
             return new ValidationResult(failures);
@@ -93,7 +103,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 application.JobPostingId,
                 application.Id,
                 application.WorkerId,
-                command.CheckInTokenHash);
+                command.CheckInTokenHash,
+                command.SupervisorCheckInTokenHash);
             UnitOfWork.Add(assignment);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 

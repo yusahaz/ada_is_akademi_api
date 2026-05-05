@@ -135,6 +135,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             ErrorMessage: "This operation is not allowed for the current shift assignment status.");
 
         /// <summary>
+        /// Mutual QR confirmation window has expired.
+        /// </summary>
+        public static readonly ErrorCode ShiftAssignmentMutualQrWindowExpired = new(
+            Code: "AZX_ADA_DOMAIN_027",
+            ErrorMessage: "Mutual QR confirmation window has expired.");
+
+        /// <summary>
         /// Email is already verified for the account.
         /// </summary>
         public static readonly ErrorCode SystemUserEmailAlreadyVerified = new(

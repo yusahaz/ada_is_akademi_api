@@ -33,6 +33,11 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasColumnOrder(columnOrder++)
                 .IsRequired();
 
+            builder.Property(e => e.SupervisorCheckInTokenHash)
+                .HasMaxLength(1024)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired();
+
             builder.Property(e => e.Status)
                 .HasConversion<int>()
                 .HasColumnOrder(columnOrder++)
@@ -47,6 +52,10 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .IsRequired(false);
 
             builder.Property(e => e.CheckedOutAt)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
+            builder.Property(e => e.SupervisorCheckedInAt)
                 .HasColumnOrder(columnOrder++)
                 .IsRequired(false);
 

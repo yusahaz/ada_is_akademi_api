@@ -12,6 +12,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         #region Fields
 
         private const int AnomalyEarlyCheckOutMinutesThreshold = 30;
+        private const int MutualQrGraceMinutesThreshold = 15;
 
         #endregion Fields
 
@@ -23,12 +24,14 @@ namespace Azoxia.AdaIsAkademi.Domain
             int jobPostingId,
             int jobApplicationId,
             int workerId,
-            string checkInTokenHash)
+            string checkInTokenHash,
+            string supervisorCheckInTokenHash)
         {
             JobPostingId = jobPostingId;
             JobApplicationId = jobApplicationId;
             WorkerId = workerId;
             CheckInTokenHash = checkInTokenHash;
+            SupervisorCheckInTokenHash = supervisorCheckInTokenHash;
             Status = ShiftAssignmentStatus.Pending;
             AssignedAt = DateTimeOffset.UtcNow;
         }
@@ -39,13 +42,30 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         protected internal void CheckIn(string checkInTokenHash)
         {
-            (Status == ShiftAssignmentStatus.Pending)
+            (Status == ShiftAssignmentStatus.Pending || Status == ShiftAssignmentStatus.AwaitingMutualQr)
                 .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
             (CheckInTokenHash == checkInTokenHash)
                 .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentCheckInTokenInvalid);
+            (!CheckedInAt.HasValue).ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
 
-            CheckedInAt = DateTimeOffset.UtcNow;
-            Status = ShiftAssignmentStatus.CheckedIn;
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            CheckedInAt = now;
+            Status = ShiftAssignmentStatus.AwaitingMutualQr;
+            TryCompleteMutualCheckIn(now);
+        }
+
+        protected internal void SupervisorCheckIn(string supervisorCheckInTokenHash)
+        {
+            (Status == ShiftAssignmentStatus.Pending || Status == ShiftAssignmentStatus.AwaitingMutualQr)
+                .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
+            (SupervisorCheckInTokenHash == supervisorCheckInTokenHash)
+                .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentCheckInTokenInvalid);
+            (!SupervisorCheckedInAt.HasValue).ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
+
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            SupervisorCheckedInAt = now;
+            Status = ShiftAssignmentStatus.AwaitingMutualQr;
+            TryCompleteMutualCheckIn(now);
         }
 
         protected internal void CheckOut()
@@ -63,6 +83,20 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             CheckedOutAt = now;
             Status = ShiftAssignmentStatus.CheckedOut;
+        }
+
+        private void TryCompleteMutualCheckIn(DateTimeOffset now)
+        {
+            if (!CheckedInAt.HasValue || !SupervisorCheckedInAt.HasValue)
+            {
+                return;
+            }
+
+            TimeSpan difference = (CheckedInAt.Value - SupervisorCheckedInAt.Value).Duration();
+            (difference <= TimeSpan.FromMinutes(MutualQrGraceMinutesThreshold))
+                .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentMutualQrWindowExpired);
+
+            Status = ShiftAssignmentStatus.CheckedIn;
         }
 
         #endregion Utils
@@ -98,6 +132,16 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Hash value expected during QR check-in verification.
         /// </summary>
         public string CheckInTokenHash { get; private set; }
+
+        /// <summary>
+        /// Hash value expected during supervisor-side QR mutual confirmation.
+        /// </summary>
+        public string SupervisorCheckInTokenHash { get; private set; }
+
+        /// <summary>
+        /// Timestamp recorded when supervisor-side check-in succeeds.
+        /// </summary>
+        public DateTimeOffset? SupervisorCheckedInAt { get; private set; }
 
         /// <summary>
         /// Source job application identifier.

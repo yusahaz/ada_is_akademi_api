@@ -227,6 +227,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "CheckInTokenHash cannot be null, empty, or whitespace.");
 
         /// <summary>
+        /// Supervisor check-in token hash is required when creating a shift assignment.
+        /// </summary>
+        internal static readonly ErrorCode CreateShiftAssignmentSupervisorCheckInTokenHashRequired = new(
+            Code: "AZX_ADA_APP_VAL_944",
+            ErrorMessage: "SupervisorCheckInTokenHash cannot be null, empty, or whitespace.");
+
+        /// <summary>
         /// Job application id must be positive when creating a shift assignment.
         /// </summary>
         internal static readonly ErrorCode CreateShiftAssignmentJobApplicationId = new(
@@ -575,6 +582,20 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode CheckOutShiftAssignmentAssignmentId = new(
             Code: "AZX_ADA_APP_VAL_937",
             ErrorMessage: "AssignmentId must be greater than zero.");
+
+        /// <summary>
+        /// Assignment id must be positive when supervisor confirms shift assignment check-in.
+        /// </summary>
+        internal static readonly ErrorCode SupervisorCheckInShiftAssignmentAssignmentId = new(
+            Code: "AZX_ADA_APP_VAL_945",
+            ErrorMessage: "AssignmentId must be greater than zero.");
+
+        /// <summary>
+        /// Supervisor check-in token hash is required when supervisor confirms shift assignment check-in.
+        /// </summary>
+        internal static readonly ErrorCode SupervisorCheckInShiftAssignmentTokenHashRequired = new(
+            Code: "AZX_ADA_APP_VAL_946",
+            ErrorMessage: "SupervisorCheckInTokenHash cannot be null, empty, or whitespace.");
 
         /// <summary>
         /// Job posting id must be positive when publishing a posting.

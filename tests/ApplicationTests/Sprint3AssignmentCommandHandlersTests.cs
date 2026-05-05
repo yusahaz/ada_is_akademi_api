@@ -34,6 +34,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 new CreateShiftAssignmentCommand
                 {
                     CheckInTokenHash = "qr-token-hash",
+                    SupervisorCheckInTokenHash = "supervisor-qr-token-hash",
                     JobApplicationId = applicationId,
                 },
                 CancellationToken.None);
@@ -66,6 +67,16 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 },
                 CancellationToken.None);
 
+            var supervisorCheckInHandler = new SupervisorCheckInShiftAssignmentCommandHandler(sp);
+            executionContext.ReplaceClaim("employer_id", employerId.ToString());
+            await ((IRequestHandler<SupervisorCheckInShiftAssignmentCommand, Unit>)supervisorCheckInHandler).HandleAsync(
+                new SupervisorCheckInShiftAssignmentCommand
+                {
+                    AssignmentId = assignmentId,
+                    SupervisorCheckInTokenHash = "supervisor-qr-token-hash",
+                },
+                CancellationToken.None);
+
             ShiftAssignment? assignment = await db.Set<ShiftAssignment>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == assignmentId);
             assignment.Should().NotBeNull();
             assignment!.Status.Should().Be(ShiftAssignmentStatus.CheckedIn);
@@ -80,7 +91,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             using IServiceScope scope = root.CreateScope();
             IServiceProvider sp = scope.ServiceProvider;
             AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
-            (_, int assignmentId, int workerId) = await SeedAssignmentAsync(db);
+            (int employerId, int assignmentId, int workerId) = await SeedAssignmentAsync(db);
             executionContext.ReplaceClaim("worker_id", workerId.ToString());
 
             var checkInHandler = new CheckInShiftAssignmentCommandHandler(sp);
@@ -89,6 +100,16 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 {
                     AssignmentId = assignmentId,
                     CheckInTokenHash = "qr-token-hash",
+                },
+                CancellationToken.None);
+
+            var supervisorCheckInHandler = new SupervisorCheckInShiftAssignmentCommandHandler(sp);
+            executionContext.ReplaceClaim("employer_id", employerId.ToString());
+            await ((IRequestHandler<SupervisorCheckInShiftAssignmentCommand, Unit>)supervisorCheckInHandler).HandleAsync(
+                new SupervisorCheckInShiftAssignmentCommand
+                {
+                    AssignmentId = assignmentId,
+                    SupervisorCheckInTokenHash = "supervisor-qr-token-hash",
                 },
                 CancellationToken.None);
 
@@ -133,6 +154,31 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             ex.Error.Should().Be(ApplicationValidationCodes.ActorResourceAccessDenied);
         }
 
+        [Fact]
+        public async Task SupervisorCheckInShiftAssignmentHandler_throws_for_non_owner_employer()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+            (_, int assignmentId, _) = await SeedAssignmentAsync(db);
+            executionContext.ReplaceClaim("employer_id", "999999");
+
+            var handler = new SupervisorCheckInShiftAssignmentCommandHandler(sp);
+            Func<Task> act = async () =>
+                await ((IRequestHandler<SupervisorCheckInShiftAssignmentCommand, Unit>)handler).HandleAsync(
+                    new SupervisorCheckInShiftAssignmentCommand
+                    {
+                        AssignmentId = assignmentId,
+                        SupervisorCheckInTokenHash = "supervisor-qr-token-hash",
+                    },
+                    CancellationToken.None);
+
+            AzoxiaException ex = (await act.Should().ThrowAsync<AzoxiaException>()).Which;
+            ex.Error.Should().Be(ApplicationValidationCodes.ActorResourceAccessDenied);
+        }
+
         #endregion Methods
 
         #region Utils
@@ -145,7 +191,8 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 postingId,
                 applicationId,
                 workerId,
-                "qr-token-hash");
+                "qr-token-hash",
+                "supervisor-qr-token-hash");
             db.Set<ShiftAssignment>().Add(assignment);
             await db.SaveChangesAsync();
 

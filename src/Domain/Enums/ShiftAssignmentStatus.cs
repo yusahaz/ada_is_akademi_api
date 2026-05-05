@@ -11,6 +11,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         Pending = 10,
 
         /// <summary>
+        /// One side of mutual QR has scanned; waiting for counterpart scan.
+        /// </summary>
+        AwaitingMutualQr = 15,
+
+        /// <summary>
         /// Worker has checked in for the assigned shift.
         /// </summary>
         CheckedIn = 20,

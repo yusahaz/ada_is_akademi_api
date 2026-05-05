@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-05 17:37 (UTC+3)
-- Current Phase: Sprint kapanış hızlı-temizlik
-- Current Task: Sprint 9 faz kapanış ve dayanıklılık checklist senkronizasyonu tamamlandı
-- Next Task: Faz tamamlandı - bir sonraki faz backlog önceliklendirme
+- Last Updated: 2026-05-05 17:56 (UTC+3)
+- Current Phase: Faz 1 eksiklerinin kapanışı
+- Current Task: Sprint 3 mutual QR check-in/out handshake tamamlandı (worker+supervisor çift onay)
+- Next Task: WorkerPayout lifecycle ve finansal race/idempotency sertleştirme
 - Blockers: Yok
 
 ## Phase Checklist
@@ -55,6 +55,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-05 17:36 - Sprint 8 regional: `ListOpenJobPostingsQuery` için opsiyonel `CountryCode` filtresi ve cache key varyantı eklendi; query testi + build geçti.
 - [x] 2026-05-05 17:37 - Sprint 9 kapanış: faz boyunca tamamlanan sprint dilimleri tracker/checklist ile senkronize edildi, kapanış commit zinciri tamamlandı.
 - [x] 2026-05-05 17:34 - Sprint 7 guard: commission receivable generation komutuna employer `Active` status zorunluluğu eklendi; non-active employer negatif testi yazıldı.
+- [x] 2026-05-05 17:56 - Sprint 3 mutual QR: `ShiftAssignment` için worker + supervisor çift token doğrulama, grace-period guard, yeni supervisor check-in command/endpoint ve negatif erişim testi eklendi; sprint testleri geçti.
 
 ## Deferred Backlog
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)

@@ -167,6 +167,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Gets full worker detail by id.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker detail")]
+        [EndpointDescription("Returns full worker profile detail with account summary and all profile collections.")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerFullDetailModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetDetail(
+            [FromBody] GetWorkerDetailQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Lists workers with filtering and paging support.</summary>
         [HttpPost]
         [Consumes("application/json")]

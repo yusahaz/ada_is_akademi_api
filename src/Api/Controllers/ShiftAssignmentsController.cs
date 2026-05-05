@@ -8,7 +8,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
     using Microsoft.AspNetCore.Mvc.ModelBinding;
 
     /// <summary>
-    /// Shift assignment endpoints for assignment creation and QR check-in.
+    /// Shift assignment endpoints for assignment creation and mutual QR lifecycle.
     /// </summary>
     [Tags("Shift assignments")]
     [Produces("application/json")]
@@ -38,6 +38,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> CheckIn(
             [FromBody] CheckInShiftAssignmentCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Supervisor confirms check-in by QR token hash.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Supervisor check in shift assignment")]
+        [EndpointDescription("Completes mutual QR check-in when employer/supervisor confirms assignment check-in token.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> SupervisorCheckIn(
+            [FromBody] SupervisorCheckInShiftAssignmentCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 

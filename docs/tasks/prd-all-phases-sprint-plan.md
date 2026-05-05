@@ -22,7 +22,7 @@
 ### Faz 1 - Core MVP (Sprint 1-3)
 - [ ] Identity: email verification aktivasyon, JWT, multi-device session, group-based RBAC.
 - [ ] Worker/Employer çekirdek profilleri ve ilan-başvuru akışı.
-- [ ] Assignment + mutual QR check-in/out (clock drift + grace period).
+- [x] Assignment + mutual QR check-in/out (clock drift + grace period).
 - [ ] CommissionReceivable + WorkerPayout çekirdeği.
 - [ ] Bağımlılık: auth + permission resolver tamamlanmadan operasyonel endpointler açılmaz.
 
@@ -61,7 +61,7 @@
 - [x] Çıktı (ilk dikey dilim): vardiya oluşumundan başvuruya temel iş akışının çalışması.
 
 ### Sprint 3 - Assignment, QR, Finansal Çekirdek
-- [ ] Mutual QR check-in/out + anomaly flag mekaniği.
+- [x] Mutual QR check-in/out + anomaly flag mekaniği.
 - [ ] Commission motoru ve audit log.
 - [ ] CommissionReceivable oluşturma + WorkerPayout state geçişleri.
 - [x] Çıktı (ilk dikey dilim): Faz 1 MVP operasyonel olarak tamam.
