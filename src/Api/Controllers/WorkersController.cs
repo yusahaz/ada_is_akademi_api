@@ -206,6 +206,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Confirms processing payout for authenticated worker.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Confirm worker payout")]
+        [EndpointDescription("Worker confirms payout transfer and closes payout lifecycle.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ConfirmPayout(
+            [FromBody] ConfirmWorkerPayoutCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Updates authenticated worker profile basics.</summary>
         [HttpPost]
         [Consumes("application/json")]

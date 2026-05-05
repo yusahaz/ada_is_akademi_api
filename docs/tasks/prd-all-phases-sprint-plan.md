@@ -20,11 +20,11 @@
 ## Faz Kapsamı ve Bağımlılıklar
 
 ### Faz 1 - Core MVP (Sprint 1-3)
-- [ ] Identity: email verification aktivasyon, JWT, multi-device session, group-based RBAC.
-- [ ] Worker/Employer çekirdek profilleri ve ilan-başvuru akışı.
+- [x] Identity: email verification aktivasyon, JWT, multi-device session, group-based RBAC.
+- [x] Worker/Employer çekirdek profilleri ve ilan-başvuru akışı.
 - [x] Assignment + mutual QR check-in/out (clock drift + grace period).
-- [ ] CommissionReceivable + WorkerPayout çekirdeği.
-- [ ] Bağımlılık: auth + permission resolver tamamlanmadan operasyonel endpointler açılmaz.
+- [x] CommissionReceivable + WorkerPayout çekirdeği.
+- [x] Bağımlılık: auth + permission resolver tamamlanmadan operasyonel endpointler açılmaz.
 
 ### Faz 2 - Intelligence and Automation (Sprint 4-6)
 - [ ] pgvector extension, worker/posting embedding pipeline.
@@ -62,8 +62,8 @@
 
 ### Sprint 3 - Assignment, QR, Finansal Çekirdek
 - [x] Mutual QR check-in/out + anomaly flag mekaniği.
-- [ ] Commission motoru ve audit log.
-- [ ] CommissionReceivable oluşturma + WorkerPayout state geçişleri.
+- [x] Commission motoru ve audit log.
+- [x] CommissionReceivable oluşturma + WorkerPayout state geçişleri.
 - [x] Çıktı (ilk dikey dilim): Faz 1 MVP operasyonel olarak tamam.
 
 ### Sprint 4 - Semantic Altyapı

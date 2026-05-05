@@ -196,6 +196,27 @@ namespace Azoxia.AdaIsAkademi.Domain
         public static readonly ErrorCode WorkerProfileItemNotFound = new(
             Code: "AZX_ADA_DOMAIN_025",
             ErrorMessage: "The requested worker profile item could not be found.");
+
+        /// <summary>
+        /// Worker payout cannot transition from its current status.
+        /// </summary>
+        public static readonly ErrorCode WorkerPayoutInvalidStatusTransition = new(
+            Code: "AZX_ADA_DOMAIN_028",
+            ErrorMessage: "This operation is not allowed for the current worker payout status.");
+
+        /// <summary>
+        /// Worker payout processing is blocked because related assignment is disputed.
+        /// </summary>
+        public static readonly ErrorCode WorkerPayoutAssignmentDisputed = new(
+            Code: "AZX_ADA_DOMAIN_029",
+            ErrorMessage: "Worker payout cannot proceed while assignment is disputed.");
+
+        /// <summary>
+        /// Worker payout retry threshold has been reached.
+        /// </summary>
+        public static readonly ErrorCode WorkerPayoutRetryLimitExceeded = new(
+            Code: "AZX_ADA_DOMAIN_030",
+            ErrorMessage: "Worker payout retry limit has been exceeded.");
         #endregion Properties
     }
 }

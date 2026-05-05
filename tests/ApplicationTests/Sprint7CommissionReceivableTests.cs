@@ -61,6 +61,11 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             detail.Id.Should().Be(firstId);
             detail.Amount.Should().Be(150m);
             detail.Currency.Should().Be("TRY");
+
+            int auditCount = await db.Set<CommissionAuditLog>()
+                .CountAsync(x => x.CommissionReceivableId == firstId
+                                 && x.EventType == CommissionAuditEventType.CommissionReceivableGenerated);
+            auditCount.Should().Be(1);
         }
 
         [Fact]

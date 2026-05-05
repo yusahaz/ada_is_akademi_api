@@ -113,8 +113,17 @@ namespace Azoxia.AdaIsAkademi.Application
             UnitOfWork.Add(receivable);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
+            UnitOfWork.Add(new CommissionAuditLog(
+                command.EmployerId,
+                CommissionAuditEventType.CommissionReceivableGenerated,
+                receivable.Amount,
+                commissionReceivableId: receivable.Id,
+                note: $"period:{command.PeriodStart:yyyy-MM-dd}-{command.PeriodEnd:yyyy-MM-dd}"));
+            await UnitOfWork.SaveChangesAsync(cancellationToken);
+
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionReceivableDependency(command.EmployerId), cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionReceivableAllDependency(), cancellationToken);
+            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
 
             return receivable.Id;
         }

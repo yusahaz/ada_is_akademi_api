@@ -45,6 +45,11 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<AddWorkerSkillCommand, int>, AddWorkerSkillCommandHandler>();
             services.AddScoped<IRequestHandler<BanEmployerCommand, Unit>, BanEmployerCommandHandler>();
             services.AddScoped<IRequestHandler<GenerateCommissionReceivableCommand, int>, GenerateCommissionReceivableCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateWorkerPayoutCommand, int>, CreateWorkerPayoutCommandHandler>();
+            services.AddScoped<IRequestHandler<MarkWorkerPayoutAsProcessingCommand, Unit>, MarkWorkerPayoutAsProcessingCommandHandler>();
+            services.AddScoped<IRequestHandler<FailWorkerPayoutCommand, Unit>, FailWorkerPayoutCommandHandler>();
+            services.AddScoped<IRequestHandler<RetryWorkerPayoutCommand, Unit>, RetryWorkerPayoutCommandHandler>();
+            services.AddScoped<IRequestHandler<ConfirmWorkerPayoutCommand, Unit>, ConfirmWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<SetEmployerCommissionRateCommand, Unit>, SetEmployerCommissionRateCommandHandler>();
             services.AddScoped<IRequestHandler<BanSystemUserCommand, Unit>, BanSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<RunOverdueAlarmSweepCommand, int>, RunOverdueAlarmSweepCommandHandler>();
@@ -143,6 +148,11 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<AddWorkerSkillCommand>, AddWorkerSkillCommandValidator>();
             services.AddScoped<IRequestValidator<BanEmployerCommand>, BanEmployerCommandValidator>();
             services.AddScoped<IRequestValidator<GenerateCommissionReceivableCommand>, GenerateCommissionReceivableCommandValidator>();
+            services.AddScoped<IRequestValidator<CreateWorkerPayoutCommand>, CreateWorkerPayoutCommandValidator>();
+            services.AddScoped<IRequestValidator<MarkWorkerPayoutAsProcessingCommand>, MarkWorkerPayoutAsProcessingCommandValidator>();
+            services.AddScoped<IRequestValidator<FailWorkerPayoutCommand>, FailWorkerPayoutCommandValidator>();
+            services.AddScoped<IRequestValidator<RetryWorkerPayoutCommand>, RetryWorkerPayoutCommandValidator>();
+            services.AddScoped<IRequestValidator<ConfirmWorkerPayoutCommand>, ConfirmWorkerPayoutCommandValidator>();
             services.AddScoped<IRequestValidator<SetEmployerCommissionRateCommand>, SetEmployerCommissionRateCommandValidator>();
             services.AddScoped<IRequestValidator<BanSystemUserCommand>, BanSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<RunOverdueAlarmSweepCommand>, RunOverdueAlarmSweepCommandValidator>();

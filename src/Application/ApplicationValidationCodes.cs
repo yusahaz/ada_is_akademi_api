@@ -493,6 +493,41 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "PeriodEnd must be on or after PeriodStart.");
 
         /// <summary>
+        /// Assignment id must be positive when creating worker payout.
+        /// </summary>
+        internal static readonly ErrorCode CreateWorkerPayoutAssignmentId = new(
+            Code: "AZX_ADA_APP_VAL_947",
+            ErrorMessage: "AssignmentId must be greater than zero.");
+
+        /// <summary>
+        /// Worker payout id must be positive when marking payout as processing.
+        /// </summary>
+        internal static readonly ErrorCode MarkWorkerPayoutAsProcessingWorkerPayoutId = new(
+            Code: "AZX_ADA_APP_VAL_948",
+            ErrorMessage: "WorkerPayoutId must be greater than zero.");
+
+        /// <summary>
+        /// Worker payout id must be positive when confirming payout.
+        /// </summary>
+        internal static readonly ErrorCode ConfirmWorkerPayoutWorkerPayoutId = new(
+            Code: "AZX_ADA_APP_VAL_949",
+            ErrorMessage: "WorkerPayoutId must be greater than zero.");
+
+        /// <summary>
+        /// Worker payout id must be positive when failing payout.
+        /// </summary>
+        internal static readonly ErrorCode FailWorkerPayoutWorkerPayoutId = new(
+            Code: "AZX_ADA_APP_VAL_950",
+            ErrorMessage: "WorkerPayoutId must be greater than zero.");
+
+        /// <summary>
+        /// Worker payout id must be positive when retrying payout.
+        /// </summary>
+        internal static readonly ErrorCode RetryWorkerPayoutWorkerPayoutId = new(
+            Code: "AZX_ADA_APP_VAL_951",
+            ErrorMessage: "WorkerPayoutId must be greater than zero.");
+
+        /// <summary>
         /// Employer id must be positive for commission receivable by period query.
         /// </summary>
         internal static readonly ErrorCode GetCommissionReceivableByPeriodEmployerId = new(

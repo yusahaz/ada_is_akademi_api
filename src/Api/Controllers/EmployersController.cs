@@ -166,6 +166,50 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand<int>(command, cancellationToken);
 
+        /// <summary>Creates worker payout from checked-out assignment.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Create worker payout")]
+        [EndpointDescription("Creates or returns existing worker payout row for a checked-out assignment.")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> CreateWorkerPayout(
+            [FromBody] CreateWorkerPayoutCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
+        /// <summary>Marks worker payout as processing.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Mark worker payout as processing")]
+        [EndpointDescription("Employer marks payout as paid and waits for worker confirmation.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> MarkWorkerPayoutAsProcessing(
+            [FromBody] MarkWorkerPayoutAsProcessingCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Marks worker payout as failed.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Fail worker payout")]
+        [EndpointDescription("Marks payout as failed and increments retry counter.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> FailWorkerPayout(
+            [FromBody] FailWorkerPayoutCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Retries a failed worker payout.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Retry worker payout")]
+        [EndpointDescription("Moves failed payout back to pending when retry threshold allows.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RetryWorkerPayout(
+            [FromBody] RetryWorkerPayoutCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Gets commission receivable detail by employer and period.</summary>
         [HttpPost]
         [Consumes("application/json")]

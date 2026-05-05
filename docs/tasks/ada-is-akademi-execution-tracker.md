@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-05 17:56 (UTC+3)
-- Current Phase: Faz 1 eksiklerinin kapanışı
-- Current Task: Sprint 3 mutual QR check-in/out handshake tamamlandı (worker+supervisor çift onay)
-- Next Task: WorkerPayout lifecycle ve finansal race/idempotency sertleştirme
+- Last Updated: 2026-05-05 23:05 (UTC+3)
+- Current Phase: Faz 1 kapatıldı
+- Current Task: Sprint 3 finansal çekirdek tamamlandı (WorkerPayout lifecycle + Commission audit log)
+- Next Task: Faz 2 backlog önceliklendirme
 - Blockers: Yok
 
 ## Phase Checklist
@@ -56,6 +56,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-05 17:37 - Sprint 9 kapanış: faz boyunca tamamlanan sprint dilimleri tracker/checklist ile senkronize edildi, kapanış commit zinciri tamamlandı.
 - [x] 2026-05-05 17:34 - Sprint 7 guard: commission receivable generation komutuna employer `Active` status zorunluluğu eklendi; non-active employer negatif testi yazıldı.
 - [x] 2026-05-05 17:56 - Sprint 3 mutual QR: `ShiftAssignment` için worker + supervisor çift token doğrulama, grace-period guard, yeni supervisor check-in command/endpoint ve negatif erişim testi eklendi; sprint testleri geçti.
+- [x] 2026-05-05 23:05 - Sprint 3 finansal çekirdek: `WorkerPayout` entity + status transition komutları (create/mark processing/fail/retry/confirm), `CommissionAuditLog` append-only kayıtları, ilgili API endpointleri/DI/migration ve payout+commission testleri tamamlandı.
 
 ## Deferred Backlog
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)

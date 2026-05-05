@@ -301,6 +301,36 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static CacheDependency CommissionReceivableAllDependency() =>
             new(nameof(CommissionReceivable), "all");
 
+        /// <summary>
+        /// Invalidation tag for a single <see cref="WorkerPayout"/> row.
+        /// </summary>
+        internal static CacheDependency WorkerPayoutDependency(int workerPayoutId) =>
+            new(nameof(WorkerPayout), workerPayoutId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Invalidation tag for employer-scoped worker payout read models.
+        /// </summary>
+        internal static CacheDependency WorkerPayoutEmployerDependency(int employerId) =>
+            new(nameof(WorkerPayout), $"employer:{employerId.ToString(CultureInfo.InvariantCulture)}");
+
+        /// <summary>
+        /// Invalidation tag for worker-scoped worker payout read models.
+        /// </summary>
+        internal static CacheDependency WorkerPayoutWorkerDependency(int workerId) =>
+            new(nameof(WorkerPayout), $"worker:{workerId.ToString(CultureInfo.InvariantCulture)}");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide worker payout models.
+        /// </summary>
+        internal static CacheDependency WorkerPayoutAllDependency() =>
+            new(nameof(WorkerPayout), "all");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide commission audit models.
+        /// </summary>
+        internal static CacheDependency CommissionAuditLogAllDependency() =>
+            new(nameof(CommissionAuditLog), "all");
+
         #endregion Methods
     }
 }
