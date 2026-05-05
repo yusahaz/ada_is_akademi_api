@@ -4,6 +4,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
+    using Azoxia.Core.Extensions;
 
     /// <summary>
     /// Lists system users with optional filtering and paging.
@@ -41,7 +42,7 @@ namespace Azoxia.AdaIsAkademi.Application
             var filter = UnitOfWork.GetRepository<SystemUser>().Filter().AsNoTracking();
             if (query.AccountStatus.HasValue) filter = filter.Filter(x => x.AccountStatus == query.AccountStatus.Value);
             if (query.Type.HasValue) filter = filter.Filter(x => x.Type == query.Type.Value);
-            if (!string.IsNullOrWhiteSpace(query.SearchEmail))
+            if (!query.SearchEmail.IsNullOrWhiteSpace())
             {
                 string s = query.SearchEmail.Trim().ToLowerInvariant();
                 filter = filter.Filter(x => x.Email.ToLower().Contains(s));

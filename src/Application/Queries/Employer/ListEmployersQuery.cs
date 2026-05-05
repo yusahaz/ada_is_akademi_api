@@ -4,6 +4,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
+    using Azoxia.Core.Extensions;
 
     /// <summary>
     /// Lists employers with optional filtering and paging.
@@ -58,7 +59,7 @@ namespace Azoxia.AdaIsAkademi.Application
             {
                 filter = filter.Filter(x => x.Status == query.Status.Value);
             }
-            if (!string.IsNullOrWhiteSpace(query.SearchText))
+            if (!query.SearchText.IsNullOrWhiteSpace())
             {
                 string s = query.SearchText.Trim().ToLowerInvariant();
                 filter = filter.Filter(x => x.Name.ToLower().Contains(s));

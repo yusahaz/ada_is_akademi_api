@@ -4,6 +4,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
+    using Azoxia.Core.Extensions;
 
     /// <summary>
     /// Lists workers with optional filters and paging.
@@ -46,7 +47,7 @@ namespace Azoxia.AdaIsAkademi.Application
             {
                 filter = filter.Filter(x => x.SystemUser.AccountStatus == query.AccountStatus.Value);
             }
-            if (!string.IsNullOrWhiteSpace(query.SearchEmail))
+            if (!query.SearchEmail.IsNullOrWhiteSpace())
             {
                 string s = query.SearchEmail.Trim().ToLowerInvariant();
                 filter = filter.Filter(x => x.SystemUser.Email.ToLower().Contains(s));
