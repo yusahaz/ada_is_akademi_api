@@ -141,11 +141,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("List commission receivables by employer")]
         [EndpointDescription("Returns commission receivable list for the given employer and row limit.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<CommissionReceivableListItemModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageableApiResponse<CommissionReceivableListItemModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> ListCommissionReceivables(
             [FromBody] ListCommissionReceivablesByEmployerQuery query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
+            => ExecutePageQuery<CommissionReceivableListItemModel, PagedQueryResultModel<CommissionReceivableListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
 
         /// <summary>Suspends an employer.</summary>
         [HttpPost]

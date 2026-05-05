@@ -75,7 +75,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<GetEmployerByIdQuery, EmployerDetailModel>, GetEmployerByIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListEmployersQuery, PagedQueryResultModel<EmployerListItemModel>>, ListEmployersQueryHandler>();
             services.AddScoped<IRequestHandler<GetCommissionReceivableByPeriodQuery, CommissionReceivableDetailModel>, GetCommissionReceivableByPeriodQueryHandler>();
-            services.AddScoped<IRequestHandler<ListCommissionReceivablesByEmployerQuery, IReadOnlyList<CommissionReceivableListItemModel>>, ListCommissionReceivablesByEmployerQueryHandler>();
+            services.AddScoped<IRequestHandler<ListCommissionReceivablesByEmployerQuery, PagedQueryResultModel<CommissionReceivableListItemModel>>, ListCommissionReceivablesByEmployerQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionEstimateQuery, EmployerCommissionEstimateModel>, GetEmployerCommissionEstimateQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionPolicyQuery, EmployerCommissionPolicyModel>, GetEmployerCommissionPolicyQueryHandler>();
             services.AddScoped<IRequestHandler<ListEmployerCommissionSummariesQuery, IReadOnlyList<EmployerCommissionListItemModel>>, ListEmployerCommissionSummariesQueryHandler>();
@@ -91,9 +91,9 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<GetWorkerByIdQuery, WorkerDetailModel>, GetWorkerByIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListWorkersQuery, PagedQueryResultModel<WorkerListItemModel>>, ListWorkersQueryHandler>();
             services.AddScoped<IRequestHandler<ListSystemUserGroupsQuery, PagedQueryResultModel<SystemUserGroupListItemModel>>, ListSystemUserGroupsQueryHandler>();
-            services.AddScoped<IRequestHandler<ListJobApplicationsByJobPostingIdQuery, IReadOnlyList<JobApplicationListItemModel>>, ListJobApplicationsByJobPostingIdQueryHandler>();
-            services.AddScoped<IRequestHandler<ListJobPostingsByEmployerIdQuery, IReadOnlyList<JobPostingSummaryModel>>, ListJobPostingsByEmployerIdQueryHandler>();
-            services.AddScoped<IRequestHandler<ListOpenJobPostingsQuery, IReadOnlyList<JobPostingSummaryModel>>, ListOpenJobPostingsQueryHandler>();
+            services.AddScoped<IRequestHandler<ListJobApplicationsByJobPostingIdQuery, PagedQueryResultModel<JobApplicationListItemModel>>, ListJobApplicationsByJobPostingIdQueryHandler>();
+            services.AddScoped<IRequestHandler<ListJobPostingsByEmployerIdQuery, PagedQueryResultModel<JobPostingSummaryModel>>, ListJobPostingsByEmployerIdQueryHandler>();
+            services.AddScoped<IRequestHandler<ListOpenJobPostingsQuery, PagedQueryResultModel<JobPostingSummaryModel>>, ListOpenJobPostingsQueryHandler>();
             services.AddScoped<IRequestHandler<ListSemanticMatchedJobPostingsQuery, IReadOnlyList<SemanticMatchedJobPostingModel>>, ListSemanticMatchedJobPostingsQueryHandler>();
         }
 

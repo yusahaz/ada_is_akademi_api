@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Lists job postings that are currently open for applications.
     /// </summary>
     public class ListOpenJobPostingsQuery :
-        QueryBase<IReadOnlyList<JobPostingSummaryModel>>
+        QueryBase<PagedQueryResultModel<JobPostingSummaryModel>>
     {
     }
 
@@ -28,12 +28,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListOpenJobPostingsQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListOpenJobPostingsQuery, IReadOnlyList<JobPostingSummaryModel>>(serviceProvider)
+        QueryHandlerBase<ListOpenJobPostingsQuery, PagedQueryResultModel<JobPostingSummaryModel>>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<IReadOnlyList<JobPostingSummaryModel>> HandleAsync(
+        protected override async Task<PagedQueryResultModel<JobPostingSummaryModel>> HandleAsync(
             ListOpenJobPostingsQuery query,
             CancellationToken cancellationToken)
         {
@@ -56,7 +56,8 @@ namespace Azoxia.AdaIsAkademi.Application
                         x.HeadCount),
                     cancellationToken);
 
-            return rows.ToList();
+            List<JobPostingSummaryModel> list = rows.ToList();
+            return new PagedQueryResultModel<JobPostingSummaryModel>(list, list.Count, list.Count, 0);
         }
 
         #endregion Utils

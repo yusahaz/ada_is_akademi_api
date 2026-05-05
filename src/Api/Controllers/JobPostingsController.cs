@@ -81,12 +81,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("List job postings for employer")]
         [EndpointDescription("Requires Bearer JWT with a positive employer_id claim; request body may be `{}` — employer scope is taken only from the token.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<JobPostingSummaryModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageableApiResponse<JobPostingSummaryModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> ListByEmployer(
             [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
             ListJobPostingsByEmployerIdQuery? query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query ?? new ListJobPostingsByEmployerIdQuery(), cancellationToken);
+            => ExecutePageQuery<JobPostingSummaryModel, PagedQueryResultModel<JobPostingSummaryModel>>(
+                query ?? new ListJobPostingsByEmployerIdQuery(),
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
 
         /// <summary>Lists open postings (public catalog).</summary>
         [AllowAnonymous]
@@ -94,12 +100,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("List open job postings")]
         [EndpointDescription("Returns postings currently open for applications.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<JobPostingSummaryModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageableApiResponse<JobPostingSummaryModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> ListOpen(
             [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
             ListOpenJobPostingsQuery? query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query ?? new ListOpenJobPostingsQuery(), cancellationToken);
+            => ExecutePageQuery<JobPostingSummaryModel, PagedQueryResultModel<JobPostingSummaryModel>>(
+                query ?? new ListOpenJobPostingsQuery(),
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
 
         /// <summary>Lists semantically matched open postings for a worker embedding.</summary>
         [AllowAnonymous]

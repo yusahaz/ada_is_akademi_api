@@ -34,11 +34,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("List job applications")]
         [EndpointDescription("Lists applications for a posting; JWT employer_id must match posting owner.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<JobApplicationListItemModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageableApiResponse<JobApplicationListItemModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> List(
             [FromBody] ListJobApplicationsByJobPostingIdQuery query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
+            => ExecutePageQuery<JobApplicationListItemModel, PagedQueryResultModel<JobApplicationListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
 
         /// <summary>Rejects an application.</summary>
         [HttpPost]

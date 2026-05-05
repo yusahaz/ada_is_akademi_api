@@ -17,7 +17,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Owning employer is resolved exclusively from the authenticated token's <c>employer_id</c> claim.
     /// </summary>
     public class ListJobPostingsByEmployerIdQuery :
-        QueryBase<IReadOnlyList<JobPostingSummaryModel>>
+        QueryBase<PagedQueryResultModel<JobPostingSummaryModel>>
     {
     }
 
@@ -37,12 +37,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListJobPostingsByEmployerIdQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListJobPostingsByEmployerIdQuery, IReadOnlyList<JobPostingSummaryModel>>(serviceProvider)
+        QueryHandlerBase<ListJobPostingsByEmployerIdQuery, PagedQueryResultModel<JobPostingSummaryModel>>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<IReadOnlyList<JobPostingSummaryModel>> HandleAsync(
+        protected override async Task<PagedQueryResultModel<JobPostingSummaryModel>> HandleAsync(
             ListJobPostingsByEmployerIdQuery query,
             CancellationToken cancellationToken)
         {
@@ -50,8 +50,8 @@ namespace Azoxia.AdaIsAkademi.Application
             int employerId = executionContext.RequireAdaIsEmployerActorId();
 
             CacheKey cacheKey = AdaIsCacheKeys.EmployerJobPostingsSummaryKey(employerId);
-            IReadOnlyList<JobPostingSummaryModel>? cached =
-                await CacheService.GetAsync<IReadOnlyList<JobPostingSummaryModel>>(cacheKey, cancellationToken);
+            PagedQueryResultModel<JobPostingSummaryModel>? cached =
+                await CacheService.GetAsync<PagedQueryResultModel<JobPostingSummaryModel>>(cacheKey, cancellationToken);
             if (cached is not null)
             {
                 return cached;
@@ -79,13 +79,19 @@ namespace Azoxia.AdaIsAkademi.Application
                     cancellationToken))
                 .ToList();
 
+            PagedQueryResultModel<JobPostingSummaryModel> result = new(
+                rows,
+                rows.Count,
+                rows.Count,
+                0);
+
             await CacheService.SetAsync(
                 cacheKey,
-                rows,
+                result,
                 AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.EmployerJobPostingsSummaryDependency(employerId)),
                 cancellationToken);
 
-            return rows;
+            return result;
         }
 
         #endregion Utils

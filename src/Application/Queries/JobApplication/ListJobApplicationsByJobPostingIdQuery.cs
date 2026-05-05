@@ -15,7 +15,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Lists applications submitted to a job posting (read side).
     /// </summary>
     public class ListJobApplicationsByJobPostingIdQuery :
-        QueryBase<IReadOnlyList<JobApplicationListItemModel>>
+        QueryBase<PagedQueryResultModel<JobApplicationListItemModel>>
     {
         #region Properties
 
@@ -48,12 +48,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListJobApplicationsByJobPostingIdQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListJobApplicationsByJobPostingIdQuery, IReadOnlyList<JobApplicationListItemModel>>(serviceProvider)
+        QueryHandlerBase<ListJobApplicationsByJobPostingIdQuery, PagedQueryResultModel<JobApplicationListItemModel>>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<IReadOnlyList<JobApplicationListItemModel>> HandleAsync(
+        protected override async Task<PagedQueryResultModel<JobApplicationListItemModel>> HandleAsync(
             ListJobApplicationsByJobPostingIdQuery query,
             CancellationToken cancellationToken)
         {
@@ -78,9 +78,11 @@ namespace Azoxia.AdaIsAkademi.Application
                 .OrderByDescending(x => x.AppliedAt)
                 .ToList();
 
-            return applications
+            List<JobApplicationListItemModel> rows = applications
                 .Select(x => new JobApplicationListItemModel(x.Id, x.WorkerId, x.Status, x.AppliedAt, x.Note))
                 .ToList();
+
+            return new PagedQueryResultModel<JobApplicationListItemModel>(rows, rows.Count, rows.Count, 0);
         }
 
         #endregion Utils

@@ -9,7 +9,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Lists commission receivable rows by employer.
     /// </summary>
     public class ListCommissionReceivablesByEmployerQuery :
-        QueryBase<IReadOnlyList<CommissionReceivableListItemModel>>
+        QueryBase<PagedQueryResultModel<CommissionReceivableListItemModel>>
     {
         #region Properties
 
@@ -52,18 +52,18 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListCommissionReceivablesByEmployerQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListCommissionReceivablesByEmployerQuery, IReadOnlyList<CommissionReceivableListItemModel>>(serviceProvider)
+        QueryHandlerBase<ListCommissionReceivablesByEmployerQuery, PagedQueryResultModel<CommissionReceivableListItemModel>>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<IReadOnlyList<CommissionReceivableListItemModel>> HandleAsync(
+        protected override async Task<PagedQueryResultModel<CommissionReceivableListItemModel>> HandleAsync(
             ListCommissionReceivablesByEmployerQuery query,
             CancellationToken cancellationToken)
         {
             CacheKey cacheKey = AdaIsCacheKeys.CommissionReceivableListKey(query.EmployerId, query.Limit);
-            IReadOnlyList<CommissionReceivableListItemModel>? cached =
-                await CacheService.GetAsync<IReadOnlyList<CommissionReceivableListItemModel>>(cacheKey, cancellationToken);
+            PagedQueryResultModel<CommissionReceivableListItemModel>? cached =
+                await CacheService.GetAsync<PagedQueryResultModel<CommissionReceivableListItemModel>>(cacheKey, cancellationToken);
             if (cached is not null)
             {
                 return cached;
@@ -87,15 +87,21 @@ namespace Azoxia.AdaIsAkademi.Application
                         cancellationToken))
                 .ToList();
 
+            PagedQueryResultModel<CommissionReceivableListItemModel> result = new(
+                rows,
+                rows.Count,
+                query.Limit,
+                0);
+
             await CacheService.SetAsync(
                 cacheKey,
-                rows,
+                result,
                 AdaIsCacheKeys.DetailReadModelOptions(
                     AdaIsCacheKeys.CommissionReceivableDependency(query.EmployerId),
                     AdaIsCacheKeys.CommissionReceivableAllDependency()),
                 cancellationToken);
 
-            return rows;
+            return result;
         }
 
         #endregion Utils
