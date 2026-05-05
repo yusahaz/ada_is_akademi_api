@@ -97,6 +97,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "EmployerCommissionEstimateDetail", employerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Cache key for employer commission summary list by limit.
+        /// </summary>
+        internal static CacheKey EmployerCommissionSummaryListKey(int limit) =>
+            new(QueryNamespace, "EmployerCommissionSummaryList", limit.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
         /// Cache key for employer commission policy CSV export package.
         /// </summary>
         internal static CacheKey EmployerCommissionPolicyExportPackageKey() =>

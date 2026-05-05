@@ -74,6 +74,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<GetEmployerByIdQuery, EmployerDetailModel>, GetEmployerByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionEstimateQuery, EmployerCommissionEstimateModel>, GetEmployerCommissionEstimateQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionPolicyQuery, EmployerCommissionPolicyModel>, GetEmployerCommissionPolicyQueryHandler>();
+            services.AddScoped<IRequestHandler<ListEmployerCommissionSummariesQuery, IReadOnlyList<EmployerCommissionListItemModel>>, ListEmployerCommissionSummariesQueryHandler>();
             services.AddScoped<IRequestHandler<ExportEmployerCommissionPoliciesCsvQuery, EmployerCommissionPolicyExportPackageModel>, ExportEmployerCommissionPoliciesCsvQueryHandler>();
             services.AddScoped<IRequestHandler<GetDashboardStatisticsQuery, DashboardStatisticsModel>, GetDashboardStatisticsQueryHandler>();
             services.AddScoped<IRequestHandler<ExportOverdueAlarmsCsvQuery, OverdueAlarmExportPackageModel>, ExportOverdueAlarmsCsvQueryHandler>();
@@ -115,6 +116,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<GetEmployerByIdQuery>, GetEmployerByIdQueryValidator>();
             services.AddScoped<IRequestValidator<GetEmployerCommissionEstimateQuery>, GetEmployerCommissionEstimateQueryValidator>();
             services.AddScoped<IRequestValidator<GetEmployerCommissionPolicyQuery>, GetEmployerCommissionPolicyQueryValidator>();
+            services.AddScoped<IRequestValidator<ListEmployerCommissionSummariesQuery>, ListEmployerCommissionSummariesQueryValidator>();
             services.AddScoped<IRequestValidator<ExportEmployerCommissionPoliciesCsvQuery>, ExportEmployerCommissionPoliciesCsvQueryValidator>();
             services.AddScoped<IRequestValidator<GetDashboardStatisticsQuery>, GetDashboardStatisticsQueryValidator>();
             services.AddScoped<IRequestValidator<ExportOverdueAlarmsCsvQuery>, ExportOverdueAlarmsCsvQueryValidator>();

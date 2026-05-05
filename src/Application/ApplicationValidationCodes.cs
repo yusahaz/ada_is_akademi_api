@@ -269,6 +269,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "WorkerId must be greater than zero.");
 
         /// <summary>
+        /// Limit must be between 1 and 100 for employer commission summary list query.
+        /// </summary>
+        internal static readonly ErrorCode ListEmployerCommissionSummariesLimitRange = new(
+            Code: "AZX_ADA_APP_VAL_907",
+            ErrorMessage: "Limit must be between 1 and 100.");
+
+        /// <summary>
         /// Device identifier is required when logging in a system user.
         /// </summary>
         internal static readonly ErrorCode LoginSystemUserDeviceIdentifierRequired = new(

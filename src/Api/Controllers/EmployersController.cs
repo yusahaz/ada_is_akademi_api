@@ -73,6 +73,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Lists employer commission summaries for monetization management.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List employer commission summaries")]
+        [EndpointDescription("Returns active employers ordered by monetization estimate metrics.")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EmployerCommissionListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListCommissionSummaries(
+            [FromBody] ListEmployerCommissionSummariesQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Exports employer commission policies in CSV format package.</summary>
         [HttpPost]
         [Consumes("application/json")]
