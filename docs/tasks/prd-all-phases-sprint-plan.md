@@ -82,6 +82,7 @@
 - [ ] Çıktı: Faz 2 operasyonel otomasyon + raporlama tabanı tamam.
 - [x] Uygulanan dikey dilim: overdue summary query + statistics endpoint + cache + test eklendi.
 - [x] Uygulanan dikey dilim: Hangfire recurring job + idempotent overdue alarm sweep command + migration + test eklendi.
+- [x] Uygulanan dikey dilim: overdue alarm CSV export query + statistics endpoint + cache + test eklendi.
 
 ### Sprint 7 - Monetization Başlangıcı
 - [ ] Employer abonelik domain modeli.

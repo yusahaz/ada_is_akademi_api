@@ -43,6 +43,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetOverdueJobSummaryQuery(), cancellationToken);
 
+        /// <summary>Returns overdue alarms CSV export package.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Export overdue alarms as CSV")]
+        [EndpointDescription("Returns a CSV package payload for overdue alarms report export.")]
+        [ProducesResponseType(typeof(ApiResponse<OverdueAlarmExportPackageModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ExportOverdueAlarmsCsv(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            ExportOverdueAlarmsCsvQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new ExportOverdueAlarmsCsvQuery(), cancellationToken);
+
         #endregion Methods
     }
 }

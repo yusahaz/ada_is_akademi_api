@@ -67,6 +67,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "DashboardOverdueJobSummary", "default");
 
         /// <summary>
+        /// Cache key for overdue alarms CSV export package.
+        /// </summary>
+        internal static CacheKey OverdueAlarmExportPackageKey() =>
+            new(QueryNamespace, "OverdueAlarmExportPackage", "default");
+
+        /// <summary>
         /// Cache key for <see cref="EmployerDetailModel"/> by employer id.
         /// </summary>
         internal static CacheKey EmployerDetailKey(int employerId) =>
