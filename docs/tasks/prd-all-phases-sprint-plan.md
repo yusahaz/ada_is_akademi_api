@@ -220,3 +220,4 @@
 - [x] Plan dosyası güncellendi ve Ada İş Akademi adlandırmasına normalize edildi.
 - [ ] Implementasyon sırasında her sprint kapanışında tamamlanan maddeler işaretlenecek.
 - [ ] Faz dışına taşan istekler yeni satır olarak "deferred" etiketiyle eklenecek.
+- [ ] deferred: Sprint 7 icin commission policy degisiklik gecmisi (audit trail) query + endpoint + test.
