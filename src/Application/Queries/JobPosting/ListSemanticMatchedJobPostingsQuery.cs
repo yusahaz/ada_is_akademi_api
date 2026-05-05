@@ -81,6 +81,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .GetRepository<Worker>()
                 .Filter(x => x.Id == workerId)
                 .AsNoTracking()
+                .Include(x => x.InterestedJobCategories)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (worker is null)
@@ -88,10 +89,18 @@ namespace Azoxia.AdaIsAkademi.Application
                 return [];
             }
 
+            HashSet<int>? interestedCategoryFilter = worker.InterestedJobCategories.Count > 0
+                ? worker.InterestedJobCategories.Select(x => x.JobCategoryId).ToHashSet()
+                : null;
+
             if (!HasFreshEmbedding(worker))
             {
                 IReadOnlyList<WorkerAvailability> availabilities = await LoadWorkerAvailabilitiesAsync(workerId, cancellationToken);
-                IReadOnlyList<SemanticMatchedJobPostingModel> fallbackRows = await BuildFallbackRowsAsync(query.Limit, availabilities, cancellationToken);
+                IReadOnlyList<SemanticMatchedJobPostingModel> fallbackRows = await BuildFallbackRowsAsync(
+                    query.Limit,
+                    availabilities,
+                    interestedCategoryFilter,
+                    cancellationToken);
                 await CacheService.SetAsync(
                     cacheKey,
                     fallbackRows,
@@ -110,6 +119,11 @@ namespace Azoxia.AdaIsAkademi.Application
                 .OrderBy(x => x.ShiftDate)
                 .ThenBy(x => x.ShiftStartTime)
                 .ToListAsync(cancellationToken);
+
+            if (interestedCategoryFilter is not null)
+            {
+                postings = postings.Where(x => interestedCategoryFilter.Contains(x.JobCategoryId));
+            }
 
             IReadOnlyList<SemanticMatchedJobPostingModel> rows = postings
                 .Where(x => IsWorkerAvailableForPosting(workerAvailabilities, x))
@@ -149,11 +163,17 @@ namespace Azoxia.AdaIsAkademi.Application
         private async Task<IReadOnlyList<SemanticMatchedJobPostingModel>> BuildFallbackRowsAsync(
             int limit,
             IReadOnlyList<WorkerAvailability> availabilities,
+            HashSet<int>? interestedCategoryIds,
             CancellationToken cancellationToken)
         {
+            bool restrictCategories = interestedCategoryIds is { Count: > 0 };
+
             return (await UnitOfWork
                     .GetRepository<JobPosting>()
-                    .Filter(x => x.Status == JobPostingStatus.Open && !x.IsDeleted)
+                    .Filter(x =>
+                        x.Status == JobPostingStatus.Open &&
+                        !x.IsDeleted &&
+                        (!restrictCategories || interestedCategoryIds!.Contains(x.JobCategoryId)))
                     .AsNoTracking()
                     .OrderBy(x => x.ShiftDate)
                     .ThenBy(x => x.ShiftStartTime)

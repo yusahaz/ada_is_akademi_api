@@ -5,6 +5,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
     using Azoxia.Core.Wrappers;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
 
     /// <summary>
     /// Worker read and profile skill endpoints.
@@ -159,9 +160,9 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         /// <summary>Gets worker detail by id.</summary>
         [HttpPost]
         [Consumes("application/json")]
-        [EndpointSummary("Get worker by id")]
-        [EndpointDescription("Returns worker detail model including normalized skill tags.")]
-        [ProducesResponseType(typeof(ApiResponse<WorkerDetailModel>), StatusCodes.Status200OK)]
+        [EndpointSummary("Get worker by id (employer)")]
+        [EndpointDescription("Employer-safe worker summary for a worker who shares a job application with the authenticated employer.")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerEmployerSafeDetailModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> GetById(
             [FromBody] GetWorkerByIdQuery query,
             CancellationToken cancellationToken)
@@ -170,11 +171,33 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         /// <summary>Gets full worker detail by id.</summary>
         [HttpPost]
         [Consumes("application/json")]
-        [EndpointSummary("Get worker detail")]
-        [EndpointDescription("Returns full worker profile detail with account summary and all profile collections.")]
-        [ProducesResponseType(typeof(ApiResponse<WorkerFullDetailModel>), StatusCodes.Status200OK)]
+        [EndpointSummary("Get worker detail (employer)")]
+        [EndpointDescription("Employer-safe full worker profile for a worker tied to the employer through a job application.")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerEmployerSafeFullDetailModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> GetDetail(
             [FromBody] GetWorkerDetailQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Gets authenticated worker summary with private matching preferences.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker self summary")]
+        [EndpointDescription("Returns the worker-facing profile summary including salary expectations, interested job categories, and a deterministic profile completion percentage.")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerSelfDetailModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetSelfSummary(
+            [FromBody] GetWorkerSelfDetailQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Gets authenticated worker full profile with private matching preferences.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker self full detail")]
+        [EndpointDescription("Returns the full worker-facing profile including salary expectations, interested job categories, and profile completion percentage.")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerSelfFullDetailModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetSelfFullDetail(
+            [FromBody] GetWorkerSelfFullDetailQuery query,
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
@@ -206,6 +229,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Returns live status feed for worker dashboard polling.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker live status feed")]
+        [EndpointDescription("Returns assignment and matching updates for the authenticated worker in near real-time polling format.")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerLiveStatusFeedModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> LiveStatus(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] GetWorkerLiveStatusFeedQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetWorkerLiveStatusFeedQuery(), cancellationToken);
+
         /// <summary>Confirms processing payout for authenticated worker.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -217,6 +251,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Sends worker notification through push with fallback.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Send worker notification")]
+        [EndpointDescription("Dispatches notification to worker using push and falls back to email/in-app when needed.")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> SendNotification(
+            [FromBody] SendWorkerNotificationCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
         /// <summary>Updates authenticated worker profile basics.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -225,6 +270,80 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> UpdateProfile(
             [FromBody] UpdateWorkerProfileCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Updates worker-facing bio text.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update worker bio")]
+        [EndpointDescription("Replaces the authenticated worker's short about text (null/whitespace clears).")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateBio(
+            [FromBody] UpdateWorkerBioCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Replaces outbound social links visible on worker self endpoints.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update worker social links")]
+        [EndpointDescription("Replaces the HTTPS social profile list; empty list clears all.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateSocialLinks(
+            [FromBody] UpdateWorkerSocialLinksCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Begins worker profile photo upload (presigned PUT).</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Init worker profile photo upload")]
+        [EndpointDescription("Returns an object key plus presigned PUT URL to stream the portrait to MinIO-compatible storage; call confirm after success.")]
+        [ProducesResponseType(typeof(ApiResponse<ObjectStorageUploadInitModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> InitProfilePhotoUpload(
+            [FromBody] InitWorkerProfilePhotoUploadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<ObjectStorageUploadInitModel>(command, cancellationToken);
+
+        /// <summary>Persists uploaded profile photo object key after PUT success.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Confirm worker profile photo")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ConfirmProfilePhotoUpload(
+            [FromBody] ConfirmWorkerProfilePhotoUploadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Removes persisted profile photo metadata (does not sweep MinIO objects).</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Clear worker profile photo")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ClearProfilePhoto(
+            [FromBody] ClearWorkerProfilePhotoCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Returns short-lived GET URL for worker profile photo.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker profile photo URL")]
+        [ProducesResponseType(typeof(ApiResponse<MediaBlobViewUrlModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetProfilePhotoViewUrl(
+            [FromBody] GetWorkerProfilePhotoViewUrlQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Updates authenticated worker matching preferences.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update worker matching preferences")]
+        [EndpointDescription("Sets optional expected salary bounds as Money-compatible amount/currency pairs per bound, and interested job categories (worker scope only; omitted from employer read models).")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateMatchingPreferences(
+            [FromBody] UpdateWorkerMatchingPreferencesCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 

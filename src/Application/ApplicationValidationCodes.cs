@@ -122,6 +122,146 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "University length cannot exceed 512 characters.");
 
         /// <summary>
+        /// Worker bio exceeds the maximum length.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerBioMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_944",
+            ErrorMessage: "Bio length cannot exceed 3000 characters.");
+
+        /// <summary>
+        /// Worker social links list exceeds supported count.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerSocialLinksCount = new(
+            Code: "AZX_ADA_APP_VAL_945",
+            ErrorMessage: "Too many social links.");
+
+        /// <summary>
+        /// Duplicate platforms are not supported in one replace operation.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerSocialLinksDuplicatePlatform = new(
+            Code: "AZX_ADA_APP_VAL_946",
+            ErrorMessage: "Each social platform must appear only once.");
+
+        /// <summary>
+        /// Social link URL is required for each declared row.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerSocialLinksUrlRequired = new(
+            Code: "AZX_ADA_APP_VAL_947",
+            ErrorMessage: "Social link URL is required.");
+
+        /// <summary>
+        /// Social link URL must be an absolute HTTPS address within length limits.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerSocialLinksUrlInvalid = new(
+            Code: "AZX_ADA_APP_VAL_948",
+            ErrorMessage: "Social link URL must be a valid HTTPS address.");
+
+        /// <summary>
+        /// Object storage object key belongs to another actor aggregate or is malformed.
+        /// </summary>
+        internal static readonly ErrorCode MediaBlobObjectKeyOwnership = new(
+            Code: "AZX_ADA_APP_VAL_949",
+            ErrorMessage: "The uploaded object key is not scoped to your profile.");
+
+        /// <summary>
+        /// Object storage object key payload is missing.
+        /// </summary>
+        internal static readonly ErrorCode MediaBlobObjectKeyRequired = new(
+            Code: "AZX_ADA_APP_VAL_950",
+            ErrorMessage: "ObjectKey is required.");
+
+        /// <summary>
+        /// PUT content type hint is unexpectedly long when requesting a signed upload URL.
+        /// </summary>
+        internal static readonly ErrorCode InitMediaUploadContentTypeMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_951",
+            ErrorMessage: "ContentType cannot exceed 128 characters.");
+
+        /// <summary>
+        /// Expected salary currency must be a three-letter ISO code when provided.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryCurrencyLength = new(
+            Code: "AZX_ADA_APP_VAL_960",
+            ErrorMessage: "ExpectedSalaryCurrencyCode must be a three-letter ISO 4217 code when provided.");
+
+        /// <summary>
+        /// Expected salary currency must be supplied when declaring an amount.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryCurrencyRequired = new(
+            Code: "AZX_ADA_APP_VAL_961",
+            ErrorMessage: "ExpectedSalaryCurrencyCode is required when declaring min or max salary amounts.");
+
+        /// <summary>
+        /// Expected salary bounds must remain within the supported non-negative bounded range.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryAmountRange = new(
+            Code: "AZX_ADA_APP_VAL_962",
+            ErrorMessage: "Expected salary amounts must be between 0 and 999,999,999.99.");
+
+        /// <summary>
+        /// Expected salary minimum must not exceed declared maximum when both are present.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryMinMax = new(
+            Code: "AZX_ADA_APP_VAL_963",
+            ErrorMessage: "ExpectedSalaryMinAmount cannot be greater than ExpectedSalaryMaxAmount.");
+
+        /// <summary>
+        /// Salary currency must not appear without its paired amount.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryCurrencyWithoutAmount = new(
+            Code: "AZX_ADA_APP_VAL_964",
+            ErrorMessage: "Supply amounts for salary bounds when declaring their currencies.");
+
+        /// <summary>
+        /// Salary bounds declared together must share the same currency.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryCurrencyMismatch = new(
+            Code: "AZX_ADA_APP_VAL_971",
+            ErrorMessage: "Expected salary minimum and maximum must use the same currency.");
+
+        /// <summary>
+        /// Interested job categories list cannot include duplicates for the worker.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingInterestedCategoryDuplicates = new(
+            Code: "AZX_ADA_APP_VAL_965",
+            ErrorMessage: "InterestedJobCategoryIds must not contain duplicates.");
+
+        /// <summary>
+        /// Interested category id list violates count limits.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingInterestedCategoryCount = new(
+            Code: "AZX_ADA_APP_VAL_966",
+            ErrorMessage: "Too many interested job categories.");
+
+        /// <summary>
+        /// Interested category reference must be positive.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingInterestedCategoryId = new(
+            Code: "AZX_ADA_APP_VAL_967",
+            ErrorMessage: "InterestedJobCategoryIds must contain positive category ids.");
+
+        /// <summary>
+        /// Interested job categories must be explicitly provided when replacing the list.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingInterestedCategoryIdsRequired = new(
+            Code: "AZX_ADA_APP_VAL_968",
+            ErrorMessage: "InterestedJobCategoryIds is required when SetInterestedJobCategories is true.");
+
+        /// <summary>
+        /// Matching preferences mutation must toggle at least one section.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingNoOp = new(
+            Code: "AZX_ADA_APP_VAL_969",
+            ErrorMessage: "Enable SetExpectedSalary and/or SetInterestedJobCategories.");
+
+        /// <summary>
+        /// One or more job category identifiers are unknown or inactive for matching preferences updates.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerMatchingUnknownJobCategory = new(
+            Code: "AZX_ADA_APP_VAL_970",
+            ErrorMessage: "One or more job category ids are invalid.");
+
+        /// <summary>
         /// Employer id must be positive when banning an employer.
         /// </summary>
         internal static readonly ErrorCode BanEmployerEmployerId = new(
@@ -281,6 +421,55 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode GetWorkerPersonalizedNotificationPreviewJobPostingId = new(
             Code: "AZX_ADA_APP_VAL_602",
             ErrorMessage: "JobPostingId must be greater than zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 50 for worker live status feed query.
+        /// </summary>
+        internal static readonly ErrorCode GetWorkerLiveStatusFeedLimit = new(
+            Code: "AZX_ADA_APP_VAL_953",
+            ErrorMessage: "Limit must be between 1 and 50.");
+
+        /// <summary>
+        /// Worker id must be positive when sending worker notification.
+        /// </summary>
+        internal static readonly ErrorCode SendWorkerNotificationWorkerId = new(
+            Code: "AZX_ADA_APP_VAL_954",
+            ErrorMessage: "WorkerId must be greater than zero.");
+
+        /// <summary>
+        /// System user id must be positive when sending generic user notification.
+        /// </summary>
+        internal static readonly ErrorCode SendSystemUserNotificationSystemUserId = new(
+            Code: "AZX_ADA_APP_VAL_959",
+            ErrorMessage: "SystemUserId must be greater than zero.");
+
+        /// <summary>
+        /// Notification template code is required.
+        /// </summary>
+        internal static readonly ErrorCode SendWorkerNotificationTemplateCode = new(
+            Code: "AZX_ADA_APP_VAL_955",
+            ErrorMessage: "TemplateCode cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Notification title is required.
+        /// </summary>
+        internal static readonly ErrorCode SendWorkerNotificationTitle = new(
+            Code: "AZX_ADA_APP_VAL_956",
+            ErrorMessage: "Title cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Notification body is required.
+        /// </summary>
+        internal static readonly ErrorCode SendWorkerNotificationBody = new(
+            Code: "AZX_ADA_APP_VAL_957",
+            ErrorMessage: "Body cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Retry batch size must be between 1 and 500 for failed notification retries.
+        /// </summary>
+        internal static readonly ErrorCode RetryFailedSystemUserNotificationsBatchSize = new(
+            Code: "AZX_ADA_APP_VAL_958",
+            ErrorMessage: "BatchSize must be between 1 and 500.");
 
         /// <summary>
         /// Job posting id must be positive when listing applications by posting.

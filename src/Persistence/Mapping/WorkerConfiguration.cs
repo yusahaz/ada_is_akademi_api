@@ -22,6 +22,16 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasColumnOrder(columnOrder++)
                 .IsRequired();
 
+            builder.Property(e => e.Bio)
+                .HasMaxLength(3000)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
+            builder.Property(e => e.ProfilePhotoObjectKey)
+                .HasMaxLength(512)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
             builder.Property(e => e.Nationality)
                 .HasMaxLength(128)
                 .HasColumnOrder(columnOrder++)
@@ -38,6 +48,26 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .IsRequired(false);
 
             builder.Property(e => e.EmbeddingUpdatedAt)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
+            builder.Property(e => e.ExpectedSalaryMinAmount)
+                .HasColumnType("numeric(18,2)")
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
+            builder.Property(e => e.ExpectedSalaryMinCurrency)
+                .HasMaxLength(16)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
+            builder.Property(e => e.ExpectedSalaryMaxAmount)
+                .HasColumnType("numeric(18,2)")
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
+            builder.Property(e => e.ExpectedSalaryMaxCurrency)
+                .HasMaxLength(16)
                 .HasColumnOrder(columnOrder++)
                 .IsRequired(false);
 
@@ -82,6 +112,11 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
             builder.HasMany(e => e.References)
                 .WithOne(r => r.Worker)
                 .HasForeignKey(r => r.WorkerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(e => e.SocialLinks)
+                .WithOne(s => s.Worker)
+                .HasForeignKey(s => s.WorkerId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
 

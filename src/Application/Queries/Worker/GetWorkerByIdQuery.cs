@@ -6,7 +6,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Loads a single worker profile read model by identifier.
     /// </summary>
     public class GetWorkerByIdQuery :
-        QueryBase<WorkerDetailModel>
+        QueryBase<WorkerEmployerSafeDetailModel>
     {
         #region Properties
 

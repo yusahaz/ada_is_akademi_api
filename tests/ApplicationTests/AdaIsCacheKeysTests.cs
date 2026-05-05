@@ -51,15 +51,15 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
         }
 
         /// <summary>
-        /// Worker detail key must remain consistent with dependency invalidation tag.
+        /// Employer-safe worker detail key must remain consistent with dependency invalidation tag.
         /// </summary>
         [Fact]
-        public void Worker_detail_key_and_dependency_use_invariant_id()
+        public void Worker_employer_safe_detail_key_and_dependency_use_invariant_id()
         {
-            var key = AdaIsCacheKeys.WorkerDetailKey(99);
+            var key = AdaIsCacheKeys.WorkerEmployerSafeDetailKey(99);
             var dep = AdaIsCacheKeys.WorkerDependency(99);
 
-            key.ToStorageKey().Should().Contain("WorkerDetail");
+            key.ToStorageKey().Should().Contain("WorkerEmployerSafeDetail");
             dep.ToIndexSegment().Should().Be("Worker:99");
         }
 

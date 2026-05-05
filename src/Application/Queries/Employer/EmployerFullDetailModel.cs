@@ -14,6 +14,7 @@ namespace Azoxia.AdaIsAkademi.Application
         EmployerStatus Status,
         string TaxNumber,
         decimal CommissionRate,
+        string? LogoObjectKey,
         EmployerContactModel? Contact,
         IReadOnlyList<EmployerLocationDetailModel> Locations,
         IReadOnlyList<EmployerSupervisorDetailModel> Supervisors) :

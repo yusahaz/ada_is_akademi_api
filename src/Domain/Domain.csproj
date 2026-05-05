@@ -12,4 +12,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\src\Core\Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Azoxia.AdaIsAkademi.SeedRunner" />
+  </ItemGroup>
 </Project>

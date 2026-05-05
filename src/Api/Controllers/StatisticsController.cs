@@ -55,6 +55,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new ExportOverdueAlarmsCsvQuery(), cancellationToken);
 
+        /// <summary>Returns system user notification dispatches CSV export package.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Export system user notification dispatches as CSV")]
+        [EndpointDescription("Returns a CSV package payload for system user notification delivery reporting.")]
+        [ProducesResponseType(typeof(ApiResponse<SystemUserNotificationDispatchExportPackageModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ExportSystemUserNotificationDispatchesCsv(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            ExportSystemUserNotificationDispatchesCsvQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new ExportSystemUserNotificationDispatchesCsvQuery(), cancellationToken);
+
         /// <summary>Returns monetization baseline summary counters.</summary>
         [HttpPost]
         [Consumes("application/json")]

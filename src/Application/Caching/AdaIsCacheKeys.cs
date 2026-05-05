@@ -80,6 +80,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "OverdueAlarmExportPackage", "default");
 
         /// <summary>
+        /// Cache key for system-user notification dispatch CSV export package.
+        /// </summary>
+        internal static CacheKey SystemUserNotificationDispatchExportPackageKey() =>
+            new(QueryNamespace, "SystemUserNotificationDispatchExportPackage", "default");
+
+        /// <summary>
         /// Cache key for <see cref="EmployerDetailModel"/> by employer id.
         /// </summary>
         internal static CacheKey EmployerDetailKey(int employerId) =>
@@ -182,22 +188,40 @@ namespace Azoxia.AdaIsAkademi.Application
             new(nameof(JobPosting), "all");
 
         /// <summary>
-        /// Cache key for <see cref="WorkerDetailModel"/> by worker id.
+        /// Cache key for <see cref="WorkerEmployerSafeDetailModel"/> by worker id (employer-scoped endpoints).
         /// </summary>
-        internal static CacheKey WorkerDetailKey(int workerId) =>
-            new(QueryNamespace, nameof(Worker) + DetailSuffix, workerId.ToString(CultureInfo.InvariantCulture));
+        internal static CacheKey WorkerEmployerSafeDetailKey(int workerId) =>
+            new(QueryNamespace, "WorkerEmployerSafeDetail", workerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
-        /// Cache key for <see cref="WorkerFullDetailModel"/> by worker id.
+        /// Cache key for <see cref="WorkerEmployerSafeFullDetailModel"/> by worker id (employer-scoped endpoints).
         /// </summary>
-        internal static CacheKey WorkerFullDetailKey(int workerId) =>
-            new(QueryNamespace, "WorkerFullDetail", workerId.ToString(CultureInfo.InvariantCulture));
+        internal static CacheKey WorkerEmployerSafeFullDetailKey(int workerId) =>
+            new(QueryNamespace, "WorkerEmployerSafeFullDetail", workerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Cache key for <see cref="WorkerSelfDetailModel"/> for the authenticated worker actor.
+        /// </summary>
+        internal static CacheKey WorkerSelfDetailKey(int workerId) =>
+            new(QueryNamespace, "WorkerSelfDetail", workerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Cache key for <see cref="WorkerSelfFullDetailModel"/> for the authenticated worker actor.
+        /// </summary>
+        internal static CacheKey WorkerSelfFullDetailKey(int workerId) =>
+            new(QueryNamespace, "WorkerSelfFullDetail", workerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Cache key for worker-personalized notification preview for a posting.
         /// </summary>
         internal static CacheKey WorkerNotificationPreviewKey(int workerId, int jobPostingId) =>
             new(QueryNamespace, "WorkerNotificationPreview", $"{workerId}:{jobPostingId}");
+
+        /// <summary>
+        /// Cache key for worker live status feed by limit.
+        /// </summary>
+        internal static CacheKey WorkerLiveStatusFeedKey(int workerId, int limit) =>
+            new(QueryNamespace, "WorkerLiveStatusFeed", $"{workerId}:{limit}");
 
         /// <summary>
         /// Cache key for filtered worker listing queries.
@@ -330,6 +354,24 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheDependency WorkerPayoutAllDependency() =>
             new(nameof(WorkerPayout), "all");
+
+        /// <summary>
+        /// Invalidation tag for worker-scoped notification dispatch rows.
+        /// </summary>
+        internal static CacheDependency SystemUserNotificationDispatchWorkerDependency(int workerId) =>
+            new(nameof(SystemUserNotificationDispatch), workerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Invalidation tag for system-user-scoped notification dispatch rows.
+        /// </summary>
+        internal static CacheDependency SystemUserNotificationDispatchDependency(int systemUserId) =>
+            new(nameof(SystemUserNotificationDispatch), $"systemUser:{systemUserId.ToString(CultureInfo.InvariantCulture)}");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide notification dispatch rows.
+        /// </summary>
+        internal static CacheDependency SystemUserNotificationDispatchAllDependency() =>
+            new(nameof(SystemUserNotificationDispatch), "all");
 
         /// <summary>
         /// Invalidation tag for aggregate-wide commission audit models.

@@ -6,7 +6,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Loads full worker profile detail by worker id.
     /// </summary>
     public class GetWorkerDetailQuery :
-        QueryBase<WorkerFullDetailModel>
+        QueryBase<WorkerEmployerSafeFullDetailModel>
     {
         #region Properties
 

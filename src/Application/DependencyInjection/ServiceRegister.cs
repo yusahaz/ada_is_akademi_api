@@ -1,6 +1,7 @@
 namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
 {
     using Azoxia.AdaIsAkademi.Application;
+    using Azoxia.AdaIsAkademi.Application.Services;
     using Azoxia.Core.Application;
     using Azoxia.Core.Application.Validation;
     using Azoxia.Core.DependencyInjection;
@@ -18,6 +19,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         /// <inheritdoc />
         public void Register(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IWorkerProfileCompletionEvaluator, WorkerProfileCompletionEvaluator>();
             services.AddScoped<IEmbeddingVectorizer, HashEmbeddingVectorizer>();
             RegisterCommandHandlers(services);
             RegisterQueryHandlers(services);
@@ -46,20 +48,27 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<AddWorkerSkillCommand, int>, AddWorkerSkillCommandHandler>();
             services.AddScoped<IRequestHandler<BanEmployerCommand, Unit>, BanEmployerCommandHandler>();
             services.AddScoped<IRequestHandler<GenerateCommissionReceivableCommand, int>, GenerateCommissionReceivableCommandHandler>();
+            services.AddScoped<IRequestHandler<InitEmployerLogoUploadCommand, ObjectStorageUploadInitModel>, InitEmployerLogoUploadCommandHandler>();
+            services.AddScoped<IRequestHandler<InitWorkerProfilePhotoUploadCommand, ObjectStorageUploadInitModel>, InitWorkerProfilePhotoUploadCommandHandler>();
             services.AddScoped<IRequestHandler<CreateWorkerPayoutCommand, int>, CreateWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<MarkWorkerPayoutAsProcessingCommand, Unit>, MarkWorkerPayoutAsProcessingCommandHandler>();
             services.AddScoped<IRequestHandler<FailWorkerPayoutCommand, Unit>, FailWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<RetryWorkerPayoutCommand, Unit>, RetryWorkerPayoutCommandHandler>();
+            services.AddScoped<IRequestHandler<ConfirmEmployerLogoUploadCommand, Unit>, ConfirmEmployerLogoUploadCommandHandler>();
+            services.AddScoped<IRequestHandler<ConfirmWorkerProfilePhotoUploadCommand, Unit>, ConfirmWorkerProfilePhotoUploadCommandHandler>();
             services.AddScoped<IRequestHandler<ConfirmWorkerPayoutCommand, Unit>, ConfirmWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<SetEmployerCommissionRateCommand, Unit>, SetEmployerCommissionRateCommandHandler>();
             services.AddScoped<IRequestHandler<BanSystemUserCommand, Unit>, BanSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<RunOverdueAlarmSweepCommand, int>, RunOverdueAlarmSweepCommandHandler>();
             services.AddScoped<IRequestHandler<RunEmbeddingRefreshSweepCommand, int>, RunEmbeddingRefreshSweepCommandHandler>();
+            services.AddScoped<IRequestHandler<RetryFailedSystemUserNotificationsCommand, int>, RetryFailedSystemUserNotificationsCommandHandler>();
             services.AddScoped<IRequestHandler<CancelJobPostingCommand, Unit>, CancelJobPostingCommandHandler>();
             services.AddScoped<IRequestHandler<ChangeSystemUserPasswordCommand, Unit>, ChangeSystemUserPasswordCommandHandler>();
             services.AddScoped<IRequestHandler<CheckInShiftAssignmentCommand, Unit>, CheckInShiftAssignmentCommandHandler>();
             services.AddScoped<IRequestHandler<SupervisorCheckInShiftAssignmentCommand, Unit>, SupervisorCheckInShiftAssignmentCommandHandler>();
             services.AddScoped<IRequestHandler<CheckOutShiftAssignmentCommand, Unit>, CheckOutShiftAssignmentCommandHandler>();
+            services.AddScoped<IRequestHandler<ClearEmployerLogoCommand, Unit>, ClearEmployerLogoCommandHandler>();
+            services.AddScoped<IRequestHandler<ClearWorkerProfilePhotoCommand, Unit>, ClearWorkerProfilePhotoCommandHandler>();
             services.AddScoped<IRequestHandler<CompleteJobPostingCommand, Unit>, CompleteJobPostingCommandHandler>();
             services.AddScoped<IRequestHandler<CreateShiftAssignmentCommand, int>, CreateShiftAssignmentCommandHandler>();
             services.AddScoped<IRequestHandler<CreateJobPostingCommand, int>, CreateJobPostingCommandHandler>();
@@ -88,7 +97,12 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<SuspendEmployerCommand, Unit>, SuspendEmployerCommandHandler>();
             services.AddScoped<IRequestHandler<SuspendSystemUserCommand, Unit>, SuspendSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<SubmitJobPostingApplicationCommand, int>, SubmitJobPostingApplicationCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateWorkerMatchingPreferencesCommand, Unit>, UpdateWorkerMatchingPreferencesCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateWorkerBioCommand, Unit>, UpdateWorkerBioCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateWorkerSocialLinksCommand, Unit>, UpdateWorkerSocialLinksCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateWorkerProfileCommand, Unit>, UpdateWorkerProfileCommandHandler>();
+            services.AddScoped<IRequestHandler<SendWorkerNotificationCommand, int>, SendWorkerNotificationCommandHandler>();
+            services.AddScoped<IRequestHandler<SendSystemUserNotificationCommand, int>, SendSystemUserNotificationCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateJobPostingCommand, Unit>, UpdateJobPostingCommandHandler>();
             services.AddScoped<IRequestHandler<VerifySystemUserEmailCommand, Unit>, VerifySystemUserEmailCommandHandler>();
             services.AddScoped<IRequestHandler<WithdrawJobPostingApplicationCommand, Unit>, WithdrawJobPostingApplicationCommandHandler>();
@@ -102,6 +116,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         {
             services.AddScoped<IRequestHandler<GetEmployerByIdQuery, EmployerDetailModel>, GetEmployerByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerDetailQuery, EmployerFullDetailModel>, GetEmployerDetailQueryHandler>();
+            services.AddScoped<IRequestHandler<GetEmployerLogoViewUrlQuery, MediaBlobViewUrlModel>, GetEmployerLogoViewUrlQueryHandler>();
             services.AddScoped<IRequestHandler<ListEmployersQuery, PagedQueryResultModel<EmployerListItemModel>>, ListEmployersQueryHandler>();
             services.AddScoped<IRequestHandler<GetCommissionReceivableByPeriodQuery, CommissionReceivableDetailModel>, GetCommissionReceivableByPeriodQueryHandler>();
             services.AddScoped<IRequestHandler<ListCommissionReceivablesByEmployerQuery, PagedQueryResultModel<CommissionReceivableListItemModel>>, ListCommissionReceivablesByEmployerQueryHandler>();
@@ -111,14 +126,19 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<ExportEmployerCommissionPoliciesCsvQuery, EmployerCommissionPolicyExportPackageModel>, ExportEmployerCommissionPoliciesCsvQueryHandler>();
             services.AddScoped<IRequestHandler<GetDashboardStatisticsQuery, DashboardStatisticsModel>, GetDashboardStatisticsQueryHandler>();
             services.AddScoped<IRequestHandler<ExportOverdueAlarmsCsvQuery, OverdueAlarmExportPackageModel>, ExportOverdueAlarmsCsvQueryHandler>();
+            services.AddScoped<IRequestHandler<ExportSystemUserNotificationDispatchesCsvQuery, SystemUserNotificationDispatchExportPackageModel>, ExportSystemUserNotificationDispatchesCsvQueryHandler>();
             services.AddScoped<IRequestHandler<GetOverdueJobSummaryQuery, OverdueJobSummaryModel>, GetOverdueJobSummaryQueryHandler>();
             services.AddScoped<IRequestHandler<GetMonetizationSummaryQuery, MonetizationSummaryModel>, GetMonetizationSummaryQueryHandler>();
             services.AddScoped<IRequestHandler<GetJobPostingByIdQuery, JobPostingDetailModel>, GetJobPostingByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetSystemUserMeQuery, SystemUserMeModel>, GetSystemUserMeQueryHandler>();
             services.AddScoped<IRequestHandler<ListSystemUsersQuery, PagedQueryResultModel<SystemUserListItemModel>>, ListSystemUsersQueryHandler>();
             services.AddScoped<IRequestHandler<GetWorkerPersonalizedNotificationPreviewQuery, WorkerNotificationPreviewModel>, GetWorkerPersonalizedNotificationPreviewQueryHandler>();
-            services.AddScoped<IRequestHandler<GetWorkerByIdQuery, WorkerDetailModel>, GetWorkerByIdQueryHandler>();
-            services.AddScoped<IRequestHandler<GetWorkerDetailQuery, WorkerFullDetailModel>, GetWorkerDetailQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerProfilePhotoViewUrlQuery, MediaBlobViewUrlModel>, GetWorkerProfilePhotoViewUrlQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerLiveStatusFeedQuery, WorkerLiveStatusFeedModel>, GetWorkerLiveStatusFeedQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerByIdQuery, WorkerEmployerSafeDetailModel>, GetWorkerByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerDetailQuery, WorkerEmployerSafeFullDetailModel>, GetWorkerDetailQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerSelfDetailQuery, WorkerSelfDetailModel>, GetWorkerSelfDetailQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerSelfFullDetailQuery, WorkerSelfFullDetailModel>, GetWorkerSelfFullDetailQueryHandler>();
             services.AddScoped<IRequestHandler<ListWorkersQuery, PagedQueryResultModel<WorkerListItemModel>>, ListWorkersQueryHandler>();
             services.AddScoped<IRequestHandler<ListSystemUserGroupsQuery, PagedQueryResultModel<SystemUserGroupListItemModel>>, ListSystemUserGroupsQueryHandler>();
             services.AddScoped<IRequestHandler<ListJobApplicationsByJobPostingIdQuery, PagedQueryResultModel<JobApplicationListItemModel>>, ListJobApplicationsByJobPostingIdQueryHandler>();
@@ -151,6 +171,8 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<AddWorkerSkillCommand>, AddWorkerSkillCommandValidator>();
             services.AddScoped<IRequestValidator<BanEmployerCommand>, BanEmployerCommandValidator>();
             services.AddScoped<IRequestValidator<GenerateCommissionReceivableCommand>, GenerateCommissionReceivableCommandValidator>();
+            services.AddScoped<IRequestValidator<InitEmployerLogoUploadCommand>, InitEmployerLogoUploadCommandValidator>();
+            services.AddScoped<IRequestValidator<InitWorkerProfilePhotoUploadCommand>, InitWorkerProfilePhotoUploadCommandValidator>();
             services.AddScoped<IRequestValidator<CreateWorkerPayoutCommand>, CreateWorkerPayoutCommandValidator>();
             services.AddScoped<IRequestValidator<MarkWorkerPayoutAsProcessingCommand>, MarkWorkerPayoutAsProcessingCommandValidator>();
             services.AddScoped<IRequestValidator<FailWorkerPayoutCommand>, FailWorkerPayoutCommandValidator>();
@@ -160,11 +182,16 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<BanSystemUserCommand>, BanSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<RunOverdueAlarmSweepCommand>, RunOverdueAlarmSweepCommandValidator>();
             services.AddScoped<IRequestValidator<RunEmbeddingRefreshSweepCommand>, RunEmbeddingRefreshSweepCommandValidator>();
+            services.AddScoped<IRequestValidator<RetryFailedSystemUserNotificationsCommand>, RetryFailedSystemUserNotificationsCommandValidator>();
             services.AddScoped<IRequestValidator<CancelJobPostingCommand>, CancelJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<ChangeSystemUserPasswordCommand>, ChangeSystemUserPasswordCommandValidator>();
             services.AddScoped<IRequestValidator<CheckInShiftAssignmentCommand>, CheckInShiftAssignmentCommandValidator>();
             services.AddScoped<IRequestValidator<SupervisorCheckInShiftAssignmentCommand>, SupervisorCheckInShiftAssignmentCommandValidator>();
             services.AddScoped<IRequestValidator<CheckOutShiftAssignmentCommand>, CheckOutShiftAssignmentCommandValidator>();
+            services.AddScoped<IRequestValidator<ClearEmployerLogoCommand>, ClearEmployerLogoCommandValidator>();
+            services.AddScoped<IRequestValidator<ClearWorkerProfilePhotoCommand>, ClearWorkerProfilePhotoCommandValidator>();
+            services.AddScoped<IRequestValidator<ConfirmEmployerLogoUploadCommand>, ConfirmEmployerLogoUploadCommandValidator>();
+            services.AddScoped<IRequestValidator<ConfirmWorkerProfilePhotoUploadCommand>, ConfirmWorkerProfilePhotoUploadCommandValidator>();
             services.AddScoped<IRequestValidator<CompleteJobPostingCommand>, CompleteJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<CreateShiftAssignmentCommand>, CreateShiftAssignmentCommandValidator>();
             services.AddScoped<IRequestValidator<CreateJobPostingCommand>, CreateJobPostingCommandValidator>();
@@ -173,6 +200,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<DeactivateSystemUserGroupCommand>, DeactivateSystemUserGroupCommandValidator>();
             services.AddScoped<IRequestValidator<GetEmployerByIdQuery>, GetEmployerByIdQueryValidator>();
             services.AddScoped<IRequestValidator<GetEmployerDetailQuery>, GetEmployerDetailQueryValidator>();
+            services.AddScoped<IRequestValidator<GetEmployerLogoViewUrlQuery>, GetEmployerLogoViewUrlQueryValidator>();
             services.AddScoped<IRequestValidator<ListEmployersQuery>, ListEmployersQueryValidator>();
             services.AddScoped<IRequestValidator<GetCommissionReceivableByPeriodQuery>, GetCommissionReceivableByPeriodQueryValidator>();
             services.AddScoped<IRequestValidator<ListCommissionReceivablesByEmployerQuery>, ListCommissionReceivablesByEmployerQueryValidator>();
@@ -182,13 +210,18 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ExportEmployerCommissionPoliciesCsvQuery>, ExportEmployerCommissionPoliciesCsvQueryValidator>();
             services.AddScoped<IRequestValidator<GetDashboardStatisticsQuery>, GetDashboardStatisticsQueryValidator>();
             services.AddScoped<IRequestValidator<ExportOverdueAlarmsCsvQuery>, ExportOverdueAlarmsCsvQueryValidator>();
+            services.AddScoped<IRequestValidator<ExportSystemUserNotificationDispatchesCsvQuery>, ExportSystemUserNotificationDispatchesCsvQueryValidator>();
             services.AddScoped<IRequestValidator<GetOverdueJobSummaryQuery>, GetOverdueJobSummaryQueryValidator>();
             services.AddScoped<IRequestValidator<GetMonetizationSummaryQuery>, GetMonetizationSummaryQueryValidator>();
             services.AddScoped<IRequestValidator<GetJobPostingByIdQuery>, GetJobPostingByIdQueryValidator>();
             services.AddScoped<IRequestValidator<GetSystemUserMeQuery>, GetSystemUserMeQueryValidator>();
             services.AddScoped<IRequestValidator<ListSystemUsersQuery>, ListSystemUsersQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerPersonalizedNotificationPreviewQuery>, GetWorkerPersonalizedNotificationPreviewQueryValidator>();
+            services.AddScoped<IRequestValidator<GetWorkerProfilePhotoViewUrlQuery>, GetWorkerProfilePhotoViewUrlQueryValidator>();
+            services.AddScoped<IRequestValidator<GetWorkerLiveStatusFeedQuery>, GetWorkerLiveStatusFeedQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerByIdQuery>, GetWorkerByIdQueryValidator>();
+            services.AddScoped<IRequestValidator<GetWorkerSelfDetailQuery>, GetWorkerSelfDetailQueryValidator>();
+            services.AddScoped<IRequestValidator<GetWorkerSelfFullDetailQuery>, GetWorkerSelfFullDetailQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerDetailQuery>, GetWorkerDetailQueryValidator>();
             services.AddScoped<IRequestValidator<ListWorkersQuery>, ListWorkersQueryValidator>();
             services.AddScoped<IRequestValidator<ListSystemUserGroupsQuery>, ListSystemUserGroupsQueryValidator>();
@@ -220,7 +253,12 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<SuspendEmployerCommand>, SuspendEmployerCommandValidator>();
             services.AddScoped<IRequestValidator<SuspendSystemUserCommand>, SuspendSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<SubmitJobPostingApplicationCommand>, SubmitJobPostingApplicationCommandValidator>();
+            services.AddScoped<IRequestValidator<UpdateWorkerMatchingPreferencesCommand>, UpdateWorkerMatchingPreferencesCommandValidator>();
+            services.AddScoped<IRequestValidator<UpdateWorkerBioCommand>, UpdateWorkerBioCommandValidator>();
+            services.AddScoped<IRequestValidator<UpdateWorkerSocialLinksCommand>, UpdateWorkerSocialLinksCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateWorkerProfileCommand>, UpdateWorkerProfileCommandValidator>();
+            services.AddScoped<IRequestValidator<SendWorkerNotificationCommand>, SendWorkerNotificationCommandValidator>();
+            services.AddScoped<IRequestValidator<SendSystemUserNotificationCommand>, SendSystemUserNotificationCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateJobPostingCommand>, UpdateJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<VerifySystemUserEmailCommand>, VerifySystemUserEmailCommandValidator>();
             services.AddScoped<IRequestValidator<WithdrawJobPostingApplicationCommand>, WithdrawJobPostingApplicationCommandValidator>();

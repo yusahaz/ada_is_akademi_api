@@ -48,6 +48,7 @@
                 builder.Services.AddHangfireServer();
                 builder.Services.AddScoped<OverdueAlarmRecurringJob>();
                 builder.Services.AddScoped<EmbeddingRefreshRecurringJob>();
+                builder.Services.AddScoped<RetryFailedSystemUserNotificationsRecurringJob>();
             };
 
             startup.OnConfigurePipelines += (app) =>
@@ -61,6 +62,10 @@
                     recurringJobId: "embedding-refresh-sweep",
                     methodCall: x => x.ExecuteAsync(),
                     cronExpression: "0 * * * *");
+                RecurringJob.AddOrUpdate<RetryFailedSystemUserNotificationsRecurringJob>(
+                    recurringJobId: "notification-retry-sweep",
+                    methodCall: x => x.ExecuteAsync(),
+                    cronExpression: "*/10 * * * *");
             };
 
             startup.Run(args);

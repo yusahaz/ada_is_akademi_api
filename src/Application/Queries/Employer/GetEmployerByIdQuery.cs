@@ -77,7 +77,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.Description,
                 entity.Status,
                 entity.TaxNumber.Value,
-                contact);
+                contact,
+                entity.LogoObjectKey);
 
             await CacheService.SetAsync(
                 cacheKey,

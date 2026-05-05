@@ -5,9 +5,9 @@ namespace Azoxia.AdaIsAkademi.Application
     using System.Collections.Generic;
 
     /// <summary>
-    /// Full worker profile detail snapshot.
+    /// Full worker profile snapshot for employers (matching preferences excluded).
     /// </summary>
-    public sealed record WorkerFullDetailModel(
+    public sealed record WorkerEmployerSafeFullDetailModel(
         int Id,
         int SystemUserId,
         string? Nationality,

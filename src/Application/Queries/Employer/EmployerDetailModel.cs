@@ -18,6 +18,7 @@ namespace Azoxia.AdaIsAkademi.Application
         string? Description,
         EmployerStatus Status,
         string TaxNumber,
-        EmployerContactModel? Contact) :
+        EmployerContactModel? Contact,
+        string? LogoObjectKey) :
         ModelBase;
 }

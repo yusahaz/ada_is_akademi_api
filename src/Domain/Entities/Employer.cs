@@ -173,6 +173,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             TaxNumber = new TaxNumber(taxNumber);
         }
 
+        protected internal void SetLogoObjectKey(string? objectKey)
+        {
+            LogoObjectKey = objectKey.IsNullOrWhiteSpace()
+                ? null
+                : objectKey.Trim();
+        }
+
         #endregion Utils
 
         #region Properties
@@ -200,6 +207,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Tax identifier associated with the employer.
         /// </summary>
         public TaxNumber TaxNumber { get; private set; }
+
+        /// <summary>
+        /// MinIO / S3 object key for employer logo, when configured.
+        /// </summary>
+        public string? LogoObjectKey { get; private set; }
 
         /// <summary>
         /// Registered locations under this employer.

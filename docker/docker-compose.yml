@@ -94,9 +94,36 @@ services:
       ada-is-akademi-minio:
         condition: service_healthy
 
+  ada-is-akademi-backup:
+    build:
+      context: .
+      dockerfile: backup/Dockerfile
+    container_name: ada-is-akademi-backup
+    restart: unless-stopped
+    environment:
+      DB_HOST: ada-is-akademi-db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      BACKUP_CRON_SCHEDULE: ${BACKUP_CRON_SCHEDULE}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS}
+      RUN_RESTORE_SMOKE: ${BACKUP_RESTORE_SMOKE}
+      TZ: ${BACKUP_TZ}
+    volumes:
+      - db_data:/source/db:ro
+      - minio_data:/source/minio:ro
+      - backup_data:/backups
+    depends_on:
+      ada-is-akademi-db:
+        condition: service_healthy
+      ada-is-akademi-minio:
+        condition: service_healthy
+
 volumes:
   db_data:
   redis_data:
   minio_data:
   dbview_data:
   api_dataprotection_keys:
+  backup_data:

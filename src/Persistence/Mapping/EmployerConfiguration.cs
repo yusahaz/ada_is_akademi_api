@@ -31,6 +31,11 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasPrecision(5, 4)
                 .HasColumnOrder(columnOrder++)
                 .IsRequired();
+
+            builder.Property(e => e.LogoObjectKey)
+                .HasMaxLength(512)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
         }
 
         #endregion Utils

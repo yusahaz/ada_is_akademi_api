@@ -176,6 +176,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Sends notification to a system user account.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Send system user notification")]
+        [EndpointDescription("Dispatches notification to worker, employer, or admin account using push fallback strategy.")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> SendNotification(
+            [FromBody] SendSystemUserNotificationCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
         /// <summary>Marks email verified when the token hash matches.</summary>
         [AllowAnonymous]
         [HttpPost]

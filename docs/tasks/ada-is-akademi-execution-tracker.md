@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-05 23:26 (UTC+3)
-- Current Phase: Faz 2 Sprint 5
-- Current Task: Notification personalization + fallback zinciri sertleştirme tamamlandı
-- Next Task: Sprint 5 canlı durum akışları (matching/assignment bildirimi)
+- Last Updated: 2026-05-06 (UTC+3)
+- Current Phase: Faz 2 Sprint 6
+- Current Task: P1 profil medya (bio, sosyal link, logo, profil foto + `IObjectStoragePresigner`) tamamlandı; profil tamamlanma ağırlıkları güncellendi
+- Next Task: **P2** — `docs/tasks/worker-employer-profile-enrichment.md` içinde işveren kaynaklı worker profil görüntülenme sayısı
 - Blockers: Yok
 
 ## Phase Checklist
@@ -59,11 +59,30 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-05 23:05 - Sprint 3 finansal çekirdek: `WorkerPayout` entity + status transition komutları (create/mark processing/fail/retry/confirm), `CommissionAuditLog` append-only kayıtları, ilgili API endpointleri/DI/migration ve payout+commission testleri tamamlandı.
 - [x] 2026-05-05 23:18 - Sprint 4 semantic altyapı: `RunEmbeddingRefreshSweepCommand` + saatlik Hangfire işi + deterministic vectorizer eklendi, `EnablePgvectorExtension` migrationı yazıldı, semantic matching query worker availability filtresiyle güçlendirildi ve Sprint 4 testleri geçti.
 - [x] 2026-05-05 23:26 - Sprint 5 kişiselleştirme: notification preview modeline `PersonalizationScore` + `PersonalizationSource` eklendi; semantic cosine hesaplama, template varyantı ve `push -> email -> in_app` fallback zinciri handler’da uygulandı; Sprint 5 query testleri güncellendi/genişletildi.
+- [x] 2026-05-06 00:21 - Sprint 5 canlı durum: `GetWorkerLiveStatusFeedQuery` + validator/handler + worker endpoint eklendi; assignment_status ve matching_update polling feed modeli oluşturuldu, testle doğrulandı.
+- [x] 2026-05-06 00:37 - Sprint 6 bildirim teslimatı: `SystemUserNotificationDispatch` outbox entity/mapping/migration, `SendWorkerNotificationCommand` + `SendSystemUserNotificationCommand` (push->email->in_app fallback), `RetryFailedSystemUserNotificationsCommand` + 10dk Hangfire job, worker/system-user notification endpointleri ve dispatch testleri tamamlandı.
+- [x] 2026-05-06 01:00 - Sprint 6 Docker backup: `docker-compose` icine backup servisi eklendi; Postgres dump + MinIO arsiv + retention + restore smoke akisi `docker/backup/*` altinda tamamlandi.
+- [x] 2026-05-06 01:07 - Sprint 6 raporlama: `ExportSystemUserNotificationDispatchesCsvQuery` + `StatisticsController` export endpointi + cache + test eklendi.
+- [x] 2026-05-06 - Profil P0: işçi maaş beklentisi + ilgi `JobCategory` listesi (domain + migration), `WorkerEmployerSafe*` vs `WorkerSelf*` read modelleri, işveren görünümü yalnız ortak başvuru ile, `UpdateWorkerMatchingPreferencesCommand`, semantic eşleştirmede kategori filtresi, ApplicationTests + görev dosyası güncellendi.
+- [x] 2026-05-06 - Profil P1: worker `Bio` + `WorkerSocialLink`, `ProfilePhotoObjectKey`; employer `LogoObjectKey`; EF migration `AddWorkerProfileBioSocialAndMediaKeys`; `IObjectStoragePresigner` + MinIO/S3 uyumlu `AwsS3CompatibleObjectStoragePresigner` ve dev stub; API uçları (`UpdateBio`, sosyal liste, foto init/confirm/view, logo init/confirm/view); profil tamamlanma ağırlıkları 100’e rebalance; Application + Domain testleri yeşil.
+
+## Profil / medya / eşleştirme (iş planı özeti)
+
+Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
+
+- **P0:** İşverene kapalı alanlar (maaş aralığı, ilgi pozisyonları) + read model ayrımı; ardından alanların domain/API ekleri.
+- **P0–P1:** Profil tamamlanma oranı (deterministik formül).
+- **P1:** Worker hakkında (bio), sosyal link VO listesi, employer şirket logosu, worker profil foto (MinIO — aşağıdaki madde ile birleşik hat).
+- **P2:** İşveren kaynaklı profil görüntülenme sayısı.
+- **Sonraki faz:** AI profil analizi (deferred — üstteki task dosyasında).
 
 ## Deferred Backlog
+- [x] **(Öncelik — ürün)** Worker profil fotoğrafı + employer logo: API’de presigned PUT init + confirm + presigned GET görüntüleme; kalıcı object key alanları (`Worker.ProfilePhotoObjectKey`, `Employer.LogoObjectKey`); `IObjectStoragePresigner` ile MinIO/S3 uçları (`ObjectStorage` yapılandırması). *İstemci Flutter/web bu repoda yok; URL sözleşmesi `Workers` / `Employers` controller açıklamalarında.*
+- [ ] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): `CvUploadSession`, MinIO’ya dosya, Hangfire ile extraction, worker onay ekranı — şu an domain/API’de yok; worker profili yapılandırılmış CRUD ile dolduruluyor.
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)
 - [ ] Query splitting/performance warning cleanup (Sprint 1/2 sonrası teknik borç)
 - [ ] DataProtection key encryption policy (production hardening)
+- [ ] Sprint 8: çok bölge / çok dil hazırlık backlog'u (bilinçli erteleme — talep gelince açılacak)
 
 ## Session Handoff Template
 Her yeni oturum başında bu blok güncellenir:

@@ -5,6 +5,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     using Azoxia.Core.ValueTypes;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Aggregate root representing a worker profile and related employment metadata.
@@ -18,9 +19,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         private readonly List<WorkerCertificate> _certificates = new();
         private readonly List<WorkerEducation> _educations = new();
         private readonly List<WorkerExperience> _experiences = new();
+        private readonly List<WorkerInterestedJobCategory> _interestedJobCategories = new();
         private readonly List<WorkerLanguage> _languages = new();
         private readonly List<WorkerReference> _references = new();
         private readonly List<WorkerSkill> _skills = new();
+        private readonly List<WorkerSocialLink> _socialLinks = new();
 
         #endregion Fields
 
@@ -235,6 +238,34 @@ namespace Azoxia.AdaIsAkademi.Domain
             _skills.Remove(skill);
         }
 
+        protected internal void ReplaceSocialLinks(IReadOnlyList<WorkerSocialLinkInput> links)
+        {
+            ArgumentNullException.ThrowIfNull(links);
+            _socialLinks.Clear();
+            IEnumerable<WorkerSocialLinkInput> distinctByPlatform =
+                links
+                    .GroupBy(x => x.Platform)
+                    .Select(g => g.Last());
+            foreach (WorkerSocialLinkInput row in distinctByPlatform)
+            {
+                _socialLinks.Add(new WorkerSocialLink(Id, row.Platform, row.Url));
+            }
+        }
+
+        protected internal void SetProfilePhotoObjectKey(string? objectKey)
+        {
+            ProfilePhotoObjectKey = objectKey.IsNullOrWhiteSpace()
+                ? null
+                : objectKey.Trim();
+        }
+
+        protected internal void UpdateBio(string? bio)
+        {
+            Bio = bio.IsNullOrWhiteSpace()
+                ? null
+                : bio.Trim();
+        }
+
         protected internal void UpdateProfile(string? nationality, string? university)
         {
             Nationality = nationality.IsNullOrWhiteSpace()
@@ -243,6 +274,47 @@ namespace Azoxia.AdaIsAkademi.Domain
             University = university.IsNullOrWhiteSpace()
                 ? null
                 : university.Trim();
+        }
+
+        protected internal void UpdateExpectedSalaryRange(
+            Money? minimum,
+            Money? maximum)
+        {
+            if (!minimum.HasValue)
+            {
+                ExpectedSalaryMinAmount = null;
+                ExpectedSalaryMinCurrency = null;
+            }
+            else
+            {
+                Money m = minimum.Value;
+                ExpectedSalaryMinAmount = m.Amount;
+                ExpectedSalaryMinCurrency = m.Currency.Trim().ToUpperInvariant();
+            }
+
+            if (!maximum.HasValue)
+            {
+                ExpectedSalaryMaxAmount = null;
+                ExpectedSalaryMaxCurrency = null;
+            }
+            else
+            {
+                Money m = maximum.Value;
+                ExpectedSalaryMaxAmount = m.Amount;
+                ExpectedSalaryMaxCurrency = m.Currency.Trim().ToUpperInvariant();
+            }
+        }
+
+        protected internal void ReplaceInterestedJobCategories(IEnumerable<int> jobCategoryIds)
+        {
+            ArgumentNullException.ThrowIfNull(jobCategoryIds);
+            _interestedJobCategories.Clear();
+            foreach (int categoryId in jobCategoryIds
+                         .Distinct()
+                         .OrderBy(x => x))
+            {
+                _interestedJobCategories.Add(new WorkerInterestedJobCategory(Id, categoryId));
+            }
         }
 
         protected internal void UpdateSkillEmbedding(float[]? skillEmbedding)
@@ -270,9 +342,39 @@ namespace Azoxia.AdaIsAkademi.Domain
         public DateTimeOffset? EmbeddingUpdatedAt { get; private set; }
 
         /// <summary>
+        /// Stored amount for inclusive upper remuneration bound; pairs with <see cref="ExpectedSalaryMaxCurrency"/>.
+        /// </summary>
+        public decimal? ExpectedSalaryMaxAmount { get; private set; }
+
+        /// <summary>
+        /// Stored ISO currency code for <see cref="ExpectedSalaryMaxAmount"/>.
+        /// </summary>
+        public string? ExpectedSalaryMaxCurrency { get; private set; }
+
+        /// <summary>
+        /// Stored amount for inclusive lower remuneration bound; pairs with <see cref="ExpectedSalaryMinCurrency"/>.
+        /// </summary>
+        public decimal? ExpectedSalaryMinAmount { get; private set; }
+
+        /// <summary>
+        /// Stored ISO currency code for <see cref="ExpectedSalaryMinAmount"/>.
+        /// </summary>
+        public string? ExpectedSalaryMinCurrency { get; private set; }
+
+        /// <summary>
         /// Declared nationality of the worker, if provided.
         /// </summary>
         public string? Nationality { get; private set; }
+
+        /// <summary>
+        /// Short “about” text shown on worker-owned surfaces only.
+        /// </summary>
+        public string? Bio { get; private set; }
+
+        /// <summary>
+        /// MinIO / S3 object key for the worker profile portrait, if uploaded.
+        /// </summary>
+        public string? ProfilePhotoObjectKey { get; private set; }
 
         /// <summary>
         /// Optional embedding vector derived from declared skills.
@@ -315,9 +417,21 @@ namespace Azoxia.AdaIsAkademi.Domain
         public virtual IReadOnlyList<WorkerExperience> Experiences => _experiences.AsReadOnly();
 
         /// <summary>
+        /// Job categories explicitly selected by the worker for recommendation filtering.
+        /// </summary>
+        public virtual IReadOnlyList<WorkerInterestedJobCategory> InterestedJobCategories =>
+            _interestedJobCategories.AsReadOnly();
+
+        /// <summary>
         /// Languages spoken by this worker and proficiency levels.
         /// </summary>
         public virtual IReadOnlyList<WorkerLanguage> Languages => _languages.AsReadOnly();
+
+        /// <summary>
+        /// Outbound social/profile links surfaced on worker-owned read models only.
+        /// </summary>
+        public virtual IReadOnlyList<WorkerSocialLink> SocialLinks =>
+            _socialLinks.AsReadOnly();
 
         /// <summary>
         /// External references (contacts) supplied for this worker.

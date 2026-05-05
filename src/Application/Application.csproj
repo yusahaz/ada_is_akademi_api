@@ -16,5 +16,6 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Azoxia.AdaIsAkademi.Application.Tests" />
+    <InternalsVisibleTo Include="Azoxia.AdaIsAkademi.SeedRunner" />
   </ItemGroup>
 </Project>

@@ -1,23 +1,31 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
+    using Azoxia.AdaIsAkademi.Application.Identity;
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application;
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
+    using Azoxia.Core.Identity;
+    using Microsoft.Extensions.DependencyInjection;
     using System;
 
     internal class GetWorkerByIdQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<GetWorkerByIdQuery, WorkerDetailModel>(serviceProvider)
+        QueryHandlerBase<GetWorkerByIdQuery, WorkerEmployerSafeDetailModel>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<WorkerDetailModel> HandleAsync(GetWorkerByIdQuery query, CancellationToken cancellationToken)
+        protected override async Task<WorkerEmployerSafeDetailModel> HandleAsync(GetWorkerByIdQuery query, CancellationToken cancellationToken)
         {
-            CacheKey cacheKey = AdaIsCacheKeys.WorkerDetailKey(query.WorkerId);
-            WorkerDetailModel? cached = await CacheService.GetAsync<WorkerDetailModel>(cacheKey, cancellationToken);
+            IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
+            int employerId = executionContext.RequireAdaIsEmployerActorId();
+            await EnsureEmployerSharesJobApplicationWithWorkerAsync(employerId, query.WorkerId, cancellationToken);
+
+            CacheKey cacheKey = AdaIsCacheKeys.WorkerEmployerSafeDetailKey(query.WorkerId);
+            WorkerEmployerSafeDetailModel? cached =
+                await CacheService.GetAsync<WorkerEmployerSafeDetailModel>(cacheKey, cancellationToken);
             if (cached is not null)
             {
                 return cached;
@@ -37,7 +45,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            WorkerDetailModel model = new(
+            WorkerEmployerSafeDetailModel model = new(
                 entity.Id,
                 entity.SystemUserId,
                 entity.Nationality,
@@ -52,6 +60,20 @@ namespace Azoxia.AdaIsAkademi.Application
                 cancellationToken);
 
             return model;
+        }
+
+        private async Task EnsureEmployerSharesJobApplicationWithWorkerAsync(
+            int employerId,
+            int workerId,
+            CancellationToken cancellationToken)
+        {
+            bool shared = await UnitOfWork
+                .GetRepository<JobApplication>()
+                .Filter(ja => ja.WorkerId == workerId && ja.JobPosting.EmployerId == employerId)
+                .AsNoTracking()
+                .AnyAsync(cancellationToken);
+
+            shared.ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
         }
 
         #endregion Utils

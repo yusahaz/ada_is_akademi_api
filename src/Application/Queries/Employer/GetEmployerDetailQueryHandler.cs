@@ -43,6 +43,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.Status,
                 entity.TaxNumber.Value,
                 entity.CommissionRate,
+                entity.LogoObjectKey,
                 MapContact(entity),
                 entity.Locations
                     .OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase)

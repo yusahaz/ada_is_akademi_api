@@ -104,6 +104,47 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Begins employer logo upload.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Init employer logo upload")]
+        [EndpointDescription("Returns object key and presigned PUT URL for logo upload to MinIO-compatible storage.")]
+        [ProducesResponseType(typeof(ApiResponse<ObjectStorageUploadInitModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> InitLogoUpload(
+            [FromBody] InitEmployerLogoUploadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<ObjectStorageUploadInitModel>(command, cancellationToken);
+
+        /// <summary>Persists employer logo object key after upload.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Confirm employer logo")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ConfirmLogoUpload(
+            [FromBody] ConfirmEmployerLogoUploadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Clears employer logo metadata.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Clear employer logo")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ClearLogo(
+            [FromBody] ClearEmployerLogoCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Returns short-lived logo GET URL.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get employer logo URL")]
+        [ProducesResponseType(typeof(ApiResponse<MediaBlobViewUrlModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetLogoViewUrl(
+            [FromBody] GetEmployerLogoViewUrlQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Lists employers with filtering and paging support.</summary>
         [HttpPost]
         [Consumes("application/json")]

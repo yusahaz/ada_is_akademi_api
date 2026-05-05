@@ -217,6 +217,20 @@ namespace Azoxia.AdaIsAkademi.Domain
         public static readonly ErrorCode WorkerPayoutRetryLimitExceeded = new(
             Code: "AZX_ADA_DOMAIN_030",
             ErrorMessage: "Worker payout retry limit has been exceeded.");
+
+        /// <summary>
+        /// Notification dispatch cannot transition from current status.
+        /// </summary>
+        public static readonly ErrorCode NotificationDispatchInvalidStatusTransition = new(
+            Code: "AZX_ADA_DOMAIN_031",
+            ErrorMessage: "This operation is not allowed for the current notification dispatch status.");
+
+        /// <summary>
+        /// Notification dispatch retry threshold has been reached.
+        /// </summary>
+        public static readonly ErrorCode NotificationDispatchRetryLimitExceeded = new(
+            Code: "AZX_ADA_DOMAIN_032",
+            ErrorMessage: "Notification dispatch retry limit has been exceeded.");
         #endregion Properties
     }
 }

@@ -1,10 +1,12 @@
 # Worbi — Platform Gereksinimleri Dokümanı (PRD)
 
-**Versiyon:** v6.0  
+**Versiyon:** v6.1  
 **Hazırlayan:** Azoxia  
 **Tarih:** Haziran 2025  
 **Durum:** Aktif Geliştirme  
 **Gizlilik:** Şirket İçi — Gizli
+
+> **Ada İş Akademi:** Ticari ürün adı *Ada İş Akademi* (bu dokümandaki tarihsel başlık *Worbi* korunmuştur). İş planı ve kod referansları: `docs/tasks/worker-employer-profile-enrichment.md`, `docs/tasks/ada-is-akademi-execution-tracker.md`, `docs/tasks/prd-all-phases-sprint-plan.md`.
 
 ---
 
@@ -19,6 +21,7 @@
 | v5.0 | Group-based RBAC · `resource.action` permission modeli · Level-based önceliklendirme · Scope-aware üyelik |
 | v5.1 | Tasarım sistemi eklendi |
 | v6.0 | Email doğrulama ile aktivasyon · Multi-device session · Race condition analizleri ve çözümleri · pgvector semantic matching · Agentic personalized notification · CV destekli profil oluşturma |
+| v6.1 | Worker: hakkında metni, sosyal medya linkleri (platform+URL), profil fotoğrafı, ilgilendiği pozisyonlar, beklenen maaş aralığı (**işveren API’lerinde dönülmez**), profil tamamlanma oranı, işveren kaynaklı profil görüntülenme sayısı · Employer: şirket logosu (MinIO) · PRD↔iş planı (`docs/tasks/*`) hizalama · Uygulama durumu notları (CV pipeline / `CvUploadSession`) |
 
 ---
 
@@ -245,6 +248,11 @@ Worker profili aşağıdaki bölümlerden oluşur:
 | Bölüm | Entity | Açıklama |
 |-------|--------|----------|
 | Temel | `Worker` | Ad, soyad, uyruk, doğum tarihi, üniversite, öğrenci no |
+| Hakkında | `Worker` | Opsiyonel kısa tanıtım metni (bio); karakter üst sınırı API'de doğrulanır |
+| Profil fotoğrafı | `Worker` (veya ilişkili kullanıcı özeti) | Nesne MinIO'da saklanır; DB'de object key veya versiyon; istemciye presigned GET / kısa ömürlü URL |
+| Sosyal medya | `Worker` | `WorkerSocialLink` benzeri value object listesi: platform adı/kodu + URL (JSON veya owned collection) |
+| İlgilendiği pozisyonlar | `Worker` | Eşleştirme ve “uygun ilan” önerileri için (ör. `JobCategory` referansları ve/veya etiket listesi — ürün kararı) |
+| Beklenen maaş aralığı | `Worker` | Para birimi + min/max (veya tek tutar); **yalnızca worker self ve platform içi eşleştirme kullanır** — işveren profil/detail API yanıtlarında **döndürülmez** |
 | Skill Tags | `WorkerSkill` | Lowercase etiketler — matching'de kullanılır |
 | Eğitim | `WorkerEducation` | Okul, bölüm, tür, yıl, devam ediyor mu |
 | Deneyim | `WorkerExperience` | Şirket, pozisyon, tarih aralığı, açıklama |
@@ -254,9 +262,33 @@ Worker profili aşağıdaki bölümlerden oluşur:
 | Müsaitlik | `WorkerAvailability` | Haftalık gün + TimeSlot |
 | Çalışma İzni | `WorkPermit` | Opsiyonel value object |
 | Platform Stats | `Worker` | Rating, güvenilirlik skoru, toplam vardiya, toplam saat |
+| Profil tamamlanma | Hesaplanan (read model) | Ağırlıklı, dokümante kriterler (zorunlu/opsiyonel alanlar); tek tutarlı algoritma |
+| Profil görüntülenme (işveren) | Sayıcı / istatistik | İşveren tarafından profil detayının açılması (tanım: tekil işveren + worker bazında tekrar politikası ürün kararı) |
 | **Skill Embedding** | `Worker` | `vector(1536)` — pgvector semantic search için |
 
-### 5.3 CV Destekli Profil Oluşturma
+**Gizlilik ve API sözleşmesi (v6.1):** Beklenen maaş ve ilgi pozisyonları **asıla** işveren JWT kapsamındaki worker detay/liste modellerine dahil edilmez. İş planı: read model ayrımı (`WorkerSelfDetail` vs işveren-safe model) — bkz. `docs/tasks/worker-employer-profile-enrichment.md`.
+
+**Sonraki faz (PRD kapsamı dışı uygulama zamanlaması):** AI ile profil analizi çıkarımı; ayrı onay, maliyet ve KVKK metinleri.
+
+#### 5.2.1 Uygulama durumu (Ada İş Akademi kod tabanı)
+
+| Gereksinim | Kod durumu (özet) |
+|------------|-------------------|
+| Yapılandırılmış profil bölümleri (eğitim, deneyim, skill, …) | Uygulanmış |
+| Bio, sosyal linkler, foto, maaş aralığı, ilgi pozisyonları, tamamlanma %, görüntülenme sayısı | İş planına alındı; entity/API ekleri bekiyor (`worker-employer-profile-enrichment.md`) |
+| `CvUploadSession` + CV pipeline (§5.4) | Hedefleniyor; **henüz** domain'de yok — PRD hedefi ile kod arasında bilinçli fark |
+
+### 5.3 İşveren — Kurumsal profil ve şirket logosu
+
+- **Şirket logosu:** `Employer` aggregate üzerinde kalıcı **MinIO object key** (veya eşdeğeri); yükleme presigned PUT, görüntüleme presigned GET veya CDN politikası.
+- Logo, işveren dashboard ve aday tarafında görünen işveren kartlarında kullanılır (UI ayrı teslim).
+- Worker profil fotoğrafı ile **aynı dosya depolama soyutlaması** (`IFileStorageService` / MinIO) kullanılır.
+
+**Uygulama durumu:** Logo alanı ve API uçları iş planında; kodda henüz yok — bkz. `worker-employer-profile-enrichment.md`.
+
+### 5.4 CV Destekli Profil Oluşturma
+
+> **Uygulama durumu (Ada İş Akademi repo):** Bu bölüm **hedef mimariyi** tarif eder. `CvUploadSession` entity'si, MinIO'ya dosya yükleme ve arka plan çıkarma işi kod tabanında **henüz yok**; ürün ve teknik izleme `docs/tasks/ada-is-akademi-execution-tracker.md` ve PRD sprint planı ile senkron. Tamamlandığında bu uyarı kaldırılır veya “tamamlandı” olarak güncellenir.
 
 Worker profili oluşturma sürecini hızlandırmak için CV upload ve AI extraction desteklenir.
 
@@ -298,7 +330,7 @@ record CvImportSelections(
     bool ApplySkills       = true);
 ```
 
-### 5.4 İlan ve Vardiya Yönetimi
+### 5.5 İlan ve Vardiya Yönetimi
 
 - Employer anlık veya planlanmış vardiya ilanı oluşturur
 - `JobCategory` entity bazlı — admin panelinden runtime eklenebilir, deployment gerektirmez
@@ -306,7 +338,7 @@ record CvImportSelections(
 - `IsUrgent` flag — 2 saat kala genişletilmiş bildirim
 - `description_embedding vector(1536)` — pgvector semantic search için
 
-### 5.5 Mutual QR Check-in / Check-out
+### 5.6 Mutual QR Check-in / Check-out
 
 Doğrulama iki bağımsız tarafın aynı anda, aynı fiziksel mekânda olmasını zorunlu kılar.
 
@@ -356,14 +388,14 @@ Atomik sayaç: INCR komutu
 
 Hard violation (`ReplayAttack | DuplicateAssignment`) → Otomatik `Disputed`, payout dondurulur.
 
-### 5.6 Komisyon Motoru
+### 5.7 Komisyon Motoru
 
 - Tip: `Percentage` (0–1 arası decimal, 0.15 = %15) veya `FixedAmount`
 - `ValidFrom` / `ValidUntil` — zaman sınırlı kurallar
 - `CommissionAuditLog` — immutable, append-only, DB trigger ile delete/update engellenir
 - `AssignmentCompleted` event → `CommissionEngine.CalculateAsync()` → `WorkerPayout` oluştur + `CommissionReceivable` güncelle
 
-### 5.7 Fatura Yönetimi (CommissionReceivable)
+### 5.8 Fatura Yönetimi (CommissionReceivable)
 
 - Her ay 1'i gece 00:05 scheduled job çalışır
 - Bir önceki ay tamamlanan tüm assignment'ları işveren bazında gruplar
@@ -372,7 +404,7 @@ Hard violation (`ReplayAttack | DuplicateAssignment`) → Otomatik `Disputed`, p
 - Kısmi ödeme desteği: `PaidAmount < TotalCommission` → `PartiallyPaid`
 - `DueDate + 3 gün` grace period → `Overdue` → admin alarmı
 
-### 5.8 Worker Ödeme Takibi (WorkerPayout)
+### 5.9 Worker Ödeme Takibi (WorkerPayout)
 
 - Assignment tamamlanınca otomatik `Pending`
 - Employer/Supervisor `payout.markpaid` → `Processing`
@@ -381,7 +413,7 @@ Hard violation (`ReplayAttack | DuplicateAssignment`) → Otomatik `Disputed`, p
 - `RetryCount ≥ 3` → admin müdahale gerekir
 - Payout, assignment `Disputed` iken `Processing`'e geçemez (pessimistic lock)
 
-### 5.9 Bildirim Sistemi
+### 5.10 Bildirim Sistemi
 
 | Kanal | Kullanım |
 |-------|----------|
@@ -392,7 +424,7 @@ Hard violation (`ReplayAttack | DuplicateAssignment`) → Otomatik `Disputed`, p
 
 **Agentic Personalized Notification (v6.0):** Bkz. Bölüm 7.2
 
-### 5.10 Admin Paneli
+### 5.11 Admin Paneli
 
 - `UserGroup` CRUD, permission matris yönetimi
 - Worker email doğrulama durumu takibi
@@ -960,7 +992,7 @@ stateDiagram-v2
 | Cache / Token | Redis | QR token, permission cache, rate limiting, grace period sayacı |
 | Real-time | SignalR | Matching, vardiya doluluk, QR durum |
 | Push | Firebase FCM | Flutter multicast push |
-| Dosya | MinIO (S3-compatible) | CV, sertifikalar, fatura PDF |
+| Dosya | MinIO (S3-compatible) | CV, worker profil fotoğrafı, işveren logosu, sertifikalar, fatura PDF |
 | AI / LLM | OpenAI GPT-4o | CV extraction, agentic bildirim |
 | Embedding | OpenAI text-embedding-3-small | Worker + posting semantic vector |
 | Background Jobs | Hangfire (PostgreSQL) | CV extraction, fatura periyodu, embedding üretim |
@@ -973,8 +1005,8 @@ Modules/
 ├── Identity/          ← Auth, email doğrulama, UserGroup, Permission, UserGroupMembership,
 │                        UserSession (multi-device), PermissionResolver
 ├── WorkerProfile/     ← Profil, skill+embedding, eğitim, deneyim, sertifika, referans, dil,
-│                        müsaitlik, rating, CvUploadSession, CvImportPreview
-├── EmployerProfile/   ← İşveren, lokasyon/geofence, supervisor
+│                        müsaitlik, rating, bio/sosyal/maaş(p)/ilgi pozisyonları, CvUploadSession, CvImportPreview
+├── EmployerProfile/   ← İşveren, lokasyon/geofence, supervisor, şirket logosu (MinIO key)
 ├── JobPosting/        ← İlan+embedding, başvuru, şablon, JobCategory
 ├── Matching/          ← pgvector cosine search, müsaitlik filtresi, agentic bildirim
 ├── Assignment/        ← Görevlendirme, Mutual QR (clock drift + grace period), anomali
@@ -1013,9 +1045,9 @@ Modules/
 | `Permission` | Identity | `AuditableEntityBase` | resource.action format |
 | `UserGroupMembership` | Identity | `AuditableEntityBase` | Scope + aktiflik |
 | `UserSession` | Identity | `EntityBase` | Multi-device, FCM token per device |
-| `Worker` | WorkerProfile | `StatableEntityBase` | skill_embedding vector(1536) |
-| `CvUploadSession` | WorkerProfile | `AuditableEntityBase` | Pipeline state machine |
-| `Employer` | EmployerProfile | `StatableEntityBase` | |
+| `Worker` | WorkerProfile | `StatableEntityBase` | skill_embedding vector(1536); v6.1: bio, sosyal linkler VO, maaş/ilgi (işverene kapalı alanlar), görüntülenme sayısı vb. — iş planına göre genişler |
+| `CvUploadSession` | WorkerProfile | `AuditableEntityBase` | Pipeline state machine (**hedef** — kodda henüz yok) |
+| `Employer` | EmployerProfile | `StatableEntityBase` | v6.1: şirket logosu object key (MinIO) — iş planında |
 | `JobCategory` | JobPosting | `CodedNamedEntityBase` | Runtime yönetilen |
 | `JobPosting` | JobPosting | `AuditableEntityBase` | description_embedding vector(1536) |
 | `JobPostingTemplate` | JobPosting | `AuditableEntityBase` | |
@@ -1060,6 +1092,9 @@ Modules/
 | `WorkPermit` | Worker (opsiyonel) | Owned, encrypted DocumentNumber |
 | `CommissionCalculationResult` | CommissionAuditLog | Immutable snapshot |
 | `CvImportPreview` | CvUploadSession | JSONB, PreviewField<T> confidence wrapper |
+| `WorkerSocialLink` (veya eşdeğer liste VO) | Worker | v6.1: platform + URL; persistence JSON/owned |
+| `ExpectedSalaryExpectation` (adlandırma ürün) | Worker | Opsiyonel min/max + para birimi; işveren read modelinden hariç |
+| `ProfileCompletionSnapshot` | Read-side / hesaplanan | Oran 0–100; kaynak alan seti dokümante |
 
 ### 12.4 Enum'lar
 

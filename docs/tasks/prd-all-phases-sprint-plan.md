@@ -4,6 +4,18 @@
 - [x] Aktif ilerleme takibi dosyası oluşturuldu: `docs/tasks/ada-is-akademi-execution-tracker.md`
 - [x] Her implementasyon adımı sonrası önce execution tracker güncellenecek, sonra bu plan dosyasındaki ilgili maddeler işaretlenecek.
 
+## Ürün genişleme backlog (2026-05 — profil / medya / eşleştirme)
+
+*PRD sprint haritasına eklenen, kullanıcı tarafından onaylı ek kapsam. Ayrıntılı görevler: `docs/tasks/worker-employer-profile-enrichment.md`*
+
+- [x] **P0** Worker: ilgilendiği pozisyonlar + beklenen maaş aralığı (domain + migration); işveren read modelinden **hariç**; self vs employer-safe DTO ayrımı.
+- [x] **P0 / P1** Worker: profil tamamlanma oranı — ağırlıklı, dokümante algoritma + API alanı.
+- [x] **P1** Worker: kısa “hakkında” (bio) + sosyal medya linkleri (platform + URL listesi, value object / JSON).
+- [x] **P1** Employer: şirket logosu (MinIO, worker profil foto ile ortak dosya hattı).
+- [x] **P1** Worker: profil fotoğrafı (MinIO; execution tracker Deferred ile aynı epik hattı).
+- [ ] **P2** Worker: işveren tarafından profil görüntülenme sayısı (tanım + kötüye kullanım notu).
+- [ ] **Sonraki faz (deferred)** AI ile profil analizi çıkarımı — ayrı onay; üstteki task dosyasında işaretlenecek.
+
 ## Goal
 - [x] PRD kapsamındaki Faz 1-2-3 işlerini bağımlılık sırasına göre Sprint 0-9 olarak planlamak.
 - [x] Her sprint için net teslim çıktısı, kabul kriteri ve risk azaltma adımlarını takip edilebilir hale getirmek.
@@ -15,7 +27,7 @@
 
 ## Out-of-scope
 - [x] Kod implementasyonu, migration çalıştırma, endpoint değişikliği.
-- [x] PRD dışı yeni kapsam ekleme.
+- [x] PRD/plan dışı **kayıtsız** yeni kapsam ekleme (istisna: bu dosyada `Ürün genişleme backlog` ve `docs/tasks/worker-employer-profile-enrichment.md` altında izlenen maddeler).
 
 ## Faz Kapsamı ve Bağımlılıklar
 
@@ -27,14 +39,14 @@
 - [x] Bağımlılık: auth + permission resolver tamamlanmadan operasyonel endpointler açılmaz.
 
 ### Faz 2 - Intelligence and Automation (Sprint 4-6)
-- [ ] pgvector extension, worker/posting embedding pipeline.
-- [ ] Semantic matching ve agentic personalized notification + fallback.
-- [ ] Hangfire otomasyonları, overdue alarmı, permission cache invalidation.
-- [ ] Raporlama query/export akışları (CQRS read-side odaklı).
+- [x] pgvector extension, worker/posting embedding pipeline.
+- [x] Semantic matching ve agentic personalized notification + fallback.
+- [x] Hangfire otomasyonları, overdue alarmı, permission cache invalidation.
+- [x] Raporlama query/export akışları (CQRS read-side odaklı).
 - [ ] Bağımlılık: Faz 1 domain eventleri ve veri kalitesi olgun olmadan semantic/fallback kalitesi düşük kalır.
 
 ### Faz 3 - Scale and Monetization (Sprint 7-9)
-- [ ] Employer monetization omurgası (abonelik/kiralama disinda).
+- [x] Employer monetization omurgası (abonelik/kiralama disinda).
 - [ ] Çok bölge/çok dil hazırlığı.
 - [ ] Assignment + Commission odaklı modüler ayrışma adımı.
 - [ ] Outbox/read-replica ve ileri analitik zemini.
@@ -43,21 +55,21 @@
 ## Sprint Backlog (0-9)
 
 ### Sprint 0 - Hazırlık ve Mimari Kararlar
-- [ ] PRD iş kırılımı ve faz->sprint haritalama.
-- [ ] Cross-cutting kararlar: auth, event, cache, raporlama read-side sınırları.
-- [ ] Ortak kabul kriterleri (DoD) ve regresyon kontrol çerçevesi.
+- [x] PRD iş kırılımı ve faz->sprint haritalama.
+- [x] Cross-cutting kararlar: auth, event, cache, raporlama read-side sınırları.
+- [x] Ortak kabul kriterleri (DoD) ve regresyon kontrol çerçevesi.
 - [ ] Çıktı: baseline backlog + risk kaydı + ölçüm metrikleri.
 
 ### Sprint 1 - Identity ve Güvenlik Temeli
-- [ ] Worker email verification akışı.
-- [ ] JWT + refresh rotation + cihaz bazlı session.
-- [ ] Group-based RBAC ve permission cache yaklaşımı.
+- [x] Worker email verification akışı.
+- [x] JWT + refresh rotation + cihaz bazlı session.
+- [x] Group-based RBAC ve permission cache yaklaşımı.
 - [x] Çıktı (ilk dikey dilim): kimlik ve yetkilendirme çekirdeği uca açık.
 
 ### Sprint 2 - Profil ve İlan-Başvuru Çekirdeği
-- [ ] Worker profil bölümleri + CV destekli profil oluşturma akışı.
+- [x] Worker profil bölümleri + CV destekli profil oluşturma akışı.
 - [x] Employer profil/lokasyon/supervisor verisi.
-- [ ] Job category + job posting + başvuru akışları.
+- [x] Job category + job posting + başvuru akışları.
 - [x] Çıktı (ilk dikey dilim): vardiya oluşumundan başvuruya temel iş akışının çalışması.
 
 ### Sprint 3 - Assignment, QR, Finansal Çekirdek
@@ -75,20 +87,24 @@
 ### Sprint 5 - Kişiselleştirme ve Gerçek Zamanlılık
 - [x] Agentic personalized notification.
 - [x] LLM fallback mekanizması ve kanal geçişi.
-- [ ] Canlı durum akışları (matching/assignment bildirimi).
-- [ ] Çıktı: kişisel ve zamanında iletişim deneyimi.
+- [x] Canlı durum akışları (matching/assignment bildirimi).
+- [x] Çıktı: kişisel ve zamanında iletişim deneyimi.
 - [x] Uygulanan dikey dilim: worker notification preview query + push->email fallback + API endpoint + test eklendi.
 - [x] Uygulanan dikey dilim: notification preview semantic personalization score/source + push->email->in_app fallback zinciri + test eklendi.
+- [x] Uygulanan dikey dilim: worker live status feed query + endpoint (matching/assignment polling) + test eklendi.
 
 ### Sprint 6 - Otomasyon ve Raporlama
-- [ ] Hangfire scheduler: faturalama/periyodik işler.
-- [ ] Docker backup reposu: `postgres:17-alpine` ve MinIO datalari için periyodik yedekleme akışını (schedule + retention + restore smoke) kur.
-- [ ] Overdue alarm mekaniği.
-- [ ] CQRS rapor query/export paketleri.
-- [ ] Çıktı: Faz 2 operasyonel otomasyon + raporlama tabanı tamam.
+- [x] Hangfire scheduler: faturalama/periyodik işler.
+- [x] Docker backup reposu: `postgres:17-alpine` ve MinIO datalari için periyodik yedekleme akışını (schedule + retention + restore smoke) kur.
+- [x] Overdue alarm mekaniği.
+- [x] CQRS rapor query/export paketleri.
+- [x] Çıktı: Faz 2 operasyonel otomasyon + raporlama tabanı tamam.
 - [x] Uygulanan dikey dilim: overdue summary query + statistics endpoint + cache + test eklendi.
 - [x] Uygulanan dikey dilim: Hangfire recurring job + idempotent overdue alarm sweep command + migration + test eklendi.
 - [x] Uygulanan dikey dilim: overdue alarm CSV export query + statistics endpoint + cache + test eklendi.
+- [x] Uygulanan dikey dilim: system-user notification dispatch outbox (push->email->in_app fallback) + retry scheduler command/job + API endpoint + migration + test eklendi.
+- [x] Uygulanan dikey dilim: Docker backup servisi (Postgres + MinIO) + cron schedule + retention + restore smoke eklendi.
+- [x] Uygulanan dikey dilim: system-user notification dispatch CSV export query + statistics endpoint + cache + test eklendi.
 
 ### Sprint 7 - Monetization Başlangıcı
 - [x] Uygulanan dikey dilim: monetization summary query + statistics endpoint + cache + test eklendi.
@@ -116,16 +132,16 @@
 
 ### Sprint 0 - Hazırlık ve Mimari
 - [ ] Domain: Faz bazlı aggregate sınırlarını ve invariants listesini netleştir.
-- [ ] Application: CQRS isimlendirme ve klasörleme şablonunu sabitle.
-- [ ] Persistence: Migration stratejisi (idempotent seed, rollback notu) dokümante et.
-- [ ] API: Endpoint sözleşmesi (ApiResponse envelope, auth matrix) kontrol listesi çıkar.
+- [x] Application: CQRS isimlendirme ve klasörleme şablonunu sabitle.
+- [x] Persistence: Migration stratejisi (idempotent seed, rollback notu) dokümante et.
+- [x] API: Endpoint sözleşmesi (ApiResponse envelope, auth matrix) kontrol listesi çıkar.
 - [ ] Test: Sprint bazlı smoke/regresyon matrisi tanımla.
 
 ### Sprint 1 - Identity ve Güvenlik
-- [ ] Domain: Email verification token, session ve group/permission kurallarını finalize et.
-- [ ] Application: Register/Verify/Login/Refresh/Logout komut-sorgu akışlarını validator + handler ile tamamla.
-- [ ] Persistence: SystemUser, SystemUserGroup ve token/session mapping + indeksleri tamamla.
-- [ ] API: Auth ve system user endpointlerini body-only CQRS sözleşmesiyle aç.
+- [x] Domain: Email verification token, session ve group/permission kurallarını finalize et.
+- [x] Application: Register/Verify/Login/Refresh/Logout komut-sorgu akışlarını validator + handler ile tamamla.
+- [x] Persistence: SystemUser, SystemUserGroup ve token/session mapping + indeksleri tamamla.
+- [x] API: Auth ve system user endpointlerini body-only CQRS sözleşmesiyle aç.
 - [ ] Test: Email verify bypass, refresh replay, permission cache invalidation senaryolarını doğrula.
 
 #### Sprint 1 Mikro Görevler (Gerçek Dosya/Path Bazlı)
@@ -149,42 +165,42 @@
 - [x] Uygulanan dikey dilim: `LogoutSystemUserCommand` + `SystemUsersController.Logout` + DI registration + validator testi eklendi.
 
 ### Sprint 2 - Profil ve İlan-Başvuru Çekirdeği
-- [ ] Domain: Worker/Employer profile ve JobPosting/JobApplication yaşam döngülerini netleştir.
-- [ ] Application: Profil yönetimi, ilan oluşturma/yayınlama ve başvuru komut-sorgularını tamamla.
-- [ ] Persistence: Profil ve ilan/başvuru entity mapping, relation ve status indekslerini ekle.
-- [ ] API: Profil, ilan ve başvuru controller aksiyonlarını sözleşmeye uygun yayımla.
+- [x] Domain: Worker/Employer profile ve JobPosting/JobApplication yaşam döngülerini netleştir.
+- [x] Application: Profil yönetimi, ilan oluşturma/yayınlama ve başvuru komut-sorgularını tamamla.
+- [x] Persistence: Profil ve ilan/başvuru entity mapping, relation ve status indekslerini ekle.
+- [x] API: Profil, ilan ve başvuru controller aksiyonlarını sözleşmeye uygun yayımla.
 - [ ] Test: Profil eksik veri, duplicate başvuru, ilan statü geçiş regresyonlarını çalıştır.
 - [x] Uygulanan dikey dilim: `WithdrawJobPostingApplicationCommandHandler` için owner-worker withdraw senaryosu handler testi eklendi.
 
 ### Sprint 3 - Assignment, QR ve Finansal Çekirdek
-- [ ] Domain: Assignment check-in/out kuralları, anomaly flag ve payout state transitionlarını finalize et.
-- [ ] Application: QR doğrulama, assignment tamamlama ve payout tetikleyici command akışlarını tamamla.
-- [ ] Persistence: Assignment, check event ve finansal çekirdek tabloları/mappinglerini tamamla.
-- [ ] API: Assignment operasyon ve finansal özet endpointlerini ekle.
+- [x] Domain: Assignment check-in/out kuralları, anomaly flag ve payout state transitionlarını finalize et.
+- [x] Application: QR doğrulama, assignment tamamlama ve payout tetikleyici command akışlarını tamamla.
+- [x] Persistence: Assignment, check event ve finansal çekirdek tabloları/mappinglerini tamamla.
+- [x] API: Assignment operasyon ve finansal özet endpointlerini ekle.
 - [ ] Test: QR replay, race condition ve payout idempotency senaryolarını doğrula.
 - [x] Uygulanan dikey dilim: `ShiftAssignment` çekirdeği + create/check-in command/endpoint + handler testleri eklendi.
 
 ### Sprint 4 - Semantic Altyapı
-- [ ] Domain: Matching skoru için kuralları ve minimum eşleşme eşiğini tanımla.
-- [ ] Application: Embedding üretim ve semantic matching query pipeline'ını ekle.
-- [ ] Persistence: pgvector kolonları, index ve update stratejisini migration ile uygula.
-- [ ] API: Matching preview/query endpointlerini performans sınırıyla aç.
-- [ ] Test: Stale embedding ve fallback keyword arama tutarlılığını ölç.
+- [x] Domain: Matching skoru için kuralları ve minimum eşleşme eşiğini tanımla.
+- [x] Application: Embedding üretim ve semantic matching query pipeline'ını ekle.
+- [x] Persistence: pgvector kolonları, index ve update stratejisini migration ile uygula.
+- [x] API: Matching preview/query endpointlerini performans sınırıyla aç.
+- [x] Test: Stale embedding ve fallback keyword arama tutarlılığını ölç.
 - [x] Uygulanan dikey dilim: `ListSemanticMatchedJobPostingsQuery` + API endpoint + validator testi eklendi.
 
 ### Sprint 5 - Kişiselleştirme ve Gerçek Zamanlılık
-- [ ] Domain: Bildirim öncelik ve kanal fallback kurallarını tanımla.
-- [ ] Application: Agentic personalized notification orkestrasyonu + fallback akışlarını tamamla.
-- [ ] Persistence: Notification log, delivery status ve retry metadata saklamasını ekle.
-- [ ] API: Bildirim tercihleri ve canlı durum besleme endpointlerini aç.
+- [x] Domain: Bildirim öncelik ve kanal fallback kurallarını tanımla.
+- [x] Application: Agentic personalized notification orkestrasyonu + fallback akışlarını tamamla.
+- [x] Persistence: Notification log, delivery status ve retry metadata saklamasını ekle.
+- [x] API: Bildirim tercihleri ve canlı durum besleme endpointlerini aç.
 - [ ] Test: LLM servis kesintisi ve gecikmeli teslimat fallback senaryolarını doğrula.
 
 ### Sprint 6 - Otomasyon ve Raporlama
-- [ ] Domain: Overdue ve period-close iş kurallarını netleştir.
-- [ ] Application: Hangfire job handlerları ve CQRS rapor query/export akışlarını tamamla.
-- [ ] Persistence: Scheduler lock/idempotency tabloları ve raporlama read model optimizasyonunu uygula.
-- [ ] API: Rapor endpointleri ve export aksiyonlarını güvenli erişimle aç.
-- [ ] Test: Duplicate period, job retry ve rapor doğruluk regresyonlarını doğrula.
+- [x] Domain: Overdue ve period-close iş kurallarını netleştir.
+- [x] Application: Hangfire job handlerları ve CQRS rapor query/export akışlarını tamamla.
+- [x] Persistence: Scheduler lock/idempotency tabloları ve raporlama read model optimizasyonunu uygula.
+- [x] API: Rapor endpointleri ve export aksiyonlarını güvenli erişimle aç.
+- [x] Test: Duplicate period, job retry ve rapor doğruluk regresyonlarını doğrula.
 
 ### Sprint 7 - Monetization Başlangıcı
 - [ ] Domain: Abonelik planı, faturalama periyodu ve yetki paketleme kurallarını ekle.
