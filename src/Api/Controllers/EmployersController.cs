@@ -93,6 +93,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Gets full employer detail by id.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get employer detail")]
+        [EndpointDescription("Returns full employer profile detail with locations and supervisor list.")]
+        [ProducesResponseType(typeof(ApiResponse<EmployerFullDetailModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetDetail(
+            [FromBody] GetEmployerDetailQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Lists employers with filtering and paging support.</summary>
         [HttpPost]
         [Consumes("application/json")]

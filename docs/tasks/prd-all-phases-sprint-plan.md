@@ -73,14 +73,16 @@
 - [x] Çıktı (ilk dikey dilim): semantic öneri altyapısı çalışır.
 
 ### Sprint 5 - Kişiselleştirme ve Gerçek Zamanlılık
-- [ ] Agentic personalized notification.
-- [ ] LLM fallback mekanizması ve kanal geçişi.
+- [x] Agentic personalized notification.
+- [x] LLM fallback mekanizması ve kanal geçişi.
 - [ ] Canlı durum akışları (matching/assignment bildirimi).
 - [ ] Çıktı: kişisel ve zamanında iletişim deneyimi.
 - [x] Uygulanan dikey dilim: worker notification preview query + push->email fallback + API endpoint + test eklendi.
+- [x] Uygulanan dikey dilim: notification preview semantic personalization score/source + push->email->in_app fallback zinciri + test eklendi.
 
 ### Sprint 6 - Otomasyon ve Raporlama
 - [ ] Hangfire scheduler: faturalama/periyodik işler.
+- [ ] Docker backup reposu: `postgres:17-alpine` ve MinIO datalari için periyodik yedekleme akışını (schedule + retention + restore smoke) kur.
 - [ ] Overdue alarm mekaniği.
 - [ ] CQRS rapor query/export paketleri.
 - [ ] Çıktı: Faz 2 operasyonel otomasyon + raporlama tabanı tamam.
@@ -89,9 +91,6 @@
 - [x] Uygulanan dikey dilim: overdue alarm CSV export query + statistics endpoint + cache + test eklendi.
 
 ### Sprint 7 - Monetization Başlangıcı
-- [ ] Employer gelir modeli domain kurallari (abonelik/kiralama olmadan).
-- [ ] Gelir modeli kontratları ve yönetim akışları.
-- [ ] Çıktı: ticari genişleme omurgası oluşur.
 - [x] Uygulanan dikey dilim: monetization summary query + statistics endpoint + cache + test eklendi.
 - [x] Uygulanan dikey dilim: employer commission policy command/query + employer endpointleri + cache + test eklendi.
 - [x] Uygulanan dikey dilim: employer commission policy CSV export query + employer endpoint + cache + test eklendi.

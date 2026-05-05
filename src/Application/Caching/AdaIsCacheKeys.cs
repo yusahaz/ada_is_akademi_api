@@ -86,6 +86,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, nameof(Employer) + DetailSuffix, employerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
+        /// Cache key for <see cref="EmployerFullDetailModel"/> by employer id.
+        /// </summary>
+        internal static CacheKey EmployerFullDetailKey(int employerId) =>
+            new(QueryNamespace, "EmployerFullDetail", employerId.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
         /// Cache key for employer commission policy detail.
         /// </summary>
         internal static CacheKey EmployerCommissionPolicyKey(int employerId) =>

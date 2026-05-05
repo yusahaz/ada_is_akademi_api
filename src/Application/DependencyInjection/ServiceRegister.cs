@@ -101,6 +101,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         private void RegisterQueryHandlers(IServiceCollection services)
         {
             services.AddScoped<IRequestHandler<GetEmployerByIdQuery, EmployerDetailModel>, GetEmployerByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetEmployerDetailQuery, EmployerFullDetailModel>, GetEmployerDetailQueryHandler>();
             services.AddScoped<IRequestHandler<ListEmployersQuery, PagedQueryResultModel<EmployerListItemModel>>, ListEmployersQueryHandler>();
             services.AddScoped<IRequestHandler<GetCommissionReceivableByPeriodQuery, CommissionReceivableDetailModel>, GetCommissionReceivableByPeriodQueryHandler>();
             services.AddScoped<IRequestHandler<ListCommissionReceivablesByEmployerQuery, PagedQueryResultModel<CommissionReceivableListItemModel>>, ListCommissionReceivablesByEmployerQueryHandler>();
@@ -171,6 +172,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<DeleteWorkerCommand>, DeleteWorkerCommandValidator>();
             services.AddScoped<IRequestValidator<DeactivateSystemUserGroupCommand>, DeactivateSystemUserGroupCommandValidator>();
             services.AddScoped<IRequestValidator<GetEmployerByIdQuery>, GetEmployerByIdQueryValidator>();
+            services.AddScoped<IRequestValidator<GetEmployerDetailQuery>, GetEmployerDetailQueryValidator>();
             services.AddScoped<IRequestValidator<ListEmployersQuery>, ListEmployersQueryValidator>();
             services.AddScoped<IRequestValidator<GetCommissionReceivableByPeriodQuery>, GetCommissionReceivableByPeriodQueryValidator>();
             services.AddScoped<IRequestValidator<ListCommissionReceivablesByEmployerQuery>, ListCommissionReceivablesByEmployerQueryValidator>();

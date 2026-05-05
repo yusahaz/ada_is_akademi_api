@@ -57,13 +57,34 @@ namespace Azoxia.AdaIsAkademi.Application
                 .OrderByDescending(x => x.LastActiveAt)
                 .FirstOrDefault();
 
-            bool fallbackApplied = pushDevice is null;
-            string? fallbackReason = fallbackApplied ? "missing_push_token" : null;
-            string channel = fallbackApplied ? "email" : "push";
+            bool hasPush = pushDevice is not null;
+            bool hasVerifiedEmail = systemUser.EmailVerifiedAt.HasValue && !systemUser.Email.IsNullOrWhiteSpace();
+
+            bool fallbackApplied = !hasPush;
+            string? fallbackReason = null;
+            string channel = "push";
+            if (!hasPush && hasVerifiedEmail)
+            {
+                channel = "email";
+                fallbackReason = "missing_push_token";
+            }
+            else if (!hasPush)
+            {
+                channel = "in_app";
+                fallbackReason = "missing_push_token_and_unverified_email";
+            }
+
+            double personalizationScore = ComputePersonalizationScore(worker, posting);
+            string personalizationSource = personalizationScore > 0d
+                ? "semantic_cosine"
+                : "rule_based_fallback";
+
             var message = new WorkerNotificationPreviewMessageModel(
                 posting.Title,
                 posting.ShiftDate,
-                "worker.semantic.match");
+                personalizationScore > 0d
+                    ? "worker.semantic.match.personalized"
+                    : "worker.semantic.match.fallback");
 
             var model = new WorkerNotificationPreviewModel(
                 posting.Id,
@@ -71,6 +92,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 message,
                 fallbackApplied,
                 fallbackReason,
+                personalizationScore,
+                personalizationSource,
                 DateTimeOffset.UtcNow);
 
             await CacheService.SetAsync(
@@ -82,6 +105,42 @@ namespace Azoxia.AdaIsAkademi.Application
                 cancellationToken);
 
             return model;
+        }
+
+        private double ComputePersonalizationScore(Worker worker, JobPosting posting)
+        {
+            if (worker.SkillEmbedding is null || posting.DescriptionEmbedding is null)
+            {
+                return 0d;
+            }
+
+            if (worker.SkillEmbedding.Length == 0
+                || posting.DescriptionEmbedding.Length == 0
+                || worker.SkillEmbedding.Length != posting.DescriptionEmbedding.Length)
+            {
+                return 0d;
+            }
+
+            double dot = 0d;
+            double leftNorm = 0d;
+            double rightNorm = 0d;
+
+            for (int i = 0; i < worker.SkillEmbedding.Length; i++)
+            {
+                float left = worker.SkillEmbedding[i];
+                float right = posting.DescriptionEmbedding[i];
+                dot += left * right;
+                leftNorm += left * left;
+                rightNorm += right * right;
+            }
+
+            if (leftNorm <= 0d || rightNorm <= 0d)
+            {
+                return 0d;
+            }
+
+            double cosine = dot / (Math.Sqrt(leftNorm) * Math.Sqrt(rightNorm));
+            return Math.Round(Math.Max(0d, Math.Min(1d, cosine)), 4);
         }
 
         #endregion Utils

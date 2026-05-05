@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-05 23:18 (UTC+3)
-- Current Phase: Faz 2 Sprint 4
-- Current Task: Semantic altyapı dikey dilimi tamamlandı (pgvector extension + embedding refresh sweep + availability filtreli matching)
-- Next Task: Faz 2 Sprint 5 kişiselleştirme/fallback sertleştirme
+- Last Updated: 2026-05-05 23:26 (UTC+3)
+- Current Phase: Faz 2 Sprint 5
+- Current Task: Notification personalization + fallback zinciri sertleştirme tamamlandı
+- Next Task: Sprint 5 canlı durum akışları (matching/assignment bildirimi)
 - Blockers: Yok
 
 ## Phase Checklist
@@ -58,6 +58,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-05 17:56 - Sprint 3 mutual QR: `ShiftAssignment` için worker + supervisor çift token doğrulama, grace-period guard, yeni supervisor check-in command/endpoint ve negatif erişim testi eklendi; sprint testleri geçti.
 - [x] 2026-05-05 23:05 - Sprint 3 finansal çekirdek: `WorkerPayout` entity + status transition komutları (create/mark processing/fail/retry/confirm), `CommissionAuditLog` append-only kayıtları, ilgili API endpointleri/DI/migration ve payout+commission testleri tamamlandı.
 - [x] 2026-05-05 23:18 - Sprint 4 semantic altyapı: `RunEmbeddingRefreshSweepCommand` + saatlik Hangfire işi + deterministic vectorizer eklendi, `EnablePgvectorExtension` migrationı yazıldı, semantic matching query worker availability filtresiyle güçlendirildi ve Sprint 4 testleri geçti.
+- [x] 2026-05-05 23:26 - Sprint 5 kişiselleştirme: notification preview modeline `PersonalizationScore` + `PersonalizationSource` eklendi; semantic cosine hesaplama, template varyantı ve `push -> email -> in_app` fallback zinciri handler’da uygulandı; Sprint 5 query testleri güncellendi/genişletildi.
 
 ## Deferred Backlog
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)

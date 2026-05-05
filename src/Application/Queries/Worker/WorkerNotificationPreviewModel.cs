@@ -11,6 +11,8 @@ namespace Azoxia.AdaIsAkademi.Application
         WorkerNotificationPreviewMessageModel Message,
         bool FallbackApplied,
         string? FallbackReason,
+    double PersonalizationScore,
+    string PersonalizationSource,
         DateTimeOffset GeneratedAtUtc) :
         ModelBase;
 }
