@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-05 17:07 (UTC+3)
+- Last Updated: 2026-05-05 17:21 (UTC+3)
 - Current Phase: Sprint kapanış hızlı-temizlik
-- Current Task: Sprint 2 employer profil/lokasyon/supervisor dikey dilimi testlerle doğrulandı ve tamamlandı
-- Next Task: Sprint 2 worker profil bölümleri için test ve endpoint kontrat derinleştirme adımına geçiş
+- Current Task: Sprint 2 worker profil command handler test derinleştirme adımı tamamlandı
+- Next Task: Sprint 3 QR/anomaly ve finansal çekirdek için ilk dikey dilime geçiş
 - Blockers: Yok
 
 ## Phase Checklist
@@ -45,6 +45,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-05 16:36 - Runtime hardening: `krb5-libs`, DataProtection volume ve izin düzeltmesi uygulandı.
 - [x] 2026-05-05 17:03 - Sprint 2 profil derinleştirme: `AddEmployerLocation`, `AddEmployerSupervisor`, `RemoveEmployerSupervisor`, `DeleteEmployer` endpoint/command akışları ve DI kayıtları eklendi; build+linter temiz.
 - [x] 2026-05-05 17:07 - Sprint 2 doğrulama: employer profil/supervisor/delete command handler testleri eklendi; ilişkili kullanıcı soft-delete akışı testle doğrulandı.
+- [x] 2026-05-05 17:21 - Sprint 2 doğrulama: worker profile command handler testleri (availability add/remove + delete worker soft-delete) eklendi ve geçti.
 
 ## Deferred Backlog
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)

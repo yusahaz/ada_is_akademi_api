@@ -68,6 +68,80 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             ex.Error.Should().Be(AzoxiaErrorCodes.NotFound);
         }
 
+        [Fact]
+        public async Task AddAndRemoveWorkerAvailability_handlers_manage_collection_for_actor_worker()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            Worker worker = await SeedWorkerAsync(db);
+            executionContext.ReplaceClaim("worker_id", worker.Id.ToString());
+
+            var addHandler = new AddWorkerAvailabilityCommandHandler(sp);
+            int availabilityId = await ((IRequestHandler<AddWorkerAvailabilityCommand, int>)addHandler).HandleAsync(
+                new AddWorkerAvailabilityCommand
+                {
+                    DayOfWeek = DayOfWeek.Monday,
+                    TimeFrom = new TimeOnly(9, 0),
+                    TimeTo = new TimeOnly(18, 0),
+                },
+                CancellationToken.None);
+
+            WorkerAvailability? added = await db.Set<WorkerAvailability>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == availabilityId);
+            added.Should().NotBeNull();
+            added!.WorkerId.Should().Be(worker.Id);
+
+            var removeHandler = new RemoveWorkerAvailabilityCommandHandler(sp);
+            await ((IRequestHandler<RemoveWorkerAvailabilityCommand, Unit>)removeHandler).HandleAsync(
+                new RemoveWorkerAvailabilityCommand
+                {
+                    AvailabilityId = availabilityId,
+                },
+                CancellationToken.None);
+
+            Worker? reloaded = await db.Set<Worker>()
+                .Include(x => x.Availabilities)
+                .FirstOrDefaultAsync(x => x.Id == worker.Id);
+            reloaded.Should().NotBeNull();
+            reloaded!.Availabilities.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task DeleteWorkerCommandHandler_soft_deletes_worker_and_linked_system_user()
+        {
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider();
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            Worker worker = await SeedWorkerAsync(db);
+
+            var handler = new DeleteWorkerCommandHandler(sp);
+            await ((IRequestHandler<DeleteWorkerCommand, Unit>)handler).HandleAsync(
+                new DeleteWorkerCommand
+                {
+                    WorkerId = worker.Id,
+                },
+                CancellationToken.None);
+
+            Worker? workerReloaded = await db.Set<Worker>()
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.Id == worker.Id);
+            SystemUser? userReloaded = await db.Set<SystemUser>()
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.Id == worker.SystemUserId);
+
+            workerReloaded.Should().NotBeNull();
+            userReloaded.Should().NotBeNull();
+            workerReloaded!.IsDeleted.Should().BeTrue();
+            userReloaded!.IsDeleted.Should().BeTrue();
+        }
+
         #endregion Methods
 
         #region Utils
