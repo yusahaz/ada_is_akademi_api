@@ -1,5 +1,9 @@
 # Ada İş Akademi - PRD Tüm Fazlar Sprint Planı
 
+## Tracking Anchor
+- [x] Aktif ilerleme takibi dosyası oluşturuldu: `docs/tasks/ada-is-akademi-execution-tracker.md`
+- [x] Her implementasyon adımı sonrası önce execution tracker güncellenecek, sonra bu plan dosyasındaki ilgili maddeler işaretlenecek.
+
 ## Goal
 - [x] PRD kapsamındaki Faz 1-2-3 işlerini bağımlılık sırasına göre Sprint 0-9 olarak planlamak.
 - [x] Her sprint için net teslim çıktısı, kabul kriteri ve risk azaltma adımlarını takip edilebilir hale getirmek.
@@ -52,7 +56,7 @@
 
 ### Sprint 2 - Profil ve İlan-Başvuru Çekirdeği
 - [ ] Worker profil bölümleri + CV destekli profil oluşturma akışı.
-- [ ] Employer profil/lokasyon/supervisor verisi.
+- [x] Employer profil/lokasyon/supervisor verisi.
 - [ ] Job category + job posting + başvuru akışları.
 - [x] Çıktı (ilk dikey dilim): vardiya oluşumundan başvuruya temel iş akışının çalışması.
 
@@ -224,6 +228,8 @@
 
 ## Done / Follow-ups
 - [x] Plan dosyası güncellendi ve Ada İş Akademi adlandırmasına normalize edildi.
-- [ ] Implementasyon sırasında her sprint kapanışında tamamlanan maddeler işaretlenecek.
-- [ ] Faz dışına taşan istekler yeni satır olarak "deferred" etiketiyle eklenecek.
+- [x] Implementasyon sırasında her sprint kapanışında tamamlanan maddeler işaretlenecek.
+- [x] Faz dışına taşan istekler yeni satır olarak "deferred" etiketiyle eklenecek.
 - [ ] deferred: Sprint 7 icin commission policy degisiklik gecmisi (audit trail) query + endpoint + test.
+- [ ] deferred: Sprint 1/2 auth-query performans uyarıları için `QuerySplittingBehavior` kararı ve optimize düzenleme.
+- [ ] deferred: DataProtection key encryption (container volume var; encryptor policy production için ayrıca netleşecek).
