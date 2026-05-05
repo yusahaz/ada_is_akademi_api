@@ -521,6 +521,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "EmployerId must be greater than zero.");
 
         /// <summary>
+        /// Employer id must be positive for employer commission estimate query.
+        /// </summary>
+        internal static readonly ErrorCode GetEmployerCommissionEstimateEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_906",
+            ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
         /// System user id must be positive when suspending a system user.
         /// </summary>
         internal static readonly ErrorCode SuspendSystemUserSystemUserId = new(

@@ -62,6 +62,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Gets employer-specific commission estimate metrics.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get employer commission estimate")]
+        [EndpointDescription("Returns accepted volume and estimated commission amounts for the given employer.")]
+        [ProducesResponseType(typeof(ApiResponse<EmployerCommissionEstimateModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetCommissionEstimate(
+            [FromBody] GetEmployerCommissionEstimateQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Exports employer commission policies in CSV format package.</summary>
         [HttpPost]
         [Consumes("application/json")]
