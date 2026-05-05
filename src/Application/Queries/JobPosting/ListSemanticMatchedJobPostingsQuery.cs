@@ -90,7 +90,8 @@ namespace Azoxia.AdaIsAkademi.Application
 
             if (!HasFreshEmbedding(worker))
             {
-                IReadOnlyList<SemanticMatchedJobPostingModel> fallbackRows = await BuildFallbackRowsAsync(query.Limit, cancellationToken);
+                IReadOnlyList<WorkerAvailability> availabilities = await LoadWorkerAvailabilitiesAsync(workerId, cancellationToken);
+                IReadOnlyList<SemanticMatchedJobPostingModel> fallbackRows = await BuildFallbackRowsAsync(query.Limit, availabilities, cancellationToken);
                 await CacheService.SetAsync(
                     cacheKey,
                     fallbackRows,
@@ -101,6 +102,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 return fallbackRows;
             }
 
+            IReadOnlyList<WorkerAvailability> workerAvailabilities = await LoadWorkerAvailabilitiesAsync(workerId, cancellationToken);
             IEnumerable<JobPosting> postings = await UnitOfWork
                 .GetRepository<JobPosting>()
                 .Filter(x => x.Status == JobPostingStatus.Open && !x.IsDeleted && x.DescriptionEmbedding != null)
@@ -110,6 +112,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .ToListAsync(cancellationToken);
 
             IReadOnlyList<SemanticMatchedJobPostingModel> rows = postings
+                .Where(x => IsWorkerAvailableForPosting(workerAvailabilities, x))
                 .Where(x => x.DescriptionEmbedding is not null && x.DescriptionEmbedding.Length == worker.SkillEmbedding.Length)
                 .Select(x => new SemanticMatchedJobPostingModel(
                     x.Id,
@@ -133,7 +136,20 @@ namespace Azoxia.AdaIsAkademi.Application
             return rows;
         }
 
-        private async Task<IReadOnlyList<SemanticMatchedJobPostingModel>> BuildFallbackRowsAsync(int limit, CancellationToken cancellationToken)
+        private async Task<IReadOnlyList<WorkerAvailability>> LoadWorkerAvailabilitiesAsync(int workerId, CancellationToken cancellationToken)
+        {
+            return (await UnitOfWork
+                    .GetRepository<WorkerAvailability>()
+                    .Filter(x => x.WorkerId == workerId)
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken))
+                .ToList();
+        }
+
+        private async Task<IReadOnlyList<SemanticMatchedJobPostingModel>> BuildFallbackRowsAsync(
+            int limit,
+            IReadOnlyList<WorkerAvailability> availabilities,
+            CancellationToken cancellationToken)
         {
             return (await UnitOfWork
                     .GetRepository<JobPosting>()
@@ -141,7 +157,6 @@ namespace Azoxia.AdaIsAkademi.Application
                     .AsNoTracking()
                     .OrderBy(x => x.ShiftDate)
                     .ThenBy(x => x.ShiftStartTime)
-                    .Take(limit)
                     .ToListAsync(
                         x => new SemanticMatchedJobPostingModel(
                             x.Id,
@@ -151,6 +166,8 @@ namespace Azoxia.AdaIsAkademi.Application
                             x.ShiftEndTime,
                             0d),
                         cancellationToken))
+                .Where(x => IsWorkerAvailableForPosting(availabilities, x.ShiftDate, x.ShiftStartTime, x.ShiftEndTime))
+                .Take(limit)
                 .ToList();
         }
 
@@ -179,6 +196,27 @@ namespace Azoxia.AdaIsAkademi.Application
             }
 
             return dot / (Math.Sqrt(leftNorm) * Math.Sqrt(rightNorm));
+        }
+
+        private bool IsWorkerAvailableForPosting(IReadOnlyList<WorkerAvailability> availabilities, JobPosting posting)
+            => IsWorkerAvailableForPosting(availabilities, posting.ShiftDate, posting.ShiftStartTime, posting.ShiftEndTime);
+
+        private bool IsWorkerAvailableForPosting(
+            IReadOnlyList<WorkerAvailability> availabilities,
+            DateOnly shiftDate,
+            TimeOnly shiftStartTime,
+            TimeOnly shiftEndTime)
+        {
+            if (availabilities.Count == 0)
+            {
+                return true;
+            }
+
+            DayOfWeek dayOfWeek = shiftDate.DayOfWeek;
+            return availabilities.Any(x =>
+                x.DayOfWeek == dayOfWeek
+                && x.TimeFrom <= shiftStartTime
+                && x.TimeTo >= shiftEndTime);
         }
 
         #endregion Utils

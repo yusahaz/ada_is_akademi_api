@@ -245,6 +245,19 @@ namespace Azoxia.AdaIsAkademi.Domain
                 : university.Trim();
         }
 
+        protected internal void UpdateSkillEmbedding(float[]? skillEmbedding)
+        {
+            if (skillEmbedding is null || skillEmbedding.Length == 0)
+            {
+                SkillEmbedding = null;
+                EmbeddingUpdatedAt = null;
+                return;
+            }
+
+            SkillEmbedding = skillEmbedding;
+            EmbeddingUpdatedAt = DateTimeOffset.UtcNow;
+        }
+
         protected internal void DeleteWorker()
             => base.Delete();
 

@@ -47,6 +47,7 @@
                     .UseInMemoryStorage());
                 builder.Services.AddHangfireServer();
                 builder.Services.AddScoped<OverdueAlarmRecurringJob>();
+                builder.Services.AddScoped<EmbeddingRefreshRecurringJob>();
             };
 
             startup.OnConfigurePipelines += (app) =>
@@ -56,6 +57,10 @@
                     recurringJobId: "overdue-alarm-sweep",
                     methodCall: x => x.ExecuteAsync(),
                     cronExpression: "*/30 * * * *");
+                RecurringJob.AddOrUpdate<EmbeddingRefreshRecurringJob>(
+                    recurringJobId: "embedding-refresh-sweep",
+                    methodCall: x => x.ExecuteAsync(),
+                    cronExpression: "0 * * * *");
             };
 
             startup.Run(args);

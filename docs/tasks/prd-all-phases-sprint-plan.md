@@ -67,9 +67,9 @@
 - [x] Çıktı (ilk dikey dilim): Faz 1 MVP operasyonel olarak tamam.
 
 ### Sprint 4 - Semantic Altyapı
-- [ ] pgvector ve embedding kolon/indexleri.
-- [ ] Worker/job embedding üretim triggerları.
-- [ ] Matching temel sorguları + availability filtreleri.
+- [x] pgvector ve embedding kolon/indexleri.
+- [x] Worker/job embedding üretim triggerları.
+- [x] Matching temel sorguları + availability filtreleri.
 - [x] Çıktı (ilk dikey dilim): semantic öneri altyapısı çalışır.
 
 ### Sprint 5 - Kişiselleştirme ve Gerçek Zamanlılık

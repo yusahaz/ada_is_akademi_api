@@ -18,6 +18,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         /// <inheritdoc />
         public void Register(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IEmbeddingVectorizer, HashEmbeddingVectorizer>();
             RegisterCommandHandlers(services);
             RegisterQueryHandlers(services);
             RegisterValidators(services);
@@ -53,6 +54,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<SetEmployerCommissionRateCommand, Unit>, SetEmployerCommissionRateCommandHandler>();
             services.AddScoped<IRequestHandler<BanSystemUserCommand, Unit>, BanSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<RunOverdueAlarmSweepCommand, int>, RunOverdueAlarmSweepCommandHandler>();
+            services.AddScoped<IRequestHandler<RunEmbeddingRefreshSweepCommand, int>, RunEmbeddingRefreshSweepCommandHandler>();
             services.AddScoped<IRequestHandler<CancelJobPostingCommand, Unit>, CancelJobPostingCommandHandler>();
             services.AddScoped<IRequestHandler<ChangeSystemUserPasswordCommand, Unit>, ChangeSystemUserPasswordCommandHandler>();
             services.AddScoped<IRequestHandler<CheckInShiftAssignmentCommand, Unit>, CheckInShiftAssignmentCommandHandler>();
@@ -156,6 +158,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<SetEmployerCommissionRateCommand>, SetEmployerCommissionRateCommandValidator>();
             services.AddScoped<IRequestValidator<BanSystemUserCommand>, BanSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<RunOverdueAlarmSweepCommand>, RunOverdueAlarmSweepCommandValidator>();
+            services.AddScoped<IRequestValidator<RunEmbeddingRefreshSweepCommand>, RunEmbeddingRefreshSweepCommandValidator>();
             services.AddScoped<IRequestValidator<CancelJobPostingCommand>, CancelJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<ChangeSystemUserPasswordCommand>, ChangeSystemUserPasswordCommandValidator>();
             services.AddScoped<IRequestValidator<CheckInShiftAssignmentCommand>, CheckInShiftAssignmentCommandValidator>();

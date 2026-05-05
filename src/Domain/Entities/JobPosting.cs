@@ -183,7 +183,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         protected internal void UpdateEmbedding(float[] descriptionEmbedding)
         {
-            if (descriptionEmbedding is not null && descriptionEmbedding.Length == 1536)
+            if (descriptionEmbedding is not null && descriptionEmbedding.Length > 0)
             {
                 DescriptionEmbedding = descriptionEmbedding;
             }
