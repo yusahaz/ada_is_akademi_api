@@ -53,6 +53,12 @@ namespace Azoxia.AdaIsAkademi.Application
     internal class ListSemanticMatchedJobPostingsQueryHandler(IServiceProvider serviceProvider) :
         QueryHandlerBase<ListSemanticMatchedJobPostingsQuery, IReadOnlyList<SemanticMatchedJobPostingModel>>(serviceProvider)
     {
+        #region Fields
+
+        private const int EmbeddingFreshnessDays = 30;
+
+        #endregion Fields
+
         #region Utils
 
         /// <inheritdoc />
@@ -77,9 +83,22 @@ namespace Azoxia.AdaIsAkademi.Application
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (worker?.SkillEmbedding is null || worker.SkillEmbedding.Length == 0)
+            if (worker is null)
             {
                 return [];
+            }
+
+            if (!HasFreshEmbedding(worker))
+            {
+                IReadOnlyList<SemanticMatchedJobPostingModel> fallbackRows = await BuildFallbackRowsAsync(query.Limit, cancellationToken);
+                await CacheService.SetAsync(
+                    cacheKey,
+                    fallbackRows,
+                    AdaIsCacheKeys.DetailReadModelOptions(
+                        AdaIsCacheKeys.WorkerDependency(workerId),
+                        AdaIsCacheKeys.JobPostingAllDependency()),
+                    cancellationToken);
+                return fallbackRows;
             }
 
             IEnumerable<JobPosting> postings = await UnitOfWork
@@ -113,6 +132,33 @@ namespace Azoxia.AdaIsAkademi.Application
 
             return rows;
         }
+
+        private async Task<IReadOnlyList<SemanticMatchedJobPostingModel>> BuildFallbackRowsAsync(int limit, CancellationToken cancellationToken)
+        {
+            return (await UnitOfWork
+                    .GetRepository<JobPosting>()
+                    .Filter(x => x.Status == JobPostingStatus.Open && !x.IsDeleted)
+                    .AsNoTracking()
+                    .OrderBy(x => x.ShiftDate)
+                    .ThenBy(x => x.ShiftStartTime)
+                    .Take(limit)
+                    .ToListAsync(
+                        x => new SemanticMatchedJobPostingModel(
+                            x.Id,
+                            x.Title,
+                            x.ShiftDate,
+                            x.ShiftStartTime,
+                            x.ShiftEndTime,
+                            0d),
+                        cancellationToken))
+                .ToList();
+        }
+
+        private bool HasFreshEmbedding(Worker worker)
+            => worker.SkillEmbedding is not null
+               && worker.SkillEmbedding.Length > 0
+               && worker.EmbeddingUpdatedAt.HasValue
+               && worker.EmbeddingUpdatedAt.Value >= DateTimeOffset.UtcNow.AddDays(-EmbeddingFreshnessDays);
 
         private double ComputeCosineSimilarity(float[] left, float[] right)
         {
