@@ -30,7 +30,7 @@
 - [ ] Bağımlılık: Faz 1 domain eventleri ve veri kalitesi olgun olmadan semantic/fallback kalitesi düşük kalır.
 
 ### Faz 3 - Scale and Monetization (Sprint 7-9)
-- [ ] Employer abonelik ve monetization omurgası.
+- [ ] Employer monetization omurgası (abonelik/kiralama disinda).
 - [ ] Çok bölge/çok dil hazırlığı.
 - [ ] Assignment + Commission odaklı modüler ayrışma adımı.
 - [ ] Outbox/read-replica ve ileri analitik zemini.
@@ -85,9 +85,10 @@
 - [x] Uygulanan dikey dilim: overdue alarm CSV export query + statistics endpoint + cache + test eklendi.
 
 ### Sprint 7 - Monetization Başlangıcı
-- [ ] Employer abonelik domain modeli.
+- [ ] Employer gelir modeli domain kurallari (abonelik/kiralama olmadan).
 - [ ] Gelir modeli kontratları ve yönetim akışları.
 - [ ] Çıktı: ticari genişleme omurgası oluşur.
+- [x] Uygulanan dikey dilim: monetization summary query + statistics endpoint + cache + test eklendi.
 
 ### Sprint 8 - Coğrafi ve Üretim Ölçeği
 - [ ] Çok bölge/çok dil hazırlık backlog'u.
@@ -177,7 +178,7 @@
 ### Sprint 7 - Monetization Başlangıcı
 - [ ] Domain: Abonelik planı, faturalama periyodu ve yetki paketleme kurallarını ekle.
 - [ ] Application: Plan atama, yükseltme/düşürme ve fatura üretim komutlarını tamamla.
-- [ ] Persistence: Subscription/billing entity mapping ve unique constraintleri migration ile uygula.
+- [ ] Persistence: Billing/commission entity mapping ve unique constraintleri migration ile uygula.
 - [ ] API: Abonelik yönetimi ve fatura görüntüleme endpointlerini yayımla.
 - [ ] Test: Plan geçişi, period çakışması ve fatura tutarlılığını doğrula.
 
@@ -209,7 +210,7 @@
 - [ ] Sprint 4 riski: stale embedding -> event-driven regeneration + keyword fallback.
 - [ ] Sprint 5 riski: LLM kesintisi -> template fallback ile bildirim gecikmeden devam.
 - [ ] Sprint 6 riski: duplicate invoice period -> unique constraint + idempotent scheduler.
-- [ ] Sprint 7 riski: abonelik kural karmaşası -> kapsamlı policy ve migration denetimi.
+- [ ] Sprint 7 riski: monetization kural karmasasi -> kapsamli policy ve migration denetimi.
 - [ ] Sprint 8 riski: bölge-dil regresyonu -> feature flag + kademeli rollout.
 - [ ] Sprint 9 riski: dağıtık event kaybı -> outbox + teslimat gözlemi.
 

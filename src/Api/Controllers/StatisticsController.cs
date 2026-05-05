@@ -55,6 +55,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new ExportOverdueAlarmsCsvQuery(), cancellationToken);
 
+        /// <summary>Returns monetization baseline summary counters.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get monetization summary")]
+        [EndpointDescription("Returns accepted application volume, active employer count, and estimated commission metrics.")]
+        [ProducesResponseType(typeof(ApiResponse<MonetizationSummaryModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> MonetizationSummary(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            GetMonetizationSummaryQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetMonetizationSummaryQuery(), cancellationToken);
+
         #endregion Methods
     }
 }

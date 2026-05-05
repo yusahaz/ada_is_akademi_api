@@ -67,6 +67,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "DashboardOverdueJobSummary", "default");
 
         /// <summary>
+        /// Cache key for monetization summary counters.
+        /// </summary>
+        internal static CacheKey DashboardMonetizationSummaryKey() =>
+            new(QueryNamespace, "DashboardMonetizationSummary", "default");
+
+        /// <summary>
         /// Cache key for overdue alarms CSV export package.
         /// </summary>
         internal static CacheKey OverdueAlarmExportPackageKey() =>
