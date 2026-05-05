@@ -89,6 +89,8 @@ namespace Azoxia.AdaIsAkademi.Application
         {
             Employer? employer = await UnitOfWork.GetRepository<Employer>().GetByIdAsync(command.EmployerId, cancellationToken);
             employer = employer.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            (employer.Status == EmployerStatus.Active)
+                .ThrowIfFalse(DomainErrorCodes.CommissionReceivableEmployerNotActive);
 
             CommissionReceivable? existing = await UnitOfWork
                 .GetRepository<CommissionReceivable>()

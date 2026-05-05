@@ -44,6 +44,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             ErrorMessage: "Commission receivable period is invalid.");
 
         /// <summary>
+        /// Commission receivable generation requires an active employer.
+        /// </summary>
+        public static readonly ErrorCode CommissionReceivableEmployerNotActive = new(
+            Code: "AZX_ADA_DOMAIN_026",
+            ErrorMessage: "Commission receivable can only be generated for active employers.");
+
+        /// <summary>
         /// Geofence radius is outside the permitted range.
         /// </summary>
         public static readonly ErrorCode GeofenceRadiusOutOfRange = new(

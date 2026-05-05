@@ -4,6 +4,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.AdaIsAkademi.Persistence;
     using Azoxia.Core.Application;
+    using Azoxia.Core.Exceptions;
     using Azoxia.Core.ValueTypes;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,36 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             detail.Id.Should().Be(firstId);
             detail.Amount.Should().Be(150m);
             detail.Currency.Should().Be("TRY");
+        }
+
+        [Fact]
+        public async Task Generate_commission_receivable_should_fail_for_non_active_employer()
+        {
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider();
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            Employer employer = await SeedEmployerAsync(db);
+            employer.SetAsSuspended();
+            await db.SaveChangesAsync();
+
+            var commandHandler = new GenerateCommissionReceivableCommandHandler(sp);
+            Func<Task> act = async () =>
+                await ((IRequestHandler<GenerateCommissionReceivableCommand, int>)commandHandler)
+                    .HandleAsync(
+                        new GenerateCommissionReceivableCommand
+                        {
+                            EmployerId = employer.Id,
+                            Amount = 150m,
+                            Currency = "TRY",
+                            PeriodStart = new DateOnly(2026, 5, 1),
+                            PeriodEnd = new DateOnly(2026, 5, 31),
+                        },
+                        CancellationToken.None);
+
+            AzoxiaException ex = (await act.Should().ThrowAsync<AzoxiaException>()).Which;
+            ex.Error.Should().Be(DomainErrorCodes.CommissionReceivableEmployerNotActive);
         }
 
         #endregion Methods
