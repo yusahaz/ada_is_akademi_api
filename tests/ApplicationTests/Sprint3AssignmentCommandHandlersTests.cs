@@ -104,6 +104,8 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             assignment.Should().NotBeNull();
             assignment!.Status.Should().Be(ShiftAssignmentStatus.CheckedOut);
             assignment.CheckedOutAt.Should().NotBeNull();
+            assignment.IsAnomalyFlagged.Should().BeTrue();
+            assignment.AnomalyCode.Should().Be("EARLY_CHECKOUT");
         }
 
         [Fact]

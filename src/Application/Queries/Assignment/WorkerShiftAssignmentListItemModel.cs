@@ -11,6 +11,8 @@ namespace Azoxia.AdaIsAkademi.Application
         int JobPostingId,
         int JobApplicationId,
         ShiftAssignmentStatus Status,
+        bool IsAnomalyFlagged,
+        string? AnomalyCode,
         DateTimeOffset AssignedAt,
         DateTimeOffset? CheckedInAt,
         DateTimeOffset? CheckedOutAt,

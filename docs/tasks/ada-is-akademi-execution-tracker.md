@@ -10,10 +10,10 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Her güncellemede `Last Updated` alanına tarih/saat yaz.
 
 ## Current Status
-- Last Updated: 2026-05-05 17:22 (UTC+3)
+- Last Updated: 2026-05-05 17:24 (UTC+3)
 - Current Phase: Sprint kapanış hızlı-temizlik
-- Current Task: Sprint 3 assignment check-in/check-out handler test derinleştirme adımı tamamlandı
-- Next Task: Sprint 3 anomaly flag ve finansal çekirdek guard adımına geçiş
+- Current Task: Sprint 3 anomaly guard dilimi tamamlandı (early checkout anomaly flag + read model)
+- Next Task: Sprint 4 semantic altyapıda embedding güncellik guard adımına geçiş
 - Blockers: Yok
 
 ## Phase Checklist
@@ -47,6 +47,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-05 17:07 - Sprint 2 doğrulama: employer profil/supervisor/delete command handler testleri eklendi; ilişkili kullanıcı soft-delete akışı testle doğrulandı.
 - [x] 2026-05-05 17:21 - Sprint 2 doğrulama: worker profile command handler testleri (availability add/remove + delete worker soft-delete) eklendi ve geçti.
 - [x] 2026-05-05 17:22 - Sprint 3 doğrulama: assignment handler testlerine check-out success ve non-owner check-in access denied senaryoları eklendi.
+- [x] 2026-05-05 17:24 - Sprint 3 anomaly guard: check-out sonrası erken çıkışta assignment anomaly işaretleme (`EARLY_CHECKOUT`) ve worker assignment listesine anomaly alanları eklendi; test+build geçti.
 
 ## Deferred Backlog
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)

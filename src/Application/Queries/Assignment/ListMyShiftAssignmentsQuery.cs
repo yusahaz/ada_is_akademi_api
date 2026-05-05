@@ -86,6 +86,8 @@ namespace Azoxia.AdaIsAkademi.Application
                         x.JobPostingId,
                         x.JobApplicationId,
                         x.Status,
+                        x.IsAnomalyFlagged,
+                        x.AnomalyCode,
                         x.AssignedAt,
                         x.CheckedInAt,
                         x.CheckedOutAt,

@@ -9,6 +9,12 @@ namespace Azoxia.AdaIsAkademi.Domain
     public class ShiftAssignment :
         EntityBase
     {
+        #region Fields
+
+        private const int AnomalyEarlyCheckOutMinutesThreshold = 30;
+
+        #endregion Fields
+
         #region Ctors
 
         protected ShiftAssignment() { }
@@ -47,7 +53,15 @@ namespace Azoxia.AdaIsAkademi.Domain
             (Status == ShiftAssignmentStatus.CheckedIn)
                 .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentInvalidStatusTransition);
 
-            CheckedOutAt = DateTimeOffset.UtcNow;
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            if (CheckedInAt.HasValue &&
+                now - CheckedInAt.Value < TimeSpan.FromMinutes(AnomalyEarlyCheckOutMinutesThreshold))
+            {
+                IsAnomalyFlagged = true;
+                AnomalyCode = "EARLY_CHECKOUT";
+            }
+
+            CheckedOutAt = now;
             Status = ShiftAssignmentStatus.CheckedOut;
         }
 
@@ -59,6 +73,16 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Assignment creation timestamp.
         /// </summary>
         public DateTimeOffset AssignedAt { get; private set; }
+
+        /// <summary>
+        /// True when assignment lifecycle contains an anomaly marker.
+        /// </summary>
+        public bool IsAnomalyFlagged { get; private set; }
+
+        /// <summary>
+        /// Machine-friendly anomaly code when <see cref="IsAnomalyFlagged"/> is true.
+        /// </summary>
+        public string? AnomalyCode { get; private set; }
 
         /// <summary>
         /// Timestamp recorded when worker check-in succeeds.
