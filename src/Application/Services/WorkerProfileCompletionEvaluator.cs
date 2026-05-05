@@ -2,6 +2,7 @@ namespace Azoxia.AdaIsAkademi.Application.Services
 {
     using Azoxia.AdaIsAkademi.Application;
     using Azoxia.AdaIsAkademi.Domain;
+    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
 
     /// <summary>
@@ -31,7 +32,7 @@ namespace Azoxia.AdaIsAkademi.Application.Services
         /// <inheritdoc />
         public int CompletionPercentOf(Worker worker)
         {
-            ArgumentNullException.ThrowIfNull(worker);
+            worker = worker.ThrowIfNull(AzoxiaErrorCodes.ArgumentNull);
 
             int earned = 0;
 
@@ -64,8 +65,10 @@ namespace Azoxia.AdaIsAkademi.Application.Services
                 earned += WeightNationalityOrUniversity;
             }
 
-            bool salaryComplete = worker.GetExpectedSalaryMinMoney() is not null
-                && worker.GetExpectedSalaryMaxMoney() is not null;
+            bool salaryComplete = worker.ExpectedSalaryMinAmount.HasValue
+                && !(worker.ExpectedSalaryMinCurrency.IsNullOrWhiteSpace())
+                && worker.ExpectedSalaryMaxAmount.HasValue
+                && !(worker.ExpectedSalaryMaxCurrency.IsNullOrWhiteSpace());
 
             if (salaryComplete)
             {

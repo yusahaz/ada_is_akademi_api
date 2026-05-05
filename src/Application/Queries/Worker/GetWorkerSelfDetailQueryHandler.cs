@@ -9,6 +9,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
     using Azoxia.Core.Identity;
+    using Azoxia.Core.ValueTypes;
     using Microsoft.Extensions.DependencyInjection;
     using System;
 
@@ -70,8 +71,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.ProfilePhotoObjectKey,
                 entity.EmbeddingUpdatedAt,
                 tags,
-                entity.GetExpectedSalaryMinMoney(),
-                entity.GetExpectedSalaryMaxMoney(),
+                MapWorkerExpectedSalary(entity.ExpectedSalaryMinAmount, entity.ExpectedSalaryMinCurrency),
+                MapWorkerExpectedSalary(entity.ExpectedSalaryMaxAmount, entity.ExpectedSalaryMaxCurrency),
                 profileCompletionPercent,
                 categories);
 
@@ -82,6 +83,19 @@ namespace Azoxia.AdaIsAkademi.Application
                 cancellationToken);
 
             return model;
+        }
+
+        /// <summary>
+        /// Builds <see cref="Money"/> from persisted salary columns when both amount and currency exist (EF cannot materialize nullable composites).
+        /// </summary>
+        private Money? MapWorkerExpectedSalary(decimal? amount, string? currency)
+        {
+            if (!amount.HasValue || currency.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            return new Money(amount.Value, currency.Trim().ToUpperInvariant());
         }
 
         #endregion Utils

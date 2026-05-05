@@ -15,7 +15,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// <summary>
         /// PBKDF2 hash algorithm used when deriving password material.
         /// </summary>
-        private static readonly HashAlgorithmName HashAlgorithm = HashAlgorithmName.SHA256;
+        private readonly HashAlgorithmName _hashAlgorithm = HashAlgorithmName.SHA256;
 
         /// <summary>
         /// Defines the size of the hash for password hashing.
@@ -131,7 +131,7 @@ namespace Azoxia.AdaIsAkademi.Domain
                     password: password,
                     salt: saltBytes,
                     iterations: Iterations,
-                    hashAlgorithm: HashAlgorithm,
+                    hashAlgorithm: _hashAlgorithm,
                     outputLength: HashSize);
 
                 return CryptographicOperations.FixedTimeEquals(storedHash, computed);
@@ -154,7 +154,7 @@ namespace Azoxia.AdaIsAkademi.Domain
                 password,
                 saltBytes,
                 Iterations,
-                HashAlgorithm,
+                _hashAlgorithm,
                 HashSize);
 
             return hashBytes.ToBase64String();

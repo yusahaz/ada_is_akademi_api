@@ -12,4 +12,5 @@ alwaysApply: false
 - Centralize resilience policies (retry, timeout, circuit breaker) here.
 - Logging and observability carry technical detail only; do not leak sensitive business data.
 - Normalize external service exceptions at the layer boundary; do not bubble raw provider exceptions upward.
+- **Errors:** Do not throw **`ArgumentNullException`** / **`ArgumentException`** for validation; use **`GuardExtensions`** with **`AzoxiaErrorCodes`** (and registered **`ErrorCode`** values when added for infrastructure-specific failures) so callers see **`AzoxiaException`**. **`OperationCanceledException`** from **`CancellationToken.ThrowIfCancellationRequested()`** remains acceptable for cooperative cancellation.
 - Keep naming and layout aligned with the project-wide C# conventions.

@@ -1,6 +1,8 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
     using Azoxia.AdaIsAkademi.Domain;
+    using Azoxia.Core.Exceptions;
+    using Azoxia.Core.Extensions;
     using Azoxia.Core.Persistence;
 
     /// <summary>
@@ -20,7 +22,7 @@ namespace Azoxia.AdaIsAkademi.Application
             Worker worker,
             CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(worker);
+            worker = worker.ThrowIfNull(AzoxiaErrorCodes.ArgumentNull);
             IReadOnlyList<WorkerInterestedJobCategory> junction = worker.InterestedJobCategories;
 
             if (junction.Count == 0)

@@ -5,6 +5,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     using System.Linq;
 
     using Azoxia.Core.Domain;
+    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
     using Azoxia.Core.ValueTypes;
 
@@ -164,7 +165,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         protected internal void ReplaceSocialLinks(IReadOnlyList<EmployerSocialLinkInput> links)
         {
-            ArgumentNullException.ThrowIfNull(links);
+            links = links.ThrowIfNull(AzoxiaErrorCodes.ArgumentNull);
             _socialLinks.Clear();
             IEnumerable<EmployerSocialLinkInput> distinctByPlatform =
                 links

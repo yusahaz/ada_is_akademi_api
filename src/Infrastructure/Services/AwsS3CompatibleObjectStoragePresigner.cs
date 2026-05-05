@@ -8,6 +8,7 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
     using Azoxia.AdaIsAkademi.Application.Services;
     using Azoxia.AdaIsAkademi.Infrastructure.Configuration;
 
+    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
 
     /// <summary>
@@ -33,14 +34,14 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
         /// <param name="optionsBinding">MinIO/S3-compatible storage settings used for the client and presign operations.</param>
         public AwsS3CompatibleObjectStoragePresigner(ObjectStorageConfig optionsBinding)
         {
-            ArgumentNullException.ThrowIfNull(optionsBinding);
+            optionsBinding = optionsBinding.ThrowIfNull(AzoxiaErrorCodes.ArgumentNull);
 
             _options = optionsBinding;
 
-            ArgumentException.ThrowIfNullOrWhiteSpace(_options.ServiceUrl);
-            ArgumentException.ThrowIfNullOrWhiteSpace(_options.AccessKey);
-            ArgumentException.ThrowIfNullOrWhiteSpace(_options.SecretKey);
-            ArgumentException.ThrowIfNullOrWhiteSpace(_options.BucketName);
+            _ = _options.ServiceUrl.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
+            _ = _options.AccessKey.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
+            _ = _options.SecretKey.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
+            _ = _options.BucketName.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
 
             AmazonS3Config config =
                 new()
@@ -71,7 +72,7 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
             TimeSpan timeToLive,
             CancellationToken cancellationToken)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(objectKey);
+            _ = objectKey.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -96,8 +97,8 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
             TimeSpan timeToLive,
             CancellationToken cancellationToken)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(objectKey);
-            ArgumentException.ThrowIfNullOrWhiteSpace(contentType);
+            _ = objectKey.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
+            _ = contentType.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
 
             cancellationToken.ThrowIfCancellationRequested();
 
