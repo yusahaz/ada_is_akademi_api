@@ -5,7 +5,6 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Commands;
     using Azoxia.Core.Application.Services;
     using Azoxia.Core.Application.Validation;
-    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
     using Microsoft.Extensions.DependencyInjection;
     using System;
@@ -56,17 +55,17 @@ namespace Azoxia.AdaIsAkademi.Application
         {
             List<ValidationFailure> failures = [];
 
-            if (string.IsNullOrWhiteSpace(request.Email))
+            if (request.Email.IsNullOrWhiteSpace())
             {
                 failures.Add(ApplicationValidationCodes.LoginSystemUserEmailRequired.ForField(nameof(request.Email)));
             }
 
-            if (string.IsNullOrWhiteSpace(request.Password))
+            if (request.Password.IsNullOrWhiteSpace())
             {
                 failures.Add(ApplicationValidationCodes.LoginSystemUserPasswordRequired.ForField(nameof(request.Password)));
             }
 
-            if (string.IsNullOrWhiteSpace(request.DeviceIdentifier))
+            if (request.DeviceIdentifier.IsNullOrWhiteSpace())
             {
                 failures.Add(ApplicationValidationCodes.LoginSystemUserDeviceIdentifierRequired.ForField(nameof(request.DeviceIdentifier)));
             }
@@ -93,18 +92,23 @@ namespace Azoxia.AdaIsAkademi.Application
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(cancellationToken);
-            user = user.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (user is null)
+            {
+                ApplicationValidationCodes.LoginSystemUserAuthenticationFailed.Throw();
+            }
 
             // Login is only allowed for active and non-locked accounts.
-            (user.AccountStatus == AccountStatus.Active).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
-            (!user.IsLocked).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            if (user.AccountStatus != AccountStatus.Active || user.IsLocked)
+            {
+                ApplicationValidationCodes.LoginSystemUserAuthenticationFailed.Throw();
+            }
 
             bool isPasswordValid = await user.CheckPassword(command.Password);
             if (!isPasswordValid)
             {
                 user.RecordFailedLoginAttempt();
                 await UnitOfWork.SaveChangesAsync(cancellationToken);
-                AzoxiaErrorCodes.NotFound.Throw();
+                ApplicationValidationCodes.LoginSystemUserAuthenticationFailed.Throw();
             }
 
             user.RecordSuccessfulLogin();

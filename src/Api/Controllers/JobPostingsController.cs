@@ -2,7 +2,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
 {
     using Azoxia.AdaIsAkademi.Application;
     using Azoxia.Core.Api.Controllers;
-    using Azoxia.Core.Api.Responses;
+    using Azoxia.Core.Wrappers;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;

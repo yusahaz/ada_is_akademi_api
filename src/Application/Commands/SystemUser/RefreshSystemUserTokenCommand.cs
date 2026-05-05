@@ -5,7 +5,6 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Commands;
     using Azoxia.Core.Application.Services;
     using Azoxia.Core.Application.Validation;
-    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
     using Microsoft.Extensions.DependencyInjection;
     using System;
@@ -81,22 +80,33 @@ namespace Azoxia.AdaIsAkademi.Application
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(cancellationToken);
-            user = user.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (user is null)
+            {
+                ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
+            }
 
             // Refresh is only allowed for active and non-locked accounts.
-            (user.AccountStatus == AccountStatus.Active).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
-            (!user.IsLocked).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            if (user.AccountStatus != AccountStatus.Active || user.IsLocked)
+            {
+                ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
+            }
 
             SystemUserDevice? device = user.Devices
                 .FirstOrDefault(x => x.DeviceIdentifier == command.DeviceIdentifier);
-            device = device.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (device is null)
+            {
+                ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
+            }
 
             SystemUserRefreshToken? existingRefreshToken = user.RefreshTokens
                 .FirstOrDefault(x =>
                     x.DeviceId == device.Id &&
                     x.TokenHash == command.RefreshToken &&
                     x.IsActive);
-            existingRefreshToken = existingRefreshToken.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (existingRefreshToken is null)
+            {
+                ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
+            }
 
             ITokenService tokenService = ServiceProvider.GetRequiredService<ITokenService>();
             existingRefreshToken.Revoke();

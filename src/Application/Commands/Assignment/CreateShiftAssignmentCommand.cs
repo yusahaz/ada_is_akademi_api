@@ -75,8 +75,10 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefaultAsync(cancellationToken);
             application = application.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
-            (application.Status == JobApplicationStatus.Accepted).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
-            (application.JobPosting.EmployerId == employerId).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            (application.Status == JobApplicationStatus.Accepted)
+                .ThrowIfFalse(ApplicationValidationCodes.CreateShiftAssignmentApplicationNotAccepted);
+            (application.JobPosting.EmployerId == employerId)
+                .ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
 
             ShiftAssignment? existing = await UnitOfWork
                 .GetRepository<ShiftAssignment>()

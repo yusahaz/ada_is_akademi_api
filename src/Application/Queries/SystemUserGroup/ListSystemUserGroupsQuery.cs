@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Lists system user groups with optional filters and paging.
     /// </summary>
     public class ListSystemUserGroupsQuery :
-        QueryBase<IReadOnlyList<SystemUserGroupListItemModel>>
+        QueryBase<PagedQueryResultModel<SystemUserGroupListItemModel>>
     {
         public bool? IsActive { get; set; }
         public bool? IsSystem { get; set; }
@@ -31,12 +31,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListSystemUserGroupsQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListSystemUserGroupsQuery, IReadOnlyList<SystemUserGroupListItemModel>>(serviceProvider)
+        QueryHandlerBase<ListSystemUserGroupsQuery, PagedQueryResultModel<SystemUserGroupListItemModel>>(serviceProvider)
     {
-        protected override async Task<IReadOnlyList<SystemUserGroupListItemModel>> HandleAsync(ListSystemUserGroupsQuery query, CancellationToken cancellationToken)
+        protected override async Task<PagedQueryResultModel<SystemUserGroupListItemModel>> HandleAsync(ListSystemUserGroupsQuery query, CancellationToken cancellationToken)
         {
             CacheKey cacheKey = AdaIsCacheKeys.SystemUserGroupListKey(query);
-            IReadOnlyList<SystemUserGroupListItemModel>? cached = await CacheService.GetAsync<IReadOnlyList<SystemUserGroupListItemModel>>(cacheKey, cancellationToken);
+            PagedQueryResultModel<SystemUserGroupListItemModel>? cached = await CacheService.GetAsync<PagedQueryResultModel<SystemUserGroupListItemModel>>(cacheKey, cancellationToken);
             if (cached is not null) return cached;
 
             var filter = UnitOfWork.GetRepository<SystemUserGroup>().Filter().AsNoTracking();
@@ -48,6 +48,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 filter = filter.Filter(x => x.Name.ToLower().Contains(s));
             }
 
+            int totalCount = checked((int)await filter.CountAsync(cancellationToken));
+
             IReadOnlyList<SystemUserGroupListItemModel> rows = (await filter
                     .OrderBy(x => x.Level)
                     .ThenBy(x => x.Name)
@@ -58,8 +60,9 @@ namespace Azoxia.AdaIsAkademi.Application
                         cancellationToken))
                 .ToList();
 
-            await CacheService.SetAsync(cacheKey, rows, AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.SystemUserGroupAllDependency()), cancellationToken);
-            return rows;
+            PagedQueryResultModel<SystemUserGroupListItemModel> result = new(rows, totalCount, query.Limit, query.Offset);
+            await CacheService.SetAsync(cacheKey, result, AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.SystemUserGroupAllDependency()), cancellationToken);
+            return result;
         }
     }
 }

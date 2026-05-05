@@ -76,7 +76,7 @@ namespace Azoxia.AdaIsAkademi.Application
 
             JobApplication? application = posting.Applications.FirstOrDefault(x => x.Id == command.ApplicationId);
             application = application.ThrowIfNull(AzoxiaErrorCodes.NotFound);
-            (application.WorkerId == workerId).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            (application.WorkerId == workerId).ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
 
             posting.WithdrawApplication(command.ApplicationId);
 

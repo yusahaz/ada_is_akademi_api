@@ -2,7 +2,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
 {
     using Azoxia.AdaIsAkademi.Application;
     using Azoxia.Core.Api.Controllers;
-    using Azoxia.Core.Api.Responses;
+    using Azoxia.Core.Wrappers;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -57,11 +57,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("List employers")]
         [EndpointDescription("Returns filtered employer rows with paging options.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EmployerListItemModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageableApiResponse<EmployerListItemModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> List(
             [FromBody] ListEmployersQuery query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
+            => ExecutePageQuery<EmployerListItemModel, PagedQueryResultModel<EmployerListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
 
         /// <summary>Gets employer commission policy by employer id.</summary>
         [HttpPost]

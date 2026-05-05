@@ -67,7 +67,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefaultAsync(cancellationToken);
 
             posting = posting.ThrowIfNull(AzoxiaErrorCodes.NotFound);
-            (posting.EmployerId == employerId).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            (posting.EmployerId == employerId).ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
 
             // Order in-memory: SQLite cannot translate OrderBy on DateTimeOffset; PostgreSQL can, and result set is bounded by posting.
             List<JobApplication> applications = (await UnitOfWork

@@ -2,7 +2,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
 {
     using Azoxia.AdaIsAkademi.Application;
     using Azoxia.Core.Api.Controllers;
-    using Azoxia.Core.Api.Responses;
+    using Azoxia.Core.Wrappers;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
@@ -56,11 +56,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("List system user groups")]
         [EndpointDescription("Returns filtered system-user-group rows by active/system flags and name search.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<SystemUserGroupListItemModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageableApiResponse<SystemUserGroupListItemModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> List(
             [FromBody] ListSystemUserGroupsQuery query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
+            => ExecutePageQuery<SystemUserGroupListItemModel, PagedQueryResultModel<SystemUserGroupListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
 
         #endregion Methods
     }

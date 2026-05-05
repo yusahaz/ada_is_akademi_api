@@ -81,7 +81,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefaultAsync(cancellationToken);
             entity = entity.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
-            (entity.EmployerId == employerId).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            (entity.EmployerId == employerId).ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
 
             entity.AcceptApplication(command.ApplicationId);
 

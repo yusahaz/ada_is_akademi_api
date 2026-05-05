@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Lists employers with optional filtering and paging.
     /// </summary>
     public class ListEmployersQuery :
-        QueryBase<IReadOnlyList<EmployerListItemModel>>
+        QueryBase<PagedQueryResultModel<EmployerListItemModel>>
     {
         #region Properties
         public decimal? CommissionRateMax { get; set; }
@@ -46,12 +46,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListEmployersQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListEmployersQuery, IReadOnlyList<EmployerListItemModel>>(serviceProvider)
+        QueryHandlerBase<ListEmployersQuery, PagedQueryResultModel<EmployerListItemModel>>(serviceProvider)
     {
-        protected override async Task<IReadOnlyList<EmployerListItemModel>> HandleAsync(ListEmployersQuery query, CancellationToken cancellationToken)
+        protected override async Task<PagedQueryResultModel<EmployerListItemModel>> HandleAsync(ListEmployersQuery query, CancellationToken cancellationToken)
         {
             CacheKey cacheKey = AdaIsCacheKeys.EmployerListKey(query);
-            IReadOnlyList<EmployerListItemModel>? cached = await CacheService.GetAsync<IReadOnlyList<EmployerListItemModel>>(cacheKey, cancellationToken);
+            PagedQueryResultModel<EmployerListItemModel>? cached = await CacheService.GetAsync<PagedQueryResultModel<EmployerListItemModel>>(cacheKey, cancellationToken);
             if (cached is not null) return cached;
 
             var filter = UnitOfWork.GetRepository<Employer>().Filter().AsNoTracking();
@@ -73,6 +73,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 filter = filter.Filter(x => x.CommissionRate <= query.CommissionRateMax.Value);
             }
 
+            int totalCount = checked((int)await filter.CountAsync(cancellationToken));
+
             IReadOnlyList<EmployerListItemModel> rows = (await filter
                     .OrderBy(x => x.Name)
                     .Skip(query.Offset)
@@ -82,8 +84,9 @@ namespace Azoxia.AdaIsAkademi.Application
                         cancellationToken))
                 .ToList();
 
-            await CacheService.SetAsync(cacheKey, rows, AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.EmployerAllDependency()), cancellationToken);
-            return rows;
+            PagedQueryResultModel<EmployerListItemModel> result = new(rows, totalCount, query.Limit, query.Offset);
+            await CacheService.SetAsync(cacheKey, result, AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.EmployerAllDependency()), cancellationToken);
+            return result;
         }
     }
 }

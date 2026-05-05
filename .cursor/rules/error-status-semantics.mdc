@@ -1,0 +1,7 @@
+# Error/status semantics
+
+- Use `AzoxiaErrorCodes.NotFound` only when the requested domain record truly does not exist (or has been hard-deleted and is no longer addressable).
+- Do **not** use `NotFound` for authentication failures, invalid credentials, inactive/locked account checks, invalid refresh sessions, or authorization mismatches.
+- For auth/session/business precondition failures, throw explicit `ApplicationValidationCodes` (or a dedicated non-404 error family) so API returns a non-404 status with clear `ApiResponse` error details.
+- Keep HTTP and business semantics aligned: 404 means "resource missing", not "endpoint missing", not "login failed".
+- When adding a new command/query, decide error code semantics intentionally; avoid copy-pasting `NotFound` as a generic guard fallback.

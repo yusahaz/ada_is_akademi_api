@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Lists workers with optional filters and paging.
     /// </summary>
     public class ListWorkersQuery :
-        QueryBase<IReadOnlyList<WorkerListItemModel>>
+        QueryBase<PagedQueryResultModel<WorkerListItemModel>>
     {
         public AccountStatus? AccountStatus { get; set; }
         public int Limit { get; set; } = 20;
@@ -30,12 +30,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListWorkersQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListWorkersQuery, IReadOnlyList<WorkerListItemModel>>(serviceProvider)
+        QueryHandlerBase<ListWorkersQuery, PagedQueryResultModel<WorkerListItemModel>>(serviceProvider)
     {
-        protected override async Task<IReadOnlyList<WorkerListItemModel>> HandleAsync(ListWorkersQuery query, CancellationToken cancellationToken)
+        protected override async Task<PagedQueryResultModel<WorkerListItemModel>> HandleAsync(ListWorkersQuery query, CancellationToken cancellationToken)
         {
             CacheKey cacheKey = AdaIsCacheKeys.WorkerListKey(query);
-            IReadOnlyList<WorkerListItemModel>? cached = await CacheService.GetAsync<IReadOnlyList<WorkerListItemModel>>(cacheKey, cancellationToken);
+            PagedQueryResultModel<WorkerListItemModel>? cached = await CacheService.GetAsync<PagedQueryResultModel<WorkerListItemModel>>(cacheKey, cancellationToken);
             if (cached is not null) return cached;
 
             var filter = UnitOfWork.GetRepository<Worker>()
@@ -53,6 +53,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 filter = filter.Filter(x => x.SystemUser.Email.ToLower().Contains(s));
             }
 
+            int totalCount = checked((int)await filter.CountAsync(cancellationToken));
+
             IReadOnlyList<WorkerListItemModel> rows = (await filter
                     .OrderBy(x => x.Id)
                     .Skip(query.Offset)
@@ -62,12 +64,13 @@ namespace Azoxia.AdaIsAkademi.Application
                         cancellationToken))
                 .ToList();
 
+            PagedQueryResultModel<WorkerListItemModel> result = new(rows, totalCount, query.Limit, query.Offset);
             await CacheService.SetAsync(
                 cacheKey,
-                rows,
+                result,
                 AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.WorkerAllDependency(), AdaIsCacheKeys.SystemUserAllDependency()),
                 cancellationToken);
-            return rows;
+            return result;
         }
     }
 }

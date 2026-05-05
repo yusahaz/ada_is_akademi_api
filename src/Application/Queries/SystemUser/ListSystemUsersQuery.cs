@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Lists system users with optional filtering and paging.
     /// </summary>
     public class ListSystemUsersQuery :
-        QueryBase<IReadOnlyList<SystemUserListItemModel>>
+        QueryBase<PagedQueryResultModel<SystemUserListItemModel>>
     {
         public AccountStatus? AccountStatus { get; set; }
         public int Limit { get; set; } = 20;
@@ -31,12 +31,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ListSystemUsersQueryHandler(IServiceProvider serviceProvider) :
-        QueryHandlerBase<ListSystemUsersQuery, IReadOnlyList<SystemUserListItemModel>>(serviceProvider)
+        QueryHandlerBase<ListSystemUsersQuery, PagedQueryResultModel<SystemUserListItemModel>>(serviceProvider)
     {
-        protected override async Task<IReadOnlyList<SystemUserListItemModel>> HandleAsync(ListSystemUsersQuery query, CancellationToken cancellationToken)
+        protected override async Task<PagedQueryResultModel<SystemUserListItemModel>> HandleAsync(ListSystemUsersQuery query, CancellationToken cancellationToken)
         {
             CacheKey cacheKey = AdaIsCacheKeys.SystemUserListKey(query);
-            IReadOnlyList<SystemUserListItemModel>? cached = await CacheService.GetAsync<IReadOnlyList<SystemUserListItemModel>>(cacheKey, cancellationToken);
+            PagedQueryResultModel<SystemUserListItemModel>? cached = await CacheService.GetAsync<PagedQueryResultModel<SystemUserListItemModel>>(cacheKey, cancellationToken);
             if (cached is not null) return cached;
 
             var filter = UnitOfWork.GetRepository<SystemUser>().Filter().AsNoTracking();
@@ -48,6 +48,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 filter = filter.Filter(x => x.Email.ToLower().Contains(s));
             }
 
+            int totalCount = checked((int)await filter.CountAsync(cancellationToken));
+
             IReadOnlyList<SystemUserListItemModel> rows = (await filter
                     .OrderBy(x => x.Email)
                     .Skip(query.Offset)
@@ -57,8 +59,9 @@ namespace Azoxia.AdaIsAkademi.Application
                         cancellationToken))
                 .ToList();
 
-            await CacheService.SetAsync(cacheKey, rows, AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.SystemUserAllDependency()), cancellationToken);
-            return rows;
+            PagedQueryResultModel<SystemUserListItemModel> result = new(rows, totalCount, query.Limit, query.Offset);
+            await CacheService.SetAsync(cacheKey, result, AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.SystemUserAllDependency()), cancellationToken);
+            return result;
         }
     }
 }

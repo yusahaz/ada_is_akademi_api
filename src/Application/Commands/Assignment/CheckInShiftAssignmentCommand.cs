@@ -72,7 +72,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .Filter(x => x.Id == command.AssignmentId)
                 .FirstOrDefaultAsync(cancellationToken);
             assignment = assignment.ThrowIfNull(AzoxiaErrorCodes.NotFound);
-            (assignment.WorkerId == workerId).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            (assignment.WorkerId == workerId).ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
 
             assignment.CheckIn(command.CheckInTokenHash);
 

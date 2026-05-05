@@ -38,6 +38,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "A valid system_user_id claim is required.");
 
         /// <summary>
+        /// Authenticated actor is not allowed to access or mutate the targeted resource.
+        /// </summary>
+        internal static readonly ErrorCode ActorResourceAccessDenied = new(
+            Code: "AZX_ADA_APP_VAL_928",
+            ErrorMessage: "You are not allowed to perform this operation on the requested resource.");
+
+        /// <summary>
         /// Job posting id must be positive when accepting a job posting application.
         /// </summary>
         internal static readonly ErrorCode AcceptJobPostingApplicationJobPostingId = new(
@@ -211,6 +218,13 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode CreateShiftAssignmentJobApplicationId = new(
             Code: "AZX_ADA_APP_VAL_332",
             ErrorMessage: "JobApplicationId must be greater than zero.");
+
+        /// <summary>
+        /// Shift assignment can only be created from an accepted job application.
+        /// </summary>
+        internal static readonly ErrorCode CreateShiftAssignmentApplicationNotAccepted = new(
+            Code: "AZX_ADA_APP_VAL_929",
+            ErrorMessage: "Shift assignment can only be created for accepted applications.");
 
         /// <summary>
         /// System user group id must be positive when deactivating a group.
@@ -416,6 +430,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Password cannot be null, empty, or whitespace.");
 
         /// <summary>
+        /// Credentials are invalid or the account is not eligible for login.
+        /// </summary>
+        internal static readonly ErrorCode LoginSystemUserAuthenticationFailed = new(
+            Code: "AZX_ADA_APP_VAL_925",
+            ErrorMessage: "Email/password combination is invalid or the account cannot sign in.");
+
+        /// <summary>
         /// Device identifier is required when logging out a system user.
         /// </summary>
         internal static readonly ErrorCode LogoutSystemUserDeviceIdentifierRequired = new(
@@ -435,6 +456,13 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode LogoutSystemUserSystemUserId = new(
             Code: "AZX_ADA_APP_VAL_330",
             ErrorMessage: "SystemUserId must be greater than zero.");
+
+        /// <summary>
+        /// Logout request failed because the provided user-device-token combination is invalid.
+        /// </summary>
+        internal static readonly ErrorCode LogoutSystemUserSessionNotFound = new(
+            Code: "AZX_ADA_APP_VAL_927",
+            ErrorMessage: "Active session was not found for the provided user, device, and refresh token.");
 
         /// <summary>
         /// Assignment id must be positive when checking in a shift assignment.
@@ -484,6 +512,13 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode RefreshSystemUserTokenSystemUserId = new(
             Code: "AZX_ADA_APP_VAL_313",
             ErrorMessage: "SystemUserId must be greater than zero.");
+
+        /// <summary>
+        /// Refresh token rotation request failed due to invalid or inactive auth session state.
+        /// </summary>
+        internal static readonly ErrorCode RefreshSystemUserTokenAuthenticationFailed = new(
+            Code: "AZX_ADA_APP_VAL_926",
+            ErrorMessage: "Refresh session is invalid or account cannot refresh token.");
 
         /// <summary>
         /// Employer organization name is required when registering an employer account.

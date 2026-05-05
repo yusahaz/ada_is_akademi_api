@@ -61,7 +61,7 @@ namespace Azoxia.AdaIsAkademi.Application
 
             JobPosting? entity = await UnitOfWork.GetRepository<JobPosting>().GetByIdAsync(command.JobPostingId, cancellationToken);
             entity = entity.ThrowIfNull(AzoxiaErrorCodes.NotFound);
-            (entity.EmployerId == employerId).ThrowIfFalse(AzoxiaErrorCodes.NotFound);
+            (entity.EmployerId == employerId).ThrowIfFalse(ApplicationValidationCodes.ActorResourceAccessDenied);
 
             entity.Publish();
 

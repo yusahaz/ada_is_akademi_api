@@ -4,7 +4,6 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application;
     using Azoxia.Core.Application.Commands;
     using Azoxia.Core.Application.Validation;
-    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
     using System;
 
@@ -78,18 +77,27 @@ namespace Azoxia.AdaIsAkademi.Application
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(cancellationToken);
-            user = user.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (user is null)
+            {
+                ApplicationValidationCodes.LogoutSystemUserSessionNotFound.Throw();
+            }
 
             SystemUserDevice? device = user.Devices
                 .FirstOrDefault(x => x.DeviceIdentifier == command.DeviceIdentifier);
-            device = device.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (device is null)
+            {
+                ApplicationValidationCodes.LogoutSystemUserSessionNotFound.Throw();
+            }
 
             SystemUserRefreshToken? token = user.RefreshTokens
                 .FirstOrDefault(x =>
                     x.DeviceId == device.Id &&
                     x.TokenHash == command.RefreshToken &&
                     x.IsActive);
-            token = token.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (token is null)
+            {
+                ApplicationValidationCodes.LogoutSystemUserSessionNotFound.Throw();
+            }
 
             token.Revoke();
             device.RecordActivity();

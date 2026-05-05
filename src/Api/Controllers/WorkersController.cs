@@ -2,7 +2,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
 {
     using Azoxia.AdaIsAkademi.Application;
     using Azoxia.Core.Api.Controllers;
-    using Azoxia.Core.Api.Responses;
+    using Azoxia.Core.Wrappers;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
@@ -45,11 +45,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("List workers")]
         [EndpointDescription("Returns filtered worker rows with account status and email filters.")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<WorkerListItemModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageableApiResponse<WorkerListItemModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> List(
             [FromBody] ListWorkersQuery query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
+            => ExecutePageQuery<WorkerListItemModel, PagedQueryResultModel<WorkerListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
 
         /// <summary>Gets personalized notification preview with push/email fallback.</summary>
         [HttpPost]
