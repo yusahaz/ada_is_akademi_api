@@ -276,6 +276,20 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Limit must be between 1 and 100.");
 
         /// <summary>
+        /// Employer id must be positive for list commission receivables query.
+        /// </summary>
+        internal static readonly ErrorCode ListCommissionReceivablesByEmployerEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_914",
+            ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 100 for list commission receivables query.
+        /// </summary>
+        internal static readonly ErrorCode ListCommissionReceivablesByEmployerLimit = new(
+            Code: "AZX_ADA_APP_VAL_915",
+            ErrorMessage: "Limit must be between 1 and 100.");
+
+        /// <summary>
         /// Amount must be non-negative when generating commission receivable.
         /// </summary>
         internal static readonly ErrorCode GenerateCommissionReceivableAmount = new(

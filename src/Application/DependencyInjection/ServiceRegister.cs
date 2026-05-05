@@ -74,6 +74,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
         {
             services.AddScoped<IRequestHandler<GetEmployerByIdQuery, EmployerDetailModel>, GetEmployerByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetCommissionReceivableByPeriodQuery, CommissionReceivableDetailModel>, GetCommissionReceivableByPeriodQueryHandler>();
+            services.AddScoped<IRequestHandler<ListCommissionReceivablesByEmployerQuery, IReadOnlyList<CommissionReceivableListItemModel>>, ListCommissionReceivablesByEmployerQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionEstimateQuery, EmployerCommissionEstimateModel>, GetEmployerCommissionEstimateQueryHandler>();
             services.AddScoped<IRequestHandler<GetEmployerCommissionPolicyQuery, EmployerCommissionPolicyModel>, GetEmployerCommissionPolicyQueryHandler>();
             services.AddScoped<IRequestHandler<ListEmployerCommissionSummariesQuery, IReadOnlyList<EmployerCommissionListItemModel>>, ListEmployerCommissionSummariesQueryHandler>();
@@ -118,6 +119,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<DeactivateSystemUserGroupCommand>, DeactivateSystemUserGroupCommandValidator>();
             services.AddScoped<IRequestValidator<GetEmployerByIdQuery>, GetEmployerByIdQueryValidator>();
             services.AddScoped<IRequestValidator<GetCommissionReceivableByPeriodQuery>, GetCommissionReceivableByPeriodQueryValidator>();
+            services.AddScoped<IRequestValidator<ListCommissionReceivablesByEmployerQuery>, ListCommissionReceivablesByEmployerQueryValidator>();
             services.AddScoped<IRequestValidator<GetEmployerCommissionEstimateQuery>, GetEmployerCommissionEstimateQueryValidator>();
             services.AddScoped<IRequestValidator<GetEmployerCommissionPolicyQuery>, GetEmployerCommissionPolicyQueryValidator>();
             services.AddScoped<IRequestValidator<ListEmployerCommissionSummariesQuery>, ListEmployerCommissionSummariesQueryValidator>();

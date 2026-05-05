@@ -226,6 +226,15 @@ namespace Azoxia.AdaIsAkademi.Application
                 $"{employerId}:{periodStart:yyyyMMdd}:{periodEnd:yyyyMMdd}");
 
         /// <summary>
+        /// Cache key for commission receivable list by employer and limit.
+        /// </summary>
+        internal static CacheKey CommissionReceivableListKey(int employerId, int limit) =>
+            new(
+                QueryNamespace,
+                "CommissionReceivableList",
+                $"{employerId}:{limit}");
+
+        /// <summary>
         /// Invalidation tag for employer-scoped commission receivable models.
         /// </summary>
         internal static CacheDependency CommissionReceivableDependency(int employerId) =>
