@@ -29,27 +29,25 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
         }
 
         [Fact]
-        public void Refresh_token_requires_system_user_id_device_identifier_and_token()
+        public void Refresh_token_requires_device_identifier_and_token()
         {
             var validator = new RefreshSystemUserTokenCommandValidator();
             ValidationResult result = validator.Validate(new RefreshSystemUserTokenCommand());
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().HaveCount(3);
-            result.Errors.Should().Contain(x => x.Field == nameof(RefreshSystemUserTokenCommand.SystemUserId));
+            result.Errors.Should().HaveCount(2);
             result.Errors.Should().Contain(x => x.Field == nameof(RefreshSystemUserTokenCommand.DeviceIdentifier));
             result.Errors.Should().Contain(x => x.Field == nameof(RefreshSystemUserTokenCommand.RefreshToken));
         }
 
         [Fact]
-        public void Logout_requires_system_user_id_device_identifier_and_token()
+        public void Logout_requires_device_identifier_and_token()
         {
             var validator = new LogoutSystemUserCommandValidator();
             ValidationResult result = validator.Validate(new LogoutSystemUserCommand());
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().HaveCount(3);
-            result.Errors.Should().Contain(x => x.Field == nameof(LogoutSystemUserCommand.SystemUserId));
+            result.Errors.Should().HaveCount(2);
             result.Errors.Should().Contain(x => x.Field == nameof(LogoutSystemUserCommand.DeviceIdentifier));
             result.Errors.Should().Contain(x => x.Field == nameof(LogoutSystemUserCommand.RefreshToken));
         }

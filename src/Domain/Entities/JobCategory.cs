@@ -13,7 +13,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// <summary>
         /// Initializes a blank instance for persistence materialization.
         /// </summary>
-        private JobCategory() { }
+        protected JobCategory() { }
 
         /// <summary>
         /// Initializes a named category optionally carrying a descriptive text.

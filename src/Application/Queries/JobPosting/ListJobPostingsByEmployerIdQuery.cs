@@ -19,6 +19,12 @@ namespace Azoxia.AdaIsAkademi.Application
     public class ListJobPostingsByEmployerIdQuery :
         QueryBase<PagedQueryResultModel<JobPostingSummaryModel>>
     {
+        #region Properties
+
+        public int Limit { get; set; } = 20;
+        public int Offset { get; set; }
+
+        #endregion Properties
     }
 
     internal class ListJobPostingsByEmployerIdQueryValidator : IRequestValidator<ListJobPostingsByEmployerIdQuery>
@@ -29,6 +35,15 @@ namespace Azoxia.AdaIsAkademi.Application
         public ValidationResult Validate(ListJobPostingsByEmployerIdQuery request)
         {
             List<ValidationFailure> failures = [];
+            if (request.Limit is < 1 or > 200)
+            {
+                failures.Add(ApplicationValidationCodes.ListJobPostingsByEmployerIdLimit.ForField(nameof(ListJobPostingsByEmployerIdQuery.Limit)));
+            }
+
+            if (request.Offset < 0)
+            {
+                failures.Add(ApplicationValidationCodes.ListJobPostingsByEmployerIdOffset.ForField(nameof(ListJobPostingsByEmployerIdQuery.Offset)));
+            }
 
             return new ValidationResult(failures);
         }
@@ -49,7 +64,7 @@ namespace Azoxia.AdaIsAkademi.Application
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
             int employerId = executionContext.RequireAdaIsEmployerActorId();
 
-            CacheKey cacheKey = AdaIsCacheKeys.EmployerJobPostingsSummaryKey(employerId);
+            CacheKey cacheKey = AdaIsCacheKeys.EmployerJobPostingsSummaryKey(employerId, query.Limit, query.Offset);
             PagedQueryResultModel<JobPostingSummaryModel>? cached =
                 await CacheService.GetAsync<PagedQueryResultModel<JobPostingSummaryModel>>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -57,14 +72,20 @@ namespace Azoxia.AdaIsAkademi.Application
                 return cached;
             }
 
-            // Sıralama ve projeksiyon tek IQueryable üzerinde; EF SQL üretir (ORDER BY ShiftDate, ShiftStartTime, Id).
-            List<JobPostingSummaryModel> rows = (await UnitOfWork
+            var filter = UnitOfWork
                 .GetRepository<JobPosting>()
                 .Filter(x => x.EmployerId == employerId && !x.IsDeleted)
-                .AsNoTracking()
+                .AsNoTracking();
+
+            int totalCount = checked((int)await filter.CountAsync(cancellationToken));
+
+            // Sıralama ve projeksiyon tek IQueryable üzerinde; EF SQL üretir (ORDER BY ShiftDate, ShiftStartTime, Id).
+            List<JobPostingSummaryModel> rows = (await filter
                 .OrderByDescending(x => x.ShiftDate)
                 .ThenByDescending(x => x.ShiftStartTime)
                 .ThenBy(x => x.Id)
+                .Skip(query.Offset)
+                .Take(query.Limit)
                 .ToListAsync(
                     x => new JobPostingSummaryModel(
                         x.Id,
@@ -81,9 +102,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             PagedQueryResultModel<JobPostingSummaryModel> result = new(
                 rows,
-                rows.Count,
-                rows.Count,
-                0);
+                totalCount,
+                query.Limit,
+                query.Offset);
 
             await CacheService.SetAsync(
                 cacheKey,

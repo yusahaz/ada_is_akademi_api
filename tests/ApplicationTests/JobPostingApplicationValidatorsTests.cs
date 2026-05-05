@@ -68,19 +68,17 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
         }
 
         [Fact]
-        public void Semantic_match_query_requires_positive_worker_id_and_limit_in_range()
+        public void Semantic_match_query_requires_limit_in_range()
         {
             var validator = new ListSemanticMatchedJobPostingsQueryValidator();
             ValidationResult result = validator.Validate(
                 new ListSemanticMatchedJobPostingsQuery
                 {
-                    WorkerId = 0,
                     Limit = 100,
                 });
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().HaveCount(2);
-            result.Errors.Should().Contain(e => e.Field == nameof(ListSemanticMatchedJobPostingsQuery.WorkerId));
+            result.Errors.Should().HaveCount(1);
             result.Errors.Should().Contain(e => e.Field == nameof(ListSemanticMatchedJobPostingsQuery.Limit));
         }
 

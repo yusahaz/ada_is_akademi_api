@@ -24,5 +24,10 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Applicant retracted before acceptance.
         /// </summary>
         Withdrawn = 40,
+
+        /// <summary>
+        /// Application automatically expired without an employer decision.
+        /// </summary>
+        Expired = 50,
     }
 }

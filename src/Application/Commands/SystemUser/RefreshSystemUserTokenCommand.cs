@@ -6,6 +6,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Services;
     using Azoxia.Core.Application.Validation;
     using Azoxia.Core.Extensions;
+    using Azoxia.Core.Identity;
     using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Security.Claims;
@@ -29,7 +30,7 @@ namespace Azoxia.AdaIsAkademi.Application
         public string RefreshToken { get; set; }
 
         /// <summary>
-        /// User identifier owning the refresh token.
+        /// Legacy compatibility field; ignored by handler and kept for contract backward compatibility.
         /// </summary>
         public int SystemUserId { get; set; }
 
@@ -44,11 +45,6 @@ namespace Azoxia.AdaIsAkademi.Application
         public ValidationResult Validate(RefreshSystemUserTokenCommand request)
         {
             List<ValidationFailure> failures = [];
-
-            if (request.SystemUserId <= 0)
-            {
-                failures.Add(ApplicationValidationCodes.RefreshSystemUserTokenSystemUserId.ForField(nameof(request.SystemUserId)));
-            }
 
             if (string.IsNullOrWhiteSpace(request.DeviceIdentifier))
             {
@@ -74,9 +70,22 @@ namespace Azoxia.AdaIsAkademi.Application
         /// <inheritdoc />
         protected override async Task<SystemUserTokenModel> HandleAsync(RefreshSystemUserTokenCommand command, CancellationToken cancellationToken)
         {
+            IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
+            SystemUserRefreshToken? existingRefreshToken = await UnitOfWork
+                .GetRepository<SystemUserRefreshToken>()
+                .Filter(x => x.TokenHash == command.RefreshToken && !x.IsRevoked)
+                .Include(x => x.Device)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (existingRefreshToken is null ||
+                existingRefreshToken.ExpiresAt <= DateTimeOffset.UtcNow ||
+                existingRefreshToken.Device.DeviceIdentifier != command.DeviceIdentifier)
+            {
+                ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
+            }
+
             SystemUser? user = await UnitOfWork
                 .GetRepository<SystemUser>()
-                .Filter(x => x.Id == command.SystemUserId)
+                .Filter(x => x.Id == existingRefreshToken.SystemUserId)
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -98,18 +107,26 @@ namespace Azoxia.AdaIsAkademi.Application
                 ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
             }
 
-            SystemUserRefreshToken? existingRefreshToken = user.RefreshTokens
+            SystemUserRefreshToken? activeToken = user.RefreshTokens
                 .FirstOrDefault(x =>
                     x.DeviceId == device.Id &&
                     x.TokenHash == command.RefreshToken &&
                     x.IsActive);
-            if (existingRefreshToken is null)
+            if (activeToken is null)
+            {
+                ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
+            }
+
+            string? claimedSystemUserId = executionContext.GetClaim("system_user_id");
+            if (int.TryParse(claimedSystemUserId, out int actorSystemUserId) &&
+                actorSystemUserId > 0 &&
+                actorSystemUserId != user.Id)
             {
                 ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed.Throw();
             }
 
             ITokenService tokenService = ServiceProvider.GetRequiredService<ITokenService>();
-            existingRefreshToken.Revoke();
+            activeToken.Revoke();
             (string refreshToken, DateTime refreshExpiresAt) = tokenService.GenerateRefreshToken();
             user.IssueRefreshToken(refreshToken, device.Id, refreshExpiresAt);
             device.RecordActivity();

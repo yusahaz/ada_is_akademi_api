@@ -19,7 +19,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
-        private JobPosting() { }
+        protected JobPosting() { }
 
         protected internal JobPosting(
             int employerId,

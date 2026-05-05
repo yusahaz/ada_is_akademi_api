@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private OverdueJobAlarm() { }
+        protected OverdueJobAlarm() { }
 
         protected internal OverdueJobAlarm(
             int jobPostingId,

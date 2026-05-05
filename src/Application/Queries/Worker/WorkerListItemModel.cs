@@ -9,7 +9,17 @@ namespace Azoxia.AdaIsAkademi.Application
     public sealed record WorkerListItemModel(
         AccountStatus AccountStatus,
         string Email,
+        string? FirstName,
+        string? LastName,
         int SystemUserId,
         int WorkerId) :
-        ModelBase;
+        ModelBase
+    {
+        public string FullName =>
+            string.Join(
+                " ",
+                new[] { FirstName, LastName }
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Select(x => x!.Trim()));
+    }
 }

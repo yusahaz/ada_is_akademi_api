@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private WorkerCertificate() { }
+        protected WorkerCertificate() { }
 
         protected internal WorkerCertificate(
             int workerId,

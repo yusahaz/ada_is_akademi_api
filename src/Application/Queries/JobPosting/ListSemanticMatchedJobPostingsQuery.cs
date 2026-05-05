@@ -5,6 +5,9 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
+    using Azoxia.Core.Identity;
+    using Azoxia.AdaIsAkademi.Application.Identity;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Lists semantically matched open job postings for a worker embedding.
@@ -20,7 +23,7 @@ namespace Azoxia.AdaIsAkademi.Application
         public int Limit { get; set; } = 10;
 
         /// <summary>
-        /// Worker identifier used for embedding lookup.
+        /// Legacy compatibility field; ignored and worker scope is resolved from JWT claims.
         /// </summary>
         public int WorkerId { get; set; }
 
@@ -35,11 +38,6 @@ namespace Azoxia.AdaIsAkademi.Application
         public ValidationResult Validate(ListSemanticMatchedJobPostingsQuery request)
         {
             List<ValidationFailure> failures = [];
-
-            if (request.WorkerId <= 0)
-            {
-                failures.Add(ApplicationValidationCodes.ListSemanticMatchedJobPostingsWorkerId.ForField(nameof(ListSemanticMatchedJobPostingsQuery.WorkerId)));
-            }
 
             if (request.Limit <= 0 || request.Limit > 50)
             {
@@ -62,7 +60,10 @@ namespace Azoxia.AdaIsAkademi.Application
             ListSemanticMatchedJobPostingsQuery query,
             CancellationToken cancellationToken)
         {
-            CacheKey cacheKey = AdaIsCacheKeys.JobPostingSemanticMatchedListKey(query.WorkerId, query.Limit);
+            IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
+            int workerId = executionContext.RequireAdaIsWorkerActorId();
+
+            CacheKey cacheKey = AdaIsCacheKeys.JobPostingSemanticMatchedListKey(workerId, query.Limit);
             IReadOnlyList<SemanticMatchedJobPostingModel>? cached =
                 await CacheService.GetAsync<IReadOnlyList<SemanticMatchedJobPostingModel>>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -72,7 +73,7 @@ namespace Azoxia.AdaIsAkademi.Application
 
             Worker? worker = await UnitOfWork
                 .GetRepository<Worker>()
-                .Filter(x => x.Id == query.WorkerId)
+                .Filter(x => x.Id == workerId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -83,7 +84,7 @@ namespace Azoxia.AdaIsAkademi.Application
 
             IEnumerable<JobPosting> postings = await UnitOfWork
                 .GetRepository<JobPosting>()
-                .Filter(x => x.Status == JobPostingStatus.Open && x.DescriptionEmbedding != null)
+                .Filter(x => x.Status == JobPostingStatus.Open && !x.IsDeleted && x.DescriptionEmbedding != null)
                 .AsNoTracking()
                 .OrderBy(x => x.ShiftDate)
                 .ThenBy(x => x.ShiftStartTime)
@@ -106,7 +107,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 cacheKey,
                 rows,
                 AdaIsCacheKeys.DetailReadModelOptions(
-                    AdaIsCacheKeys.WorkerDependency(query.WorkerId),
+                    AdaIsCacheKeys.WorkerDependency(workerId),
                     AdaIsCacheKeys.JobPostingAllDependency()),
                 cancellationToken);
 

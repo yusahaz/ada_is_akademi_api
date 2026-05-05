@@ -5,6 +5,9 @@
     using Azoxia.Core.Api;
     using Hangfire;
     using Hangfire.InMemory;
+    using Microsoft.AspNetCore.DataProtection;
+    using System.IO;
+    using System.Text.Json.Serialization;
 
     /// <summary>
     /// Host process entry type for the Ada Is Akademi API.
@@ -24,6 +27,20 @@
             startup.OnConfigureServices += (builder) =>
             {
                 builder.Services.AddAzoxiaCore(builder.Configuration);
+                builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(
+                    configureOptions: options =>
+                    {
+                        options.JsonSerializerOptions.Converters.Add(
+                            item: new JsonStringEnumConverter());
+                    });
+                builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(
+                    configureOptions: options =>
+                    {
+                        options.SerializerOptions.Converters.Add(
+                            item: new JsonStringEnumConverter());
+                    });
+                builder.Services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo("/home/app/.aspnet/DataProtection-Keys"));
                 builder.Services.AddHangfire(configuration => configuration
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()

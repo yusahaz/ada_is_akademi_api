@@ -12,7 +12,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private CommissionReceivable() { }
+        protected CommissionReceivable() { }
 
         protected internal CommissionReceivable(
             Money amount,

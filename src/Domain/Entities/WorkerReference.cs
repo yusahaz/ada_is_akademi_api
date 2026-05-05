@@ -11,7 +11,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private WorkerReference() { }
+        protected WorkerReference() { }
 
         protected internal WorkerReference(
             int workerId,

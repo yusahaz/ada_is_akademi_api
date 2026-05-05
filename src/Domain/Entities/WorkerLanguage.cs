@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private WorkerLanguage() { }
+        protected WorkerLanguage() { }
 
         protected internal WorkerLanguage(
             int workerId,

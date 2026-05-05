@@ -11,7 +11,8 @@ ENV DOTNET_gcServer=1 \
     ASPNETCORE_ENVIRONMENT=Production
 
 USER root
-RUN apk add --no-cache icu-libs
+RUN apk add --no-cache icu-libs krb5-libs
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys && chmod -R 777 /home/app/.aspnet
 USER $APP_UID
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build

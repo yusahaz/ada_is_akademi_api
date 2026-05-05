@@ -20,7 +20,7 @@ namespace Azoxia.AdaIsAkademi.Application
     {
         #region Properties
         /// <summary>
-        /// When true, the worker is blocked from applying due to an overlapping shift (domain rule).
+        /// Legacy compatibility field; ignored by handler and conflict is computed server-side.
         /// </summary>
         public bool HasConflictingShift { get; set; }
 
@@ -81,9 +81,17 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefaultAsync(cancellationToken);
             posting = posting.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
+            bool hasConflictingShift = await HasConflictingShiftAsync(
+                workerId,
+                command.JobPostingId,
+                posting.ShiftDate,
+                posting.ShiftStartTime,
+                posting.ShiftEndTime,
+                cancellationToken);
+
             JobApplication application = posting.AddApplication(
                 workerId,
-                command.HasConflictingShift,
+                hasConflictingShift,
                 command.Note);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
@@ -101,6 +109,27 @@ namespace Azoxia.AdaIsAkademi.Application
                 cancellationToken);
 
             return application.Id;
+        }
+
+        private async Task<bool> HasConflictingShiftAsync(
+            int workerId,
+            int targetPostingId,
+            DateOnly shiftDate,
+            TimeOnly shiftStartTime,
+            TimeOnly shiftEndTime,
+            CancellationToken cancellationToken)
+        {
+            IEnumerable<JobApplication> acceptedApplications = await UnitOfWork
+                .GetRepository<JobApplication>()
+                .Filter(x => x.WorkerId == workerId && x.Status == JobApplicationStatus.Accepted)
+                .Include(x => x.JobPosting)
+                .ToListAsync(cancellationToken);
+
+            return acceptedApplications.Any(x =>
+                x.JobPostingId != targetPostingId &&
+                x.JobPosting.ShiftDate == shiftDate &&
+                shiftStartTime < x.JobPosting.ShiftEndTime &&
+                shiftEndTime > x.JobPosting.ShiftStartTime);
         }
 
         #endregion Utils

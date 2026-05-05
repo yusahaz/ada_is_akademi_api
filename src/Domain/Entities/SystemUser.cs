@@ -130,6 +130,9 @@ namespace Azoxia.AdaIsAkademi.Domain
         private string GeneratePasswordSalt()
             => RandomNumberGenerator.GetBytes(SaltSize).ToBase64String();
 
+        protected internal void DeleteSystemUser()
+            => base.Delete();
+
         protected internal SystemUserRefreshToken IssueRefreshToken(string tokenHash, int deviceId, DateTimeOffset expiresAt)
         {
             SystemUserRefreshToken? token = RefreshTokens

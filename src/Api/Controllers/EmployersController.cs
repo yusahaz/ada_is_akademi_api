@@ -41,6 +41,47 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Adds employer location for authenticated employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add employer location")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddLocation(
+            [FromBody] AddEmployerLocationCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
+        /// <summary>Adds employer supervisor for authenticated employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add employer supervisor")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddSupervisor(
+            [FromBody] AddEmployerSupervisorCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
+        /// <summary>Removes employer supervisor for authenticated employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove employer supervisor")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveSupervisor(
+            [FromBody] RemoveEmployerSupervisorCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Soft deletes an employer and linked employer users.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Delete employer")]
+        [EndpointDescription("Soft deletes employer and all users scoped to the employer.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> Delete(
+            [FromBody] DeleteEmployerCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Gets an employer detail model by id.</summary>
         [HttpPost]
         [Consumes("application/json")]

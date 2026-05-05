@@ -67,6 +67,8 @@ services:
     restart: unless-stopped
     ports:
       - ${API_PORT}:8080
+    volumes:
+      - api_dataprotection_keys:/home/app/.aspnet/DataProtection-Keys
     environment:
       ASPNETCORE_URLS: ${ASPNETCORE_URLS}
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
@@ -97,3 +99,4 @@ volumes:
   redis_data:
   minio_data:
   dbview_data:
+  api_dataprotection_keys:

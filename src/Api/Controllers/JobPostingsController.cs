@@ -24,7 +24,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [EndpointSummary("Add required skill to posting")]
-        [EndpointDescription("Adds or updates a required skill row for the posting.")]
+        [EndpointDescription("Adds a required skill row to the posting, or returns existing row when the same tag already exists.")]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         public Task<IActionResult> AddSkill(
             [FromBody] AddJobPostingSkillCommand command,
@@ -114,16 +114,15 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
                 cancellationToken);
 
         /// <summary>Lists semantically matched open postings for a worker embedding.</summary>
-        [AllowAnonymous]
         [HttpPost]
         [Consumes("application/json")]
         [EndpointSummary("List semantic matched job postings")]
-        [EndpointDescription("Ranks open postings by cosine similarity between worker skill embedding and posting description embedding.")]
+        [EndpointDescription("Ranks open postings by cosine similarity between authenticated worker embedding and posting description embedding.")]
         [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<SemanticMatchedJobPostingModel>>), StatusCodes.Status200OK)]
         public Task<IActionResult> ListSemanticMatched(
-            [FromBody] ListSemanticMatchedJobPostingsQuery query,
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ListSemanticMatchedJobPostingsQuery? query,
             CancellationToken cancellationToken)
-            => ExecuteQuery(query, cancellationToken);
+            => ExecuteQuery(query ?? new ListSemanticMatchedJobPostingsQuery(), cancellationToken);
 
         /// <summary>Publishes a draft posting.</summary>
         [HttpPost]

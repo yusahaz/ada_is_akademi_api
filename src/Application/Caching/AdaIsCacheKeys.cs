@@ -134,10 +134,10 @@ namespace Azoxia.AdaIsAkademi.Application
             new("EmployerCommissionPolicy", employerId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
-        /// Cache key for <see cref="ListJobPostingsByEmployerIdQuery"/> result (summary rows per employer).
+        /// Cache key for <see cref="ListJobPostingsByEmployerIdQuery"/> result (summary rows per employer page).
         /// </summary>
-        internal static CacheKey EmployerJobPostingsSummaryKey(int employerId) =>
-            new(QueryNamespace, "JobPostingListByEmployer", employerId.ToString(CultureInfo.InvariantCulture));
+        internal static CacheKey EmployerJobPostingsSummaryKey(int employerId, int limit, int offset) =>
+            new(QueryNamespace, "JobPostingListByEmployer", $"{employerId}:{limit}:{offset}");
 
         /// <summary>
         /// Invalidation tag for the employer-scoped job posting list read model (any posting change under that employer).
@@ -156,6 +156,12 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheKey JobPostingSemanticMatchedListKey(int workerId, int limit) =>
             new(QueryNamespace, "JobPostingSemanticMatchedList", $"{workerId}:{limit}");
+
+        /// <summary>
+        /// Cache key for open job posting list by paging window.
+        /// </summary>
+        internal static CacheKey OpenJobPostingListKey(int limit, int offset) =>
+            new(QueryNamespace, "JobPostingOpenList", $"{limit}:{offset}");
 
         /// <summary>
         /// Invalidation tag for a <see cref="JobPosting"/> aggregate instance.
@@ -230,6 +236,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(nameof(JobApplication), "all");
 
         /// <summary>
+        /// Cache key for worker-scoped job application list by paging window.
+        /// </summary>
+        internal static CacheKey WorkerJobApplicationListKey(int workerId, int limit, int offset) =>
+            new(QueryNamespace, "WorkerJobApplicationList", $"{workerId}:{limit}:{offset}");
+
+        /// <summary>
         /// Invalidation tag for a <see cref="ShiftAssignment"/> aggregate instance.
         /// </summary>
         internal static CacheDependency ShiftAssignmentDependency(int assignmentId) =>
@@ -240,6 +252,12 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheDependency ShiftAssignmentAllDependency() =>
             new(nameof(ShiftAssignment), "all");
+
+        /// <summary>
+        /// Cache key for worker-scoped shift assignment list by paging window.
+        /// </summary>
+        internal static CacheKey WorkerShiftAssignmentListKey(int workerId, int limit, int offset) =>
+            new(QueryNamespace, "WorkerShiftAssignmentList", $"{workerId}:{limit}:{offset}");
 
         /// <summary>
         /// Invalidation tag for aggregate-wide <see cref="OverdueJobAlarm"/> read models.
@@ -257,13 +275,13 @@ namespace Azoxia.AdaIsAkademi.Application
                 $"{employerId}:{periodStart:yyyyMMdd}:{periodEnd:yyyyMMdd}");
 
         /// <summary>
-        /// Cache key for commission receivable list by employer and limit.
+        /// Cache key for commission receivable list by employer and paging window.
         /// </summary>
-        internal static CacheKey CommissionReceivableListKey(int employerId, int limit) =>
+        internal static CacheKey CommissionReceivableListKey(int employerId, int limit, int offset) =>
             new(
                 QueryNamespace,
                 "CommissionReceivableList",
-                $"{employerId}:{limit}");
+                $"{employerId}:{limit}:{offset}");
 
         /// <summary>
         /// Invalidation tag for employer-scoped commission receivable models.

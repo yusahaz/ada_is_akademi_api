@@ -95,8 +95,8 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             executionContext.ReplaceClaim("employer_id", employerId.ToString());
 
             var listHandler = new ListJobApplicationsByJobPostingIdQueryHandler(sp);
-            IReadOnlyList<JobApplicationListItemModel> list =
-                await ((IRequestHandler<ListJobApplicationsByJobPostingIdQuery, IReadOnlyList<JobApplicationListItemModel>>)listHandler)
+            PagedQueryResultModel<JobApplicationListItemModel> list =
+                await ((IRequestHandler<ListJobApplicationsByJobPostingIdQuery, PagedQueryResultModel<JobApplicationListItemModel>>)listHandler)
                     .HandleAsync(
                         new ListJobApplicationsByJobPostingIdQuery
                         {
@@ -104,8 +104,8 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                         },
                         CancellationToken.None);
 
-            list.Should().HaveCount(1);
-            list[0].WorkerId.Should().Be(workerId);
+            list.Items.Should().HaveCount(1);
+            list.Items[0].WorkerId.Should().Be(workerId);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
 
             var listHandler = new ListJobApplicationsByJobPostingIdQueryHandler(sp);
             Func<Task> act = async () =>
-                await ((IRequestHandler<ListJobApplicationsByJobPostingIdQuery, IReadOnlyList<JobApplicationListItemModel>>)listHandler)
+                await ((IRequestHandler<ListJobApplicationsByJobPostingIdQuery, PagedQueryResultModel<JobApplicationListItemModel>>)listHandler)
                     .HandleAsync(
                         new ListJobApplicationsByJobPostingIdQuery
                         {
@@ -130,7 +130,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                         CancellationToken.None);
 
             AzoxiaException ex = (await act.Should().ThrowAsync<AzoxiaException>()).Which;
-            ex.Error.Should().Be(AzoxiaErrorCodes.NotFound);
+            ex.Error.Should().Be(ApplicationValidationCodes.ActorResourceAccessDenied);
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                     CancellationToken.None);
 
             AzoxiaException ex = (await act.Should().ThrowAsync<AzoxiaException>()).Which;
-            ex.Error.Should().Be(AzoxiaErrorCodes.NotFound);
+            ex.Error.Should().Be(ApplicationValidationCodes.ActorResourceAccessDenied);
         }
 
         [Fact]
@@ -269,7 +269,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                     CancellationToken.None);
 
             AzoxiaException ex = (await act.Should().ThrowAsync<AzoxiaException>()).Which;
-            ex.Error.Should().Be(AzoxiaErrorCodes.NotFound);
+            ex.Error.Should().Be(ApplicationValidationCodes.RefreshSystemUserTokenAuthenticationFailed);
         }
 
         #endregion Methods

@@ -29,6 +29,133 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add worker availability")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddAvailability(
+            [FromBody] AddWorkerAvailabilityCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove worker availability")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveAvailability(
+            [FromBody] RemoveWorkerAvailabilityCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add worker certificate")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddCertificate(
+            [FromBody] AddWorkerCertificateCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove worker certificate")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveCertificate(
+            [FromBody] RemoveWorkerCertificateCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add worker education")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddEducation(
+            [FromBody] AddWorkerEducationCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove worker education")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveEducation(
+            [FromBody] RemoveWorkerEducationCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add worker experience")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddExperience(
+            [FromBody] AddWorkerExperienceCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove worker experience")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveExperience(
+            [FromBody] RemoveWorkerExperienceCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add worker language")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddLanguage(
+            [FromBody] AddWorkerLanguageCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove worker language")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveLanguage(
+            [FromBody] RemoveWorkerLanguageCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Add worker reference")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> AddReference(
+            [FromBody] AddWorkerReferenceCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove worker reference")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveReference(
+            [FromBody] RemoveWorkerReferenceCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Remove worker skill")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> RemoveSkill(
+            [FromBody] RemoveWorkerSkillCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Delete worker")]
+        [EndpointDescription("Soft deletes worker and its linked system user.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> Delete(
+            [FromBody] DeleteWorkerCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Gets worker detail by id.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -67,6 +194,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             [FromBody] GetWorkerPersonalizedNotificationPreviewQuery query,
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Updates authenticated worker profile basics.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update worker profile")]
+        [EndpointDescription("Updates nationality and university fields for the authenticated worker.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateProfile(
+            [FromBody] UpdateWorkerProfileCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
 
         #endregion Methods
     }

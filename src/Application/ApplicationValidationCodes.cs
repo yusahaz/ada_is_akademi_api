@@ -108,6 +108,20 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "WorkerId must be greater than zero.");
 
         /// <summary>
+        /// Nationality length cannot exceed 128 characters for worker profile updates.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerProfileNationalityMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_942",
+            ErrorMessage: "Nationality length cannot exceed 128 characters.");
+
+        /// <summary>
+        /// University length cannot exceed 512 characters for worker profile updates.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerProfileUniversityMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_943",
+            ErrorMessage: "University length cannot exceed 512 characters.");
+
+        /// <summary>
         /// Employer id must be positive when banning an employer.
         /// </summary>
         internal static readonly ErrorCode BanEmployerEmployerId = new(
@@ -269,6 +283,48 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "JobPostingId must be greater than zero.");
 
         /// <summary>
+        /// Limit must be between 1 and 200 when listing job applications by posting.
+        /// </summary>
+        internal static readonly ErrorCode ListJobApplicationsByJobPostingIdLimit = new(
+            Code: "AZX_ADA_APP_VAL_930",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive when listing job applications by posting.
+        /// </summary>
+        internal static readonly ErrorCode ListJobApplicationsByJobPostingIdOffset = new(
+            Code: "AZX_ADA_APP_VAL_931",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for employer-owned job posting list query.
+        /// </summary>
+        internal static readonly ErrorCode ListJobPostingsByEmployerIdLimit = new(
+            Code: "AZX_ADA_APP_VAL_932",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for employer-owned job posting list query.
+        /// </summary>
+        internal static readonly ErrorCode ListJobPostingsByEmployerIdOffset = new(
+            Code: "AZX_ADA_APP_VAL_933",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for open job posting list query.
+        /// </summary>
+        internal static readonly ErrorCode ListOpenJobPostingsLimit = new(
+            Code: "AZX_ADA_APP_VAL_934",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for open job posting list query.
+        /// </summary>
+        internal static readonly ErrorCode ListOpenJobPostingsOffset = new(
+            Code: "AZX_ADA_APP_VAL_935",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
         /// Limit must be between 1 and 50 for semantic posting list query.
         /// </summary>
         internal static readonly ErrorCode ListSemanticMatchedJobPostingsLimitRange = new(
@@ -302,6 +358,41 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode ListCommissionReceivablesByEmployerLimit = new(
             Code: "AZX_ADA_APP_VAL_915",
             ErrorMessage: "Limit must be between 1 and 100.");
+
+        /// <summary>
+        /// Offset must be zero or positive for list commission receivables query.
+        /// </summary>
+        internal static readonly ErrorCode ListCommissionReceivablesByEmployerOffset = new(
+            Code: "AZX_ADA_APP_VAL_936",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for worker-self job application list query.
+        /// </summary>
+        internal static readonly ErrorCode ListMyJobApplicationsLimit = new(
+            Code: "AZX_ADA_APP_VAL_938",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for worker-self job application list query.
+        /// </summary>
+        internal static readonly ErrorCode ListMyJobApplicationsOffset = new(
+            Code: "AZX_ADA_APP_VAL_939",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for worker-self shift assignment list query.
+        /// </summary>
+        internal static readonly ErrorCode ListMyShiftAssignmentsLimit = new(
+            Code: "AZX_ADA_APP_VAL_940",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for worker-self shift assignment list query.
+        /// </summary>
+        internal static readonly ErrorCode ListMyShiftAssignmentsOffset = new(
+            Code: "AZX_ADA_APP_VAL_941",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
 
         /// <summary>
         /// Limit must be between 1 and 200 for list employers query.
@@ -477,6 +568,13 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode CheckInShiftAssignmentTokenHashRequired = new(
             Code: "AZX_ADA_APP_VAL_334",
             ErrorMessage: "CheckInTokenHash cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Assignment id must be positive when checking out a shift assignment.
+        /// </summary>
+        internal static readonly ErrorCode CheckOutShiftAssignmentAssignmentId = new(
+            Code: "AZX_ADA_APP_VAL_937",
+            ErrorMessage: "AssignmentId must be greater than zero.");
 
         /// <summary>
         /// Job posting id must be positive when publishing a posting.

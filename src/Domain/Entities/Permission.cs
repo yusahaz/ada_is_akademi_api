@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private Permission() { }
+        protected Permission() { }
 
         protected internal Permission(
             string name,

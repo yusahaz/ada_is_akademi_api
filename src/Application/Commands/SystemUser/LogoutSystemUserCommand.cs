@@ -5,6 +5,8 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Commands;
     using Azoxia.Core.Application.Validation;
     using Azoxia.Core.Extensions;
+    using Azoxia.Core.Identity;
+    using Microsoft.Extensions.DependencyInjection;
     using System;
 
     /// <summary>
@@ -26,7 +28,7 @@ namespace Azoxia.AdaIsAkademi.Application
         public string RefreshToken { get; set; }
 
         /// <summary>
-        /// User identifier owning the refresh token.
+        /// Legacy compatibility field; ignored by handler and kept for contract backward compatibility.
         /// </summary>
         public int SystemUserId { get; set; }
 
@@ -41,11 +43,6 @@ namespace Azoxia.AdaIsAkademi.Application
         public ValidationResult Validate(LogoutSystemUserCommand request)
         {
             List<ValidationFailure> failures = [];
-
-            if (request.SystemUserId <= 0)
-            {
-                failures.Add(ApplicationValidationCodes.LogoutSystemUserSystemUserId.ForField(nameof(LogoutSystemUserCommand.SystemUserId)));
-            }
 
             if (request.DeviceIdentifier.IsNullOrWhiteSpace())
             {
@@ -71,9 +68,22 @@ namespace Azoxia.AdaIsAkademi.Application
         /// <inheritdoc />
         protected override async Task<Unit> HandleAsync(LogoutSystemUserCommand command, CancellationToken cancellationToken)
         {
+            IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
+            SystemUserRefreshToken? existingRefreshToken = await UnitOfWork
+                .GetRepository<SystemUserRefreshToken>()
+                .Filter(x => x.TokenHash == command.RefreshToken && !x.IsRevoked)
+                .Include(x => x.Device)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (existingRefreshToken is null ||
+                existingRefreshToken.ExpiresAt <= DateTimeOffset.UtcNow ||
+                existingRefreshToken.Device.DeviceIdentifier != command.DeviceIdentifier)
+            {
+                ApplicationValidationCodes.LogoutSystemUserSessionNotFound.Throw();
+            }
+
             SystemUser? user = await UnitOfWork
                 .GetRepository<SystemUser>()
-                .Filter(x => x.Id == command.SystemUserId)
+                .Filter(x => x.Id == existingRefreshToken.SystemUserId)
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -95,6 +105,14 @@ namespace Azoxia.AdaIsAkademi.Application
                     x.TokenHash == command.RefreshToken &&
                     x.IsActive);
             if (token is null)
+            {
+                ApplicationValidationCodes.LogoutSystemUserSessionNotFound.Throw();
+            }
+
+            string? claimedSystemUserId = executionContext.GetClaim("system_user_id");
+            if (int.TryParse(claimedSystemUserId, out int actorSystemUserId) &&
+                actorSystemUserId > 0 &&
+                actorSystemUserId != user.Id)
             {
                 ApplicationValidationCodes.LogoutSystemUserSessionNotFound.Throw();
             }

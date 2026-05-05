@@ -24,6 +24,16 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         public int JobPostingId { get; set; }
 
+        /// <summary>
+        /// Maximum row count to return.
+        /// </summary>
+        public int Limit { get; set; } = 20;
+
+        /// <summary>
+        /// Zero-based row offset.
+        /// </summary>
+        public int Offset { get; set; }
+
         #endregion Properties
     }
 
@@ -38,7 +48,17 @@ namespace Azoxia.AdaIsAkademi.Application
 
             if (request.JobPostingId <= 0)
             {
-                failures.Add(ApplicationValidationCodes.ListJobApplicationsByJobPostingIdJobPostingId.ForField(nameof(request.JobPostingId)));
+                failures.Add(ApplicationValidationCodes.ListJobApplicationsByJobPostingIdJobPostingId.ForField(nameof(ListJobApplicationsByJobPostingIdQuery.JobPostingId)));
+            }
+
+            if (request.Limit is < 1 or > 200)
+            {
+                failures.Add(ApplicationValidationCodes.ListJobApplicationsByJobPostingIdLimit.ForField(nameof(ListJobApplicationsByJobPostingIdQuery.Limit)));
+            }
+
+            if (request.Offset < 0)
+            {
+                failures.Add(ApplicationValidationCodes.ListJobApplicationsByJobPostingIdOffset.ForField(nameof(ListJobApplicationsByJobPostingIdQuery.Offset)));
             }
 
             return new ValidationResult(failures);
@@ -79,10 +99,12 @@ namespace Azoxia.AdaIsAkademi.Application
                 .ToList();
 
             List<JobApplicationListItemModel> rows = applications
+                .Skip(query.Offset)
+                .Take(query.Limit)
                 .Select(x => new JobApplicationListItemModel(x.Id, x.WorkerId, x.Status, x.AppliedAt, x.Note))
                 .ToList();
 
-            return new PagedQueryResultModel<JobApplicationListItemModel>(rows, rows.Count, rows.Count, 0);
+            return new PagedQueryResultModel<JobApplicationListItemModel>(rows, applications.Count, query.Limit, query.Offset);
         }
 
         #endregion Utils

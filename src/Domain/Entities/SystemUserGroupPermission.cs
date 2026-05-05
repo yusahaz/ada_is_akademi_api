@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private SystemUserGroupPermission() { }
+        protected SystemUserGroupPermission() { }
 
         protected internal SystemUserGroupPermission(
             int systemUserGroupId,

@@ -1,6 +1,7 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
     using Azoxia.Core.Domain;
+    using Azoxia.Core.Extensions;
 
     /// <summary>
     /// Represents a worker's application for a specific job posting.
@@ -10,7 +11,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private JobApplication() { }
+        protected JobApplication() { }
 
         protected internal JobApplication(
             int jobPostingId,
@@ -30,27 +31,31 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         protected internal void Accept()
         {
-            if (Status == JobApplicationStatus.Pending)
-            {
-                Status = JobApplicationStatus.Accepted;
-            }
+            (Status == JobApplicationStatus.Pending)
+                .ThrowIfFalse(DomainErrorCodes.JobApplicationInvalidStatusTransition);
+            Status = JobApplicationStatus.Accepted;
+        }
+
+        protected internal void Expire()
+        {
+            (Status == JobApplicationStatus.Pending)
+                .ThrowIfFalse(DomainErrorCodes.JobApplicationInvalidStatusTransition);
+            Status = JobApplicationStatus.Expired;
         }
 
         protected internal void Reject(string? reason = null)
         {
-            if (Status == JobApplicationStatus.Pending)
-            {
-                Status = JobApplicationStatus.Rejected;
-                RejectionReason = reason;
-            }
+            (Status == JobApplicationStatus.Pending)
+                .ThrowIfFalse(DomainErrorCodes.JobApplicationInvalidStatusTransition);
+            Status = JobApplicationStatus.Rejected;
+            RejectionReason = reason;
         }
 
         protected internal void Withdraw()
         {
-            if (Status == JobApplicationStatus.Pending)
-            {
-                Status = JobApplicationStatus.Withdrawn;
-            }
+            (Status == JobApplicationStatus.Pending)
+                .ThrowIfFalse(DomainErrorCodes.JobApplicationInvalidStatusTransition);
+            Status = JobApplicationStatus.Withdrawn;
         }
 
         #endregion Utils

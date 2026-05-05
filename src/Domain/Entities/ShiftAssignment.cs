@@ -11,7 +11,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private ShiftAssignment() { }
+        protected ShiftAssignment() { }
 
         protected internal ShiftAssignment(
             int jobPostingId,

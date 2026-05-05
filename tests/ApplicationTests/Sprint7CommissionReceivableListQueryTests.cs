@@ -50,8 +50,8 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 CancellationToken.None);
 
             var queryHandler = new ListCommissionReceivablesByEmployerQueryHandler(sp);
-            IReadOnlyList<CommissionReceivableListItemModel> rows =
-                await ((IRequestHandler<ListCommissionReceivablesByEmployerQuery, IReadOnlyList<CommissionReceivableListItemModel>>)queryHandler)
+            PagedQueryResultModel<CommissionReceivableListItemModel> result =
+                await ((IRequestHandler<ListCommissionReceivablesByEmployerQuery, PagedQueryResultModel<CommissionReceivableListItemModel>>)queryHandler)
                     .HandleAsync(
                         new ListCommissionReceivablesByEmployerQuery
                         {
@@ -60,10 +60,10 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                         },
                         CancellationToken.None);
 
-            rows.Should().HaveCount(2);
-            rows[0].Amount.Should().Be(200m);
-            rows[0].PeriodStart.Should().Be(new DateOnly(2026, 5, 1));
-            rows[1].Amount.Should().Be(100m);
+            result.Items.Should().HaveCount(2);
+            result.Items[0].Amount.Should().Be(200m);
+            result.Items[0].PeriodStart.Should().Be(new DateOnly(2026, 5, 1));
+            result.Items[1].Amount.Should().Be(100m);
         }
 
         [Fact]

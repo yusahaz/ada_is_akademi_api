@@ -58,6 +58,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             ErrorMessage: "The target job application could not be found.");
 
         /// <summary>
+        /// The requested application state transition is not allowed.
+        /// </summary>
+        public static readonly ErrorCode JobApplicationInvalidStatusTransition = new(
+            Code: "AZX_ADA_DOMAIN_024",
+            ErrorMessage: "This operation is not allowed for the current job application status.");
+
+        /// <summary>
         /// The job posting has reached its accepted application capacity.
         /// </summary>
         public static readonly ErrorCode JobPostingCapacityReached = new(
@@ -168,6 +175,13 @@ namespace Azoxia.AdaIsAkademi.Domain
         public static readonly ErrorCode WorkerHasConflictingShift = new(
             Code: "AZX_ADA_DOMAIN_005",
             ErrorMessage: "Worker has a conflicting shift for the target date and time.");
+
+        /// <summary>
+        /// The requested worker profile sub-item could not be found.
+        /// </summary>
+        public static readonly ErrorCode WorkerProfileItemNotFound = new(
+            Code: "AZX_ADA_DOMAIN_025",
+            ErrorMessage: "The requested worker profile item could not be found.");
         #endregion Properties
     }
 }

@@ -23,6 +23,11 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         public int Limit { get; set; } = 20;
 
+        /// <summary>
+        /// Zero-based row offset.
+        /// </summary>
+        public int Offset { get; set; }
+
         #endregion Properties
     }
 
@@ -45,6 +50,11 @@ namespace Azoxia.AdaIsAkademi.Application
                 failures.Add(ApplicationValidationCodes.ListCommissionReceivablesByEmployerLimit.ForField(nameof(ListCommissionReceivablesByEmployerQuery.Limit)));
             }
 
+            if (request.Offset < 0)
+            {
+                failures.Add(ApplicationValidationCodes.ListCommissionReceivablesByEmployerOffset.ForField(nameof(ListCommissionReceivablesByEmployerQuery.Offset)));
+            }
+
             return new ValidationResult(failures);
         }
 
@@ -61,7 +71,7 @@ namespace Azoxia.AdaIsAkademi.Application
             ListCommissionReceivablesByEmployerQuery query,
             CancellationToken cancellationToken)
         {
-            CacheKey cacheKey = AdaIsCacheKeys.CommissionReceivableListKey(query.EmployerId, query.Limit);
+            CacheKey cacheKey = AdaIsCacheKeys.CommissionReceivableListKey(query.EmployerId, query.Limit, query.Offset);
             PagedQueryResultModel<CommissionReceivableListItemModel>? cached =
                 await CacheService.GetAsync<PagedQueryResultModel<CommissionReceivableListItemModel>>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -69,12 +79,17 @@ namespace Azoxia.AdaIsAkademi.Application
                 return cached;
             }
 
-            IReadOnlyList<CommissionReceivableListItemModel> rows = (await UnitOfWork
+            var filter = UnitOfWork
                     .GetRepository<CommissionReceivable>()
                     .Filter(x => x.EmployerId == query.EmployerId)
-                    .AsNoTracking()
+                .AsNoTracking();
+
+            int totalCount = checked((int)await filter.CountAsync(cancellationToken));
+
+            IReadOnlyList<CommissionReceivableListItemModel> rows = (await filter
                     .OrderByDescending(x => x.PeriodStart)
                     .ThenByDescending(x => x.PeriodEnd)
+                .Skip(query.Offset)
                     .Take(query.Limit)
                     .ToListAsync(
                         x => new CommissionReceivableListItemModel(
@@ -89,9 +104,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             PagedQueryResultModel<CommissionReceivableListItemModel> result = new(
                 rows,
-                rows.Count,
+                totalCount,
                 query.Limit,
-                0);
+                query.Offset);
 
             await CacheService.SetAsync(
                 cacheKey,

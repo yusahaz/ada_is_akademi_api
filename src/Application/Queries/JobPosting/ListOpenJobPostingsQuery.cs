@@ -2,6 +2,7 @@ namespace Azoxia.AdaIsAkademi.Application
 {
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application;
+    using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
     using System;
@@ -12,6 +13,8 @@ namespace Azoxia.AdaIsAkademi.Application
     public class ListOpenJobPostingsQuery :
         QueryBase<PagedQueryResultModel<JobPostingSummaryModel>>
     {
+        public int Limit { get; set; } = 20;
+        public int Offset { get; set; }
     }
 
     internal class ListOpenJobPostingsQueryValidator : IRequestValidator<ListOpenJobPostingsQuery>
@@ -21,7 +24,18 @@ namespace Azoxia.AdaIsAkademi.Application
         /// <inheritdoc />
         public ValidationResult Validate(ListOpenJobPostingsQuery request)
         {
-            return new ValidationResult([]);
+            List<ValidationFailure> failures = [];
+            if (request.Limit is < 1 or > 200)
+            {
+                failures.Add(ApplicationValidationCodes.ListOpenJobPostingsLimit.ForField(nameof(ListOpenJobPostingsQuery.Limit)));
+            }
+
+            if (request.Offset < 0)
+            {
+                failures.Add(ApplicationValidationCodes.ListOpenJobPostingsOffset.ForField(nameof(ListOpenJobPostingsQuery.Offset)));
+            }
+
+            return new ValidationResult(failures);
         }
 
         #endregion Methods
@@ -37,12 +51,26 @@ namespace Azoxia.AdaIsAkademi.Application
             ListOpenJobPostingsQuery query,
             CancellationToken cancellationToken)
         {
-            IEnumerable<JobPostingSummaryModel> rows = await UnitOfWork
+            CacheKey cacheKey = AdaIsCacheKeys.OpenJobPostingListKey(query.Limit, query.Offset);
+            PagedQueryResultModel<JobPostingSummaryModel>? cached =
+                await CacheService.GetAsync<PagedQueryResultModel<JobPostingSummaryModel>>(cacheKey, cancellationToken);
+            if (cached is not null)
+            {
+                return cached;
+            }
+
+            var filter = UnitOfWork
                 .GetRepository<JobPosting>()
-                .Filter(x => x.Status == JobPostingStatus.Open)
-                .AsNoTracking()
+                .Filter(x => x.Status == JobPostingStatus.Open && !x.IsDeleted)
+                .AsNoTracking();
+
+            int totalCount = checked((int)await filter.CountAsync(cancellationToken));
+
+            IEnumerable<JobPostingSummaryModel> rows = await filter
                 .OrderBy(x => x.ShiftDate)
                 .ThenBy(x => x.ShiftStartTime)
+                .Skip(query.Offset)
+                .Take(query.Limit)
                 .ToListAsync(
                     x => new JobPostingSummaryModel(
                         x.Id,
@@ -57,7 +85,16 @@ namespace Azoxia.AdaIsAkademi.Application
                     cancellationToken);
 
             List<JobPostingSummaryModel> list = rows.ToList();
-            return new PagedQueryResultModel<JobPostingSummaryModel>(list, list.Count, list.Count, 0);
+            PagedQueryResultModel<JobPostingSummaryModel> result =
+                new(list, totalCount, query.Limit, query.Offset);
+
+            await CacheService.SetAsync(
+                cacheKey,
+                result,
+                AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.JobPostingAllDependency()),
+                cancellationToken);
+
+            return result;
         }
 
         #endregion Utils

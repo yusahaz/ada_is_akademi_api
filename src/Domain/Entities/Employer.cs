@@ -20,7 +20,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
-        private Employer() { }
+        protected Employer() { }
 
         protected internal Employer(
             string name,

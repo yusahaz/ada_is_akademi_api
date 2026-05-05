@@ -10,7 +10,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     {
         #region Ctors
 
-        private ShiftSupervisor() { }
+        protected ShiftSupervisor() { }
 
         protected internal ShiftSupervisor(
             int employerId,

@@ -2,6 +2,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 {
     using Azoxia.Core.Domain;
     using Azoxia.Core.Extensions;
+    using Azoxia.Core.ValueTypes;
     using System;
     using System.Collections.Generic;
 
@@ -25,7 +26,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         #region Ctors
 
-        private Worker() { }
+        protected Worker() { }
 
         protected internal Worker(int systemUserId)
         {
@@ -52,6 +53,200 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             return skill;
         }
+
+        protected internal WorkerAvailability AddAvailability(DayOfWeek dayOfWeek, TimeOnly timeFrom, TimeOnly timeTo)
+        {
+            WorkerAvailability? existing = Availabilities.FirstOrDefault(x =>
+                x.DayOfWeek == dayOfWeek &&
+                x.TimeFrom == timeFrom &&
+                x.TimeTo == timeTo);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            WorkerAvailability availability = new(Id, dayOfWeek, timeFrom, timeTo);
+            _availabilities.Add(availability);
+            return availability;
+        }
+
+        protected internal void RemoveAvailability(int availabilityId)
+        {
+            WorkerAvailability? availability = Availabilities.FirstOrDefault(x => x.Id == availabilityId);
+            availability = availability.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _availabilities.Remove(availability);
+        }
+
+        protected internal WorkerCertificate AddCertificate(
+            string name,
+            string issuingOrganization,
+            DateOnly issuedAt,
+            DateOnly? expiresAt,
+            string? documentUrl = null)
+        {
+            string normalizedName = name.Trim();
+            string normalizedIssuer = issuingOrganization.Trim();
+
+            WorkerCertificate? existing = Certificates.FirstOrDefault(x =>
+                x.Name == normalizedName &&
+                x.IssuingOrganization == normalizedIssuer &&
+                x.IssuedAt == issuedAt);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            WorkerCertificate certificate = new(Id, name, issuingOrganization, issuedAt, expiresAt, documentUrl);
+            _certificates.Add(certificate);
+            return certificate;
+        }
+
+        protected internal void RemoveCertificate(int certificateId)
+        {
+            WorkerCertificate? certificate = Certificates.FirstOrDefault(x => x.Id == certificateId);
+            certificate = certificate.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _certificates.Remove(certificate);
+        }
+
+        protected internal WorkerEducation AddEducation(
+            string school,
+            string department,
+            EducationType educationType,
+            int startYear,
+            int? endYear,
+            bool isOngoing)
+        {
+            string normalizedSchool = school.Trim();
+            string normalizedDepartment = department.Trim();
+
+            WorkerEducation? existing = Educations.FirstOrDefault(x =>
+                x.School == normalizedSchool &&
+                x.Department == normalizedDepartment &&
+                x.EducationType == educationType &&
+                x.StartYear == startYear &&
+                x.EndYear == endYear &&
+                x.IsOngoing == isOngoing);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            WorkerEducation education = new(Id, school, department, educationType, startYear, endYear, isOngoing);
+            _educations.Add(education);
+            return education;
+        }
+
+        protected internal void RemoveEducation(int educationId)
+        {
+            WorkerEducation? education = Educations.FirstOrDefault(x => x.Id == educationId);
+            education = education.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _educations.Remove(education);
+        }
+
+        protected internal WorkerExperience AddExperience(
+            string companyName,
+            string position,
+            DateOnly startDate,
+            DateOnly? endDate,
+            string? description = null)
+        {
+            string normalizedCompany = companyName.Trim();
+            string normalizedPosition = position.Trim();
+
+            WorkerExperience? existing = Experiences.FirstOrDefault(x =>
+                x.CompanyName == normalizedCompany &&
+                x.Position == normalizedPosition &&
+                x.StartDate == startDate &&
+                x.EndDate == endDate);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            WorkerExperience experience = new(Id, companyName, position, startDate, endDate, description);
+            _experiences.Add(experience);
+            return experience;
+        }
+
+        protected internal void RemoveExperience(int experienceId)
+        {
+            WorkerExperience? experience = Experiences.FirstOrDefault(x => x.Id == experienceId);
+            experience = experience.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _experiences.Remove(experience);
+        }
+
+        protected internal WorkerLanguage AddLanguage(string language, LanguageLevel level)
+        {
+            string normalizedLanguage = language.Trim();
+
+            WorkerLanguage? existing = Languages.FirstOrDefault(x =>
+                x.Language == normalizedLanguage &&
+                x.Level == level);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            WorkerLanguage workerLanguage = new(Id, language, level);
+            _languages.Add(workerLanguage);
+            return workerLanguage;
+        }
+
+        protected internal void RemoveLanguage(int languageId)
+        {
+            WorkerLanguage? language = Languages.FirstOrDefault(x => x.Id == languageId);
+            language = language.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _languages.Remove(language);
+        }
+
+        protected internal WorkerReference AddReference(string company, string position, Contact contact)
+        {
+            string normalizedCompany = company.Trim();
+            string normalizedPosition = position.Trim();
+
+            WorkerReference? existing = References.FirstOrDefault(x =>
+                x.Company == normalizedCompany &&
+                x.Position == normalizedPosition &&
+                x.Contact.Email == contact.Email &&
+                x.Contact.FirstName == contact.FirstName &&
+                x.Contact.LastName == contact.LastName &&
+                x.Contact.Phone == contact.Phone);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            WorkerReference reference = new(Id, company, position, contact);
+            _references.Add(reference);
+            return reference;
+        }
+
+        protected internal void RemoveReference(int referenceId)
+        {
+            WorkerReference? reference = References.FirstOrDefault(x => x.Id == referenceId);
+            reference = reference.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _references.Remove(reference);
+        }
+
+        protected internal void RemoveSkill(int skillId)
+        {
+            WorkerSkill? skill = Skills.FirstOrDefault(x => x.Id == skillId);
+            skill = skill.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
+            _skills.Remove(skill);
+        }
+
+        protected internal void UpdateProfile(string? nationality, string? university)
+        {
+            Nationality = nationality.IsNullOrWhiteSpace()
+                ? null
+                : nationality.Trim();
+            University = university.IsNullOrWhiteSpace()
+                ? null
+                : university.Trim();
+        }
+
+        protected internal void DeleteWorker()
+            => base.Delete();
 
         #endregion Utils
 

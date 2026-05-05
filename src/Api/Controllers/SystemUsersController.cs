@@ -134,7 +134,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [EndpointSummary("Logout system user")]
-        [EndpointDescription("Revokes the provided active refresh token for the given user and device pair.")]
+        [EndpointDescription("Revokes the provided active refresh token for the given device session.")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> Logout(
             [FromBody] LogoutSystemUserCommand command,
@@ -146,7 +146,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [EndpointSummary("Refresh system user token")]
-        [EndpointDescription("Validates refresh token for user + device and issues a fresh token pair.")]
+        [EndpointDescription("Validates refresh token for the device session and issues a fresh token pair.")]
         [ProducesResponseType(typeof(ApiResponse<SystemUserTokenModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> RefreshToken(
             [FromBody] RefreshSystemUserTokenCommand command,

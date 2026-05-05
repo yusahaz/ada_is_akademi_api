@@ -12,7 +12,7 @@
     {
         #region Ctors
 
-        private EmployerLocation() { }
+        protected EmployerLocation() { }
 
         protected internal EmployerLocation(
             int employerId,

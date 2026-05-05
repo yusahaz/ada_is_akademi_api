@@ -5,6 +5,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
     using Azoxia.Core.Wrappers;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
 
     /// <summary>
     /// Job application commands and list query for a posting (Bearer JWT: <c>employer_id</c> işveren uçları, <c>worker_id</c> başvuru/çekme).
@@ -40,6 +41,23 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecutePageQuery<JobApplicationListItemModel, PagedQueryResultModel<JobApplicationListItemModel>>(
                 query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
+        /// <summary>Lists authenticated worker's own applications.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List my job applications")]
+        [EndpointDescription("Lists applications created by the authenticated worker.")]
+        [ProducesResponseType(typeof(PageableApiResponse<WorkerJobApplicationListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> MyApplications(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ListMyJobApplicationsQuery? query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<WorkerJobApplicationListItemModel, PagedQueryResultModel<WorkerJobApplicationListItemModel>>(
+                query ?? new ListMyJobApplicationsQuery(),
                 result => result.Items,
                 result => result.TotalCount,
                 result => result.Limit,

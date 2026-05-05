@@ -43,7 +43,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
         [Fact]
         public void Employer_job_postings_summary_key_and_dependency_use_invariant_id()
         {
-            var key = AdaIsCacheKeys.EmployerJobPostingsSummaryKey(5);
+            var key = AdaIsCacheKeys.EmployerJobPostingsSummaryKey(5, 20, 0);
             var dep = AdaIsCacheKeys.EmployerJobPostingsSummaryDependency(5);
 
             key.ToStorageKey().Should().Contain("JobPostingListByEmployer");
