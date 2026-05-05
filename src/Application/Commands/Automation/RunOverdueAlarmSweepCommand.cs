@@ -40,7 +40,8 @@ namespace Azoxia.AdaIsAkademi.Application
 
             IReadOnlyList<JobPosting> overduePostings = (await jobPostingRepository
                 .Filter(x => (x.Status == JobPostingStatus.Open || x.Status == JobPostingStatus.Filled)
-                             && x.ShiftDate < today)
+                             && x.ShiftDate < today
+                             && !x.IsDeleted)
                 .ToListAsync(cancellationToken))
                 .ToList();
 

@@ -4,6 +4,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.AdaIsAkademi.Persistence;
     using Azoxia.Core.Application;
+    using Azoxia.Core.Domain;
     using Azoxia.Core.ValueTypes;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
@@ -98,6 +99,22 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 headCount: 1);
             futureOpen.Publish();
 
+            JobPosting deletedOverdue = employer.AddJobPosting(
+                hq.Id,
+                category.Id,
+                "Deleted Overdue",
+                "Açıklama",
+                DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-3)),
+                new TimeOnly(9, 0),
+                new TimeOnly(18, 0),
+                new Money(120m, "TRY"),
+                headCount: 1);
+            deletedOverdue.Publish();
+
+            await db.SaveChangesAsync();
+
+            db.Entry(deletedOverdue).Property(nameof(DeletableEntityBase.IsDeleted)).CurrentValue = true;
+            db.Entry(deletedOverdue).Property(nameof(DeletableEntityBase.DeletedAt)).CurrentValue = DateTimeOffset.UtcNow;
             await db.SaveChangesAsync();
         }
         #endregion Utils
