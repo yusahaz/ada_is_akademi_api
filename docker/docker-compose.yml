@@ -75,8 +75,8 @@ services:
 
   ada-is-akademi-api:
     build:
-      context: ../..
-      dockerfile: AdaIsAkademi/src/Api/Dockerfile
+      context: ..
+      dockerfile: src/Api/Dockerfile
     image: ada-is-akademi-api:latest
     container_name: ada-is-akademi-api
     restart: unless-stopped
