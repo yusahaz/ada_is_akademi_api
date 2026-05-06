@@ -46,6 +46,23 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://127.0.0.1:9000/minio/health/live"]
 
+  ada-is-akademi-minio-init:
+    image: minio/mc:latest
+    container_name: ada-is-akademi-minio-init
+    restart: "no"
+    depends_on:
+      ada-is-akademi-minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-ada-is-akademi}
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
+      mc mb --ignore-existing ada/"$$MINIO_BUCKET" &&
+      mc anonymous set download ada/"$$MINIO_BUCKET" || true
+
   ada-is-akademi-dbview:
     image: dpage/pgadmin4:latest
     container_name: ada-is-akademi-dbview
@@ -83,9 +100,15 @@ services:
       DbConfig__Database: ${DB_NAME}
       DbConfig__Username: ${DB_USER}
       DbConfig__Password: ${DB_PASS}
-      RedisConfig__Enabled: ${REDIS_CONFIG_ENABLED}
-      RedisConfig__ConnectionString: ${REDIS_CONFIG_CONNECTION}
-      RedisConfig__InstanceName: ${REDIS_CONFIG_INSTANCE_NAME}
+      RedisConfig__Enabled: ${REDIS_CONFIG_ENABLED:-true}
+      RedisConfig__ConnectionString: ${REDIS_CONFIG_CONNECTION:-ada-is-akademi-redis:6379,password=${REDIS_PASSWORD}}
+      RedisConfig__InstanceName: ${REDIS_CONFIG_INSTANCE_NAME:-ada-is-akademi}
+      ObjectStorageConfig__ServiceUrl: ${OBJECT_STORAGE_SERVICE_URL:-http://ada-is-akademi-minio:9000}
+      ObjectStorageConfig__AccessKey: ${OBJECT_STORAGE_ACCESS_KEY:-${MINIO_ROOT_USER}}
+      ObjectStorageConfig__SecretKey: ${OBJECT_STORAGE_SECRET_KEY:-${MINIO_ROOT_PASSWORD}}
+      ObjectStorageConfig__BucketName: ${OBJECT_STORAGE_BUCKET_NAME:-${MINIO_BUCKET:-ada-is-akademi}}
+      ObjectStorageConfig__ForcePathStyle: ${OBJECT_STORAGE_FORCE_PATH_STYLE:-true}
+      ObjectStorageConfig__RegionName: ${OBJECT_STORAGE_REGION_NAME:-us-east-1}
     depends_on:
       ada-is-akademi-db:
         condition: service_healthy
@@ -93,6 +116,8 @@ services:
         condition: service_healthy
       ada-is-akademi-minio:
         condition: service_healthy
+      ada-is-akademi-minio-init:
+        condition: service_completed_successfully
 
   ada-is-akademi-backup:
     build:
