@@ -14,5 +14,5 @@
 
 ## Next slices
 
-- Employer/location/date filtered reconciliation report with `ReportFilter` style payload.
+- [x] Employer/date filtered reconciliation report with paged rows (`ListFinancialReconciliationRowsQuery`).
 - CSV export for reconciliation rows.

@@ -13,7 +13,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Last Updated: 2026-05-06 (UTC+3)
 - Current Phase: Faz 2 (profil zenginleştirme checklist kapalı)
 - Current Task: —
-- Next Task: Finansal mutabakat phase 2: filtreli (employer/date/status) reconciliation raporu + export.
+- Next Task: Finansal mutabakat phase 3: reconciliation CSV export ve büyük export'larda job kuyruğu.
 - Blockers: Yok
 
 ## Phase Checklist
@@ -76,6 +76,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-06 - CV pipeline phase 2: extraction sweep komutu (`RunCvExtractionSweepCommand`) + Hangfire recurring job (`cv-extraction-sweep`) + `ICvExtractionService`/`FakeCvExtractionService`; worker review komutları (`ConfirmWorkerCvReviewCommand`, `DiscardWorkerCvReviewCommand`) ve endpointleri eklendi; build + ApplicationTests geçti.
 - [x] 2026-05-06 - CV pipeline phase 3: `ConfirmWorkerCvReviewCommand` payload apply (education/experience/certificate/language/skill) + granular seçim bayrakları (`Apply*`), worker cache invalidation; extraction payload parser eklendi; build + ApplicationTests geçti.
 - [x] 2026-05-06 - Finansal mutabakat phase 1: `GetFinancialReconciliationSummaryQuery` + statistics endpoint eklendi (receivable/payout status sayıları + para birimi bazlı tutarlar), cache key/dependency bağlandı; build + ApplicationTests geçti.
+- [x] 2026-05-06 - Finansal mutabakat phase 2: `ListFinancialReconciliationRowsQuery` eklendi (employer/date filtre, paging, cache); `StatisticsController.FinancialReconciliationRows` endpointi ile detay satır raporu açıldı; build + ApplicationTests geçti.
 - [x] 2026-05-06 - Hata modeli + maaş okuma: BCL `ArgumentNullException`/`ArgumentException` kaldırıldı; `GuardExtensions` + `AzoxiaErrorCodes`/`DomainErrorCodes`. Worker üzerinde beklenen maaş `Money` projeksiyonu entity’den çıkarıldı (kurallar: entity’de `public` instance metot yok); `GetWorkerSelfDetail` / `GetWorkerSelfFullDetail` handler’larında `MapWorkerExpectedSalary`; profil tamamlanma maaş kontrolü skalar alanlarla. `WorkerExpectedSalaryProjection` DI sınıfı yok. Katman `.cursor/rules` güncellendi. Commit `f199dbc` push `main`.
 
 ## Profil / medya / eşleştirme (iş planı özeti)
@@ -91,7 +92,7 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 ## Deferred Backlog
 - [x] **(Öncelik — ürün)** Worker profil fotoğrafı + employer logo: API’de presigned PUT init + confirm + presigned GET görüntüleme; kalıcı object key alanları (`Worker.ProfilePhotoObjectKey`, `Employer.LogoObjectKey`); `IObjectStoragePresigner` ile MinIO/S3 uçları (`ObjectStorageConfig` — Azoxia Core `IConfig` bölümü). *İstemci Flutter/web bu repoda yok; URL sözleşmesi `Workers` / `Employers` controller açıklamalarında.*
 - [x] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): phase 1-3 tamam (upload session + init/confirm API + extraction sweep + review confirm/discard + confirmed payload apply).
-- [ ] Finansal mutabakat ve ileri raporlama detayları (phase 1 tamam: reconciliation summary endpoint; kalan: filtreli rapor + export)
+- [ ] Finansal mutabakat ve ileri raporlama detayları (phase 1-2 tamam: summary + filtreli satırlar; kalan: CSV export + background export kuyruğu)
 - [x] Query splitting/performance warning cleanup (EF `AsSplitQuery` repository akışı + çoklu Include sorguları)
 - [x] DataProtection key encryption policy (`SetApplicationName`, opsiyonel PKCS#12 ile `ProtectKeysWithCertificate`, deployment notu)
 - [ ] Sprint 8: çok bölge / çok dil hazırlık backlog'u (bilinçli erteleme — talep gelince açılacak)
@@ -99,7 +100,7 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 ## Session Handoff Template
 Her yeni oturum başında bu blok güncellenir:
 
-- Handoff Summary: CV pipeline phase 1-3 tamamlandı; finansal mutabakat için phase 1 reconciliation summary endpoint eklendi.
-- Nerede kaldık: Finansal mutabakat phase 2 (filter/export) ve sprint-8 çok bölge hazırlığı bekliyor.
-- Bir sonraki tek adım: report filter sözleşmesiyle `ListFinancialReconciliationRowsQuery` + CSV export.
+- Handoff Summary: CV pipeline phase 1-3 tamam; finansal mutabakat phase 1-2 tamam (summary + filtreli satır listesi).
+- Nerede kaldık: Finansal mutabakat phase 3 (CSV export) ve sprint-8 çok bölge hazırlığı bekliyor.
+- Bir sonraki tek adım: `ExportFinancialReconciliationCsvQuery` + büyük export için kuyruk stratejisi.
 - Risk/Not: CV extraction servisi deterministik placeholder (`FakeCvExtractionService`); gerçek AI extractor ayrı hardening işi.

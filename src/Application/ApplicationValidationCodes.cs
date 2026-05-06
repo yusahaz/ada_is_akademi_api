@@ -255,6 +255,34 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "CvUploadSessionId must be greater than zero.");
 
         /// <summary>
+        /// Employer id must be positive when filtering financial reconciliation rows.
+        /// </summary>
+        internal static readonly ErrorCode ListFinancialReconciliationRowsEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_970",
+            ErrorMessage: "EmployerId must be greater than zero when provided.");
+
+        /// <summary>
+        /// Limit must be within allowed bounds for financial reconciliation list query.
+        /// </summary>
+        internal static readonly ErrorCode ListFinancialReconciliationRowsLimit = new(
+            Code: "AZX_ADA_APP_VAL_971",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be non-negative for financial reconciliation list query.
+        /// </summary>
+        internal static readonly ErrorCode ListFinancialReconciliationRowsOffset = new(
+            Code: "AZX_ADA_APP_VAL_972",
+            ErrorMessage: "Offset cannot be negative.");
+
+        /// <summary>
+        /// Date range filter is invalid when from is greater than to.
+        /// </summary>
+        internal static readonly ErrorCode ListFinancialReconciliationRowsDateRange = new(
+            Code: "AZX_ADA_APP_VAL_973",
+            ErrorMessage: "From cannot be later than To.");
+
+        /// <summary>
         /// Expected salary currency must be a three-letter ISO code when provided.
         /// </summary>
         internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryCurrencyLength = new(

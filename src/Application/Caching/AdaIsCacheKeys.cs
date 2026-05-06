@@ -80,6 +80,20 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "DashboardFinancialReconciliationSummary", "default");
 
         /// <summary>
+        /// Cache key for filtered financial reconciliation rows.
+        /// </summary>
+        internal static CacheKey FinancialReconciliationRowsKey(
+            int? employerId,
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            int limit,
+            int offset) =>
+            new(
+                QueryNamespace,
+                "FinancialReconciliationRows",
+                $"{employerId?.ToString(CultureInfo.InvariantCulture) ?? "all"}:{from?.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture) ?? "null"}:{to?.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture) ?? "null"}:{limit.ToString(CultureInfo.InvariantCulture)}:{offset.ToString(CultureInfo.InvariantCulture)}");
+
+        /// <summary>
         /// Cache key for overdue alarms CSV export package.
         /// </summary>
         internal static CacheKey OverdueAlarmExportPackageKey() =>

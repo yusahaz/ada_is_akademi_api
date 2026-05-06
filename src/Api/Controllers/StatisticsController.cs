@@ -67,6 +67,23 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetFinancialReconciliationSummaryQuery(), cancellationToken);
 
+        /// <summary>Lists paged reconciliation rows with optional employer/date filters.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List financial reconciliation rows")]
+        [EndpointDescription("Returns employer/currency reconciliation rows with receivable and payout totals for detailed reporting.")]
+        [ProducesResponseType(typeof(PageableApiResponse<FinancialReconciliationListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> FinancialReconciliationRows(
+            [FromBody] ListFinancialReconciliationRowsQuery query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<FinancialReconciliationListItemModel, PagedQueryResultModel<FinancialReconciliationListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
         /// <summary>Returns dashboard summary counters.</summary>
         [HttpPost]
         [Consumes("application/json")]
