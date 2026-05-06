@@ -30,6 +30,10 @@ internal static class LookupStage
         SeederState state,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[LookupStage] Kategori seed başlıyor. Toplam satır={JobCategoryCatalog.Rows.Count}.");
+        int insertedCategoryCount = 0;
+        int updatedCategoryParentCount = 0;
+
         foreach (JobCategoryCatalog.CategoryRow row in JobCategoryCatalog.Rows)
         {
             JobCategory? existing = await db.Set<JobCategory>()
@@ -46,9 +50,11 @@ internal static class LookupStage
                 {
                     category.SetParent(parentId);
                     await db.SaveChangesAsync(cancellationToken);
+                    updatedCategoryParentCount++;
                 }
 
                 state.CategoryIdByKey[row.Key] = category.Id;
+                insertedCategoryCount++;
             }
             else
             {
@@ -59,9 +65,13 @@ internal static class LookupStage
                 {
                     existing.SetParent(parentId);
                     await db.SaveChangesAsync(cancellationToken);
+                    updatedCategoryParentCount++;
                 }
             }
         }
+
+        Console.WriteLine(
+            $"[LookupStage] Kategori seed tamamlandı. inserted={insertedCategoryCount}, parentUpdated={updatedCategoryParentCount}, mapCount={state.CategoryIdByKey.Count}.");
 
         SystemUser? adminUser = await db.Set<SystemUser>()
             .FirstOrDefaultAsync(u => u.Email == DemoAdminEmail, cancellationToken);
@@ -95,6 +105,8 @@ internal static class LookupStage
                 }
             }
         }
+
+        Console.WriteLine($"[LookupStage] Demo admin kontrolü tamamlandı. email={DemoAdminEmail}");
     }
 
     #endregion Utils

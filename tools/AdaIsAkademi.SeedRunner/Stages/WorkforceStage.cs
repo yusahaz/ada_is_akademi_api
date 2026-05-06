@@ -35,6 +35,9 @@ internal static class WorkforceStage
             JobCategoryCatalog.ClusterOffice,
         ];
 
+        Console.WriteLine(
+            $"[WorkforceStage] Workforce seed başlıyor. targetWorkers={options.Workers}, targetEmployers={options.Employers}");
+
         for (int i = 1; i <= options.Workers; i++)
         {
             string cluster = clusters[rnd.Next(clusters.Length)];
@@ -131,6 +134,11 @@ internal static class WorkforceStage
                 User = user,
                 Worker = worker,
             });
+
+            if (i % 25 == 0 || i == options.Workers)
+            {
+                Console.WriteLine($"[WorkforceStage] Worker ilerleme: {i}/{options.Workers}");
+            }
         }
 
         await db.SaveChangesAsync(cancellationToken);
@@ -197,7 +205,15 @@ internal static class WorkforceStage
                 PrimaryUser = primary,
                 ExtraSupervisorUsers = extraSupervisors,
             });
+
+            if (e % 10 == 0 || e == options.Employers)
+            {
+                Console.WriteLine($"[WorkforceStage] Employer ilerleme: {e}/{options.Employers}");
+            }
         }
+
+        Console.WriteLine(
+            $"[WorkforceStage] Workforce seed tamamlandı. workers={state.Workers.Count}, employers={state.Employers.Count}");
     }
 
     private static void AddEducation(Worker worker, Random rnd, Faker faker)

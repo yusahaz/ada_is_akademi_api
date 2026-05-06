@@ -19,9 +19,12 @@ internal static class MonetizationStage
         Random rnd,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[MonetizationStage] Başlıyor. payoutSource={state.PayoutSources.Count}, employers={state.Employers.Count}");
+
         if (state.PayoutSources.Count == 0)
         {
             await SeedReceivablesOnlyAsync(db, state, rnd, cancellationToken);
+            Console.WriteLine("[MonetizationStage] Payout source yoktu, yalnızca receivable üretildi.");
             return;
         }
 
@@ -115,6 +118,7 @@ internal static class MonetizationStage
         }
 
         await SeedReceivablesAsync(db, state, rnd, cancellationToken);
+        Console.WriteLine("[MonetizationStage] Tamamlandı. payout ve receivable üretimi bitti.");
     }
 
     private static async Task SeedReceivablesAsync(

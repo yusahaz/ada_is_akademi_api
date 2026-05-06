@@ -21,6 +21,7 @@ internal static class ResetStage
     /// </summary>
     internal static async Task ExecuteAsync(AdaIsAkademiDbContext db, CancellationToken cancellationToken)
     {
+        Console.WriteLine("[ResetStage] Yıkıcı reset işlemi başlıyor (migration admin korunur).");
         await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction trx =
             await db.Database.BeginTransactionAsync(cancellationToken);
 
@@ -75,6 +76,7 @@ internal static class ResetStage
             cancellationToken);
 
         await trx.CommitAsync(cancellationToken);
+        Console.WriteLine("[ResetStage] Reset işlemi commit edildi.");
     }
 
     #endregion Utils

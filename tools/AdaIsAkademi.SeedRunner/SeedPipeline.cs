@@ -5,6 +5,7 @@ using Azoxia.AdaIsAkademi.Persistence;
 using Azoxia.AdaIsAkademi.SeedRunner.Stages;
 using Bogus;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 /// <summary>
 /// Orchestrates deterministic demo seed stages against one <see cref="AdaIsAkademiDbContext"/> scope.
@@ -36,6 +37,7 @@ internal static class SeedPipeline
         var rnd = new Random(options.Seed);
         Randomizer.Seed = new Random(options.Seed);
         var faker = new Faker("tr");
+        Console.WriteLine("[SeedPipeline] Deterministik seed başlatıldı.");
 
         if (!options.Reset
             && await db.Set<SystemUser>().AnyAsync(u => u.Email == WorkerMarkerEmail, cancellationToken))
@@ -46,14 +48,19 @@ internal static class SeedPipeline
 
         if (options.Reset)
         {
+            Console.WriteLine("[SeedPipeline] Reset aşaması başlıyor...");
             await ResetStage.ExecuteAsync(db, cancellationToken);
+            Console.WriteLine("[SeedPipeline] Reset aşaması tamamlandı.");
         }
 
         var state = new SeederState();
-        await LookupStage.RunAsync(db, state, cancellationToken);
-        await WorkforceStage.RunAsync(db, state, options, rnd, faker, cancellationToken);
-        await JobPostingApplicationStage.RunAsync(db, state, options, rnd, faker, cancellationToken);
-        await MonetizationStage.RunAsync(db, state, options, rnd, cancellationToken);
+        await RunStageAsync("Lookup", () => LookupStage.RunAsync(db, state, cancellationToken));
+        await RunStageAsync("Workforce", () => WorkforceStage.RunAsync(db, state, options, rnd, faker, cancellationToken));
+        await RunStageAsync("JobPostingApplication", () => JobPostingApplicationStage.RunAsync(db, state, options, rnd, faker, cancellationToken));
+        await RunStageAsync("Monetization", () => MonetizationStage.RunAsync(db, state, options, rnd, cancellationToken));
+
+        Console.WriteLine(
+            $"[SeedPipeline] Özet: workers={state.Workers.Count}, employers={state.Employers.Count}, postings={state.Postings.Count}, payoutSources={state.PayoutSources.Count}");
 
         Console.WriteLine("Ada İş Akademi demo seed tamamlandı.");
         Console.WriteLine($"  Worker giriş örneği: worker001@adaisakademi.seed.local / {SeedConstants.DefaultPassword}");
@@ -70,6 +77,14 @@ internal static class SeedPipeline
 
         string? env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         return string.Equals(env, "Production", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static async Task RunStageAsync(string stageName, Func<Task> run)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        Console.WriteLine($"[SeedPipeline] {stageName} başladı.");
+        await run();
+        Console.WriteLine($"[SeedPipeline] {stageName} tamamlandı ({stopwatch.Elapsed.TotalSeconds:F1}s).");
     }
 
     #endregion Utils

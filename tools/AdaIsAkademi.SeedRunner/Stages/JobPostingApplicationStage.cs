@@ -22,6 +22,9 @@ internal static class JobPostingApplicationStage
         Faker faker,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine(
+            $"[JobPostingApplicationStage] Başlıyor. open={options.OpenPostings}, closed={options.ClosedPostings}, employers={state.Employers.Count}, workers={state.Workers.Count}");
+
         if (state.Employers.Count == 0 || state.Workers.Count == 0)
         {
             throw new InvalidOperationException("Employers ve worker kayıtları gerekli.");
@@ -117,6 +120,13 @@ internal static class JobPostingApplicationStage
             await SeedApplicationsAsync(db, state, plan, rnd, faker, cancellationToken);
         }
 
+        int openCount = plans.Count(p => p.Kind == PostingKind.Open);
+        int completedCountActual = plans.Count(p => p.Kind == PostingKind.Completed);
+        int filledCountActual = plans.Count(p => p.Kind == PostingKind.Filled);
+        int cancelledCountActual = plans.Count(p => p.Kind == PostingKind.Cancelled);
+        Console.WriteLine(
+            $"[JobPostingApplicationStage] Posting planları oluşturuldu. open={openCount}, completed={completedCountActual}, filled={filledCountActual}, cancelled={cancelledCountActual}");
+
         foreach (PostingPlan plan in plans.Where(p =>
                      p.Kind is PostingKind.Completed or PostingKind.Filled or PostingKind.Cancelled))
         {
@@ -129,6 +139,7 @@ internal static class JobPostingApplicationStage
         }
 
         await db.SaveChangesAsync(cancellationToken);
+        Console.WriteLine($"[JobPostingApplicationStage] Tamamlandı. toplamPosting={state.Postings.Count}, payoutSource={state.PayoutSources.Count}");
     }
 
     private static async Task ApplyAssignmentsAndCompleteAsync(
