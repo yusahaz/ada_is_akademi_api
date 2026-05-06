@@ -17,7 +17,7 @@ USER $APP_UID
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
+WORKDIR /
 
 COPY ["src/Api/Api.csproj", "src/Api/"]
 COPY ["src/Application/Application.csproj", "src/Application/"]
@@ -33,9 +33,9 @@ COPY ["Core/src/Generators/Generators.csproj", "Core/src/Generators/"]
 
 RUN dotnet restore "src/Api/Api.csproj"
 
-COPY src/ ./src/
-COPY Core/ ./Core/
-WORKDIR /src/src/Api
+COPY src/ /src/
+COPY Core/ /Core/
+WORKDIR /src/Api
 RUN dotnet build "Api.csproj" --configuration $BUILD_CONFIGURATION --no-restore --output /app/build
 
 FROM build AS publish
