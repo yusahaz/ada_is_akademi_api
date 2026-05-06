@@ -89,6 +89,7 @@ namespace Azoxia.AdaIsAkademi.Application
             SystemUser? user = await UnitOfWork
                 .GetRepository<SystemUser>()
                 .Filter(x => x.Email == command.Email)
+                .AsSplitQuery()
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(cancellationToken);

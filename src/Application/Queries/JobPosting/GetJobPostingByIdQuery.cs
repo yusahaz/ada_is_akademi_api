@@ -64,6 +64,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .GetRepository<JobPosting>()
                 .Filter(x => x.Id == query.JobPostingId)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(x => x.Skills)
                 .Include(x => x.Applications)
                 .FirstOrDefaultAsync(cancellationToken);

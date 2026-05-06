@@ -38,6 +38,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .GetRepository<Worker>()
                 .Filter(x => x.Id == workerId)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(x => x.SystemUser)
                 .Include(x => x.Skills)
                 .Include(x => x.Availabilities)

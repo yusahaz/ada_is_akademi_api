@@ -48,6 +48,7 @@ namespace Azoxia.AdaIsAkademi.Application
 
             Employer? employer = await UnitOfWork.GetRepository<Employer>()
                 .Filter(x => x.Id == employerId)
+                .AsSplitQuery()
                 .Include(x => x.Locations)
                 .Include(x => x.Supervisors)
                 .FirstOrDefaultAsync(cancellationToken);

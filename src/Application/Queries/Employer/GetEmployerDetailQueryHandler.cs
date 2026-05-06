@@ -28,6 +28,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 .GetRepository<Employer>()
                 .Filter(x => x.Id == query.EmployerId)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(x => x.Locations)
                 .Include(x => x.Supervisors)
                 .FirstOrDefaultAsync(cancellationToken);
