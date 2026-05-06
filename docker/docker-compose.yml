@@ -144,6 +144,32 @@ services:
       ada-is-akademi-minio:
         condition: service_healthy
 
+  ada-is-akademi-seedrunner:
+    profiles: ["seed"]
+    build:
+      context: ..
+      dockerfile: tools/AdaIsAkademi.SeedRunner/Dockerfile
+    container_name: ada-is-akademi-seedrunner
+    restart: "no"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__AdaIs: Host=ada-is-akademi-db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS}
+    command:
+      - --workers
+      - "100"
+      - --employers
+      - "20"
+      - --open-postings
+      - "50"
+      - --closed-postings
+      - "50"
+      - --seed
+      - "12345"
+      - --allow-production
+    depends_on:
+      ada-is-akademi-db:
+        condition: service_healthy
+
 volumes:
   db_data:
   redis_data:
