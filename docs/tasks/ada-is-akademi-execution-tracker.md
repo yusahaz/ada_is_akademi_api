@@ -13,7 +13,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Last Updated: 2026-05-06 (UTC+3)
 - Current Phase: Faz 2 (profil zenginleştirme checklist kapalı)
 - Current Task: —
-- Next Task: **CV pipeline phase 3**: confirmed extraction payloadun worker profil alanlarına uygulanması (education/experience/certificate/language/skill) ve read-model görünürlüğü.
+- Next Task: Deferred backlog sırasına göre **Finansal mutabakat ve ileri raporlama detayları** (ayrı faz).
 - Blockers: Yok
 
 ## Phase Checklist
@@ -74,6 +74,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-06 - Teknik borç: Core `IEntityFilterContext.AsSplitQuery`; Application worker/employer/job posting ve SystemUser auth akışlarında çoklu Include + split query; API DataProtection `SetApplicationName` + opsiyonel PKCS12 `ProtectKeysWithCertificate`; `deployment.md` / `appsettings`; agent workflow ezber yasağı netligi.
 - [x] 2026-05-06 - CV pipeline phase 1: `CvUploadSession` domain (status + format enum + lifecycle guard), persistence mapping+migration (`20260506060812_AddCvUploadSession`), worker API komutları (`InitWorkerCvUploadCommand`, `ConfirmWorkerCvUploadCommand`) ve `Workers` controller endpointleri eklendi; build + ApplicationTests geçti.
 - [x] 2026-05-06 - CV pipeline phase 2: extraction sweep komutu (`RunCvExtractionSweepCommand`) + Hangfire recurring job (`cv-extraction-sweep`) + `ICvExtractionService`/`FakeCvExtractionService`; worker review komutları (`ConfirmWorkerCvReviewCommand`, `DiscardWorkerCvReviewCommand`) ve endpointleri eklendi; build + ApplicationTests geçti.
+- [x] 2026-05-06 - CV pipeline phase 3: `ConfirmWorkerCvReviewCommand` payload apply (education/experience/certificate/language/skill) + granular seçim bayrakları (`Apply*`), worker cache invalidation; extraction payload parser eklendi; build + ApplicationTests geçti.
 - [x] 2026-05-06 - Hata modeli + maaş okuma: BCL `ArgumentNullException`/`ArgumentException` kaldırıldı; `GuardExtensions` + `AzoxiaErrorCodes`/`DomainErrorCodes`. Worker üzerinde beklenen maaş `Money` projeksiyonu entity’den çıkarıldı (kurallar: entity’de `public` instance metot yok); `GetWorkerSelfDetail` / `GetWorkerSelfFullDetail` handler’larında `MapWorkerExpectedSalary`; profil tamamlanma maaş kontrolü skalar alanlarla. `WorkerExpectedSalaryProjection` DI sınıfı yok. Katman `.cursor/rules` güncellendi. Commit `f199dbc` push `main`.
 
 ## Profil / medya / eşleştirme (iş planı özeti)
@@ -88,7 +89,7 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 
 ## Deferred Backlog
 - [x] **(Öncelik — ürün)** Worker profil fotoğrafı + employer logo: API’de presigned PUT init + confirm + presigned GET görüntüleme; kalıcı object key alanları (`Worker.ProfilePhotoObjectKey`, `Employer.LogoObjectKey`); `IObjectStoragePresigner` ile MinIO/S3 uçları (`ObjectStorageConfig` — Azoxia Core `IConfig` bölümü). *İstemci Flutter/web bu repoda yok; URL sözleşmesi `Workers` / `Employers` controller açıklamalarında.*
-- [ ] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): phase 1-2 tamam (upload session + init/confirm API + extraction sweep + review confirm/discard). Kalan: confirmed payloadun worker profil CRUD alanlarına uygulanması.
+- [x] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): phase 1-3 tamam (upload session + init/confirm API + extraction sweep + review confirm/discard + confirmed payload apply).
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)
 - [x] Query splitting/performance warning cleanup (EF `AsSplitQuery` repository akışı + çoklu Include sorguları)
 - [x] DataProtection key encryption policy (`SetApplicationName`, opsiyonel PKCS#12 ile `ProtectKeysWithCertificate`, deployment notu)
@@ -97,7 +98,7 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 ## Session Handoff Template
 Her yeni oturum başında bu blok güncellenir:
 
-- Handoff Summary: CV pipeline phase 1-2 tamamlandı (upload session + extraction sweep + review commands).
-- Nerede kaldık: CV pipeline phase 3 (confirmed payload apply) bekliyor.
-- Bir sonraki tek adım: `ConfirmWorkerCvReviewCommand` içinde seçili bölümlere worker profil yazımı (idempotent merge stratejisi).
-- Risk/Not: Phase 2 extraction şu an deterministik placeholder (`FakeCvExtractionService`); OpenAI/gerçek extractor sonraki adım.
+- Handoff Summary: CV pipeline phase 1-3 tamamlandı; worker review onayında payload profil satırlarına yazılıyor.
+- Nerede kaldık: Deferred backlog'ta finansal mutabakat / ileri raporlama ve sprint-8 çok bölge hazırlığı.
+- Bir sonraki tek adım: finansal mutabakat backlog maddesi için kapsam analizi + task dosyası.
+- Risk/Not: CV extraction servisi şu an deterministik placeholder (`FakeCvExtractionService`); gerçek AI extractor ayrı hardening işi olarak planlanmalı.
