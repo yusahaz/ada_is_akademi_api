@@ -40,10 +40,13 @@
                         {
                             policy
                                 .WithOrigins(
+                                    "https://adaisakademi.com",
+                                    "https://*.adaisakademi.com",
                                     "http://localhost:3000",
                                     "http://localhost:5173",
                                     "https://localhost:3000",
                                     "https://localhost:5173")
+                                .SetIsOriginAllowedToAllowWildcardSubdomains()
                                 .AllowAnyHeader()
                                 .AllowAnyMethod()
                                 .AllowCredentials();
@@ -52,6 +55,7 @@
 
                         policy
                             .WithOrigins(allowedOrigins)
+                            .SetIsOriginAllowedToAllowWildcardSubdomains()
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials();

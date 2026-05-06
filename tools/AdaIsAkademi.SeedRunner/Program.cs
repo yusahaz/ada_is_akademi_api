@@ -31,9 +31,9 @@ internal static class Program
                 .Build();
 
             string? connectionString = options.ConnectionString
-                ?? configuration.GetConnectionString("AdaIs")
                 ?? Environment.GetEnvironmentVariable("DOTNET_ConnectionStrings__AdaIs")
-                ?? Environment.GetEnvironmentVariable("ConnectionStrings__AdaIs");
+                ?? Environment.GetEnvironmentVariable("ConnectionStrings__AdaIs")
+                ?? configuration.GetConnectionString("AdaIs");
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -69,11 +69,6 @@ internal static class Program
         }
 
         string? fromConfig = configuration.GetConnectionString("AdaIs");
-        if (!string.IsNullOrWhiteSpace(fromConfig))
-        {
-            return "appsettings.Seed.json";
-        }
-
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DOTNET_ConnectionStrings__AdaIs")))
         {
             return "DOTNET_ConnectionStrings__AdaIs";
@@ -82,6 +77,11 @@ internal static class Program
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ConnectionStrings__AdaIs")))
         {
             return "ConnectionStrings__AdaIs";
+        }
+
+        if (!string.IsNullOrWhiteSpace(fromConfig))
+        {
+            return "appsettings.Seed.json";
         }
 
         return "bilinmiyor";
