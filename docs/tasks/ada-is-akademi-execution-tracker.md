@@ -78,6 +78,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-06 - Finansal mutabakat phase 1: `GetFinancialReconciliationSummaryQuery` + statistics endpoint eklendi (receivable/payout status sayıları + para birimi bazlı tutarlar), cache key/dependency bağlandı; build + ApplicationTests geçti.
 - [x] 2026-05-06 - Finansal mutabakat phase 2: `ListFinancialReconciliationRowsQuery` eklendi (employer/date filtre, paging, cache); `StatisticsController.FinancialReconciliationRows` endpointi ile detay satır raporu açıldı; build + ApplicationTests geçti.
 - [x] 2026-05-06 - Hata modeli + maaş okuma: BCL `ArgumentNullException`/`ArgumentException` kaldırıldı; `GuardExtensions` + `AzoxiaErrorCodes`/`DomainErrorCodes`. Worker üzerinde beklenen maaş `Money` projeksiyonu entity’den çıkarıldı (kurallar: entity’de `public` instance metot yok); `GetWorkerSelfDetail` / `GetWorkerSelfFullDetail` handler’larında `MapWorkerExpectedSalary`; profil tamamlanma maaş kontrolü skalar alanlarla. `WorkerExpectedSalaryProjection` DI sınıfı yok. Katman `.cursor/rules` güncellendi. Commit `f199dbc` push `main`.
+- [x] 2026-05-06 - Güvenlik sertleştirme: internal exception detaylarının (`AZX_CORE_INTERNAL`) API response body üzerinden client’a sızması engellendi; detay yalnızca server loglarına bırakıldı ve client mesajı genel/safe içerik olacak şekilde standardize edildi.
 
 ## Profil / medya / eşleştirme (iş planı özeti)
 

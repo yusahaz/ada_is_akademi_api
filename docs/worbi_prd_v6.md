@@ -962,6 +962,7 @@ stateDiagram-v2
 - Account lockout: 5 başarısız login → 15dk bekleme
 - Permission cache invalidation: grup üyeliği değişince Redis key silinir
 - OWASP Top 10 uyumlu geliştirme
+- Internal error detayları (DB/stack trace/SQL mesajı) client response'a sızdırılmaz; `AZX_CORE_INTERNAL` gibi durumlarda yalnız genel/safe mesaj döndürülür, ayrıntı server loglarında tutulur.
 
 ### 10.3 Güvenilirlik
 
