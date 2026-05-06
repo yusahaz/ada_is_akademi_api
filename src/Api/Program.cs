@@ -29,6 +29,34 @@
             startup.OnConfigureServices += (builder) =>
             {
                 builder.Services.AddAzoxiaCore(builder.Configuration);
+                string[] allowedOrigins = builder.Configuration
+                    .GetSection("Cors:AllowedOrigins")
+                    .Get<string[]>() ?? [];
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("Frontend", policy =>
+                    {
+                        if (allowedOrigins.Length == 0)
+                        {
+                            policy
+                                .WithOrigins(
+                                    "http://localhost:3000",
+                                    "http://localhost:5173",
+                                    "https://localhost:3000",
+                                    "https://localhost:5173")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
+                            return;
+                        }
+
+                        policy
+                            .WithOrigins(allowedOrigins)
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+                });
                 builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(
                     configureOptions: options =>
                     {
