@@ -142,6 +142,42 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             userReloaded!.IsDeleted.Should().BeTrue();
         }
 
+        [Fact]
+        public async Task ConfirmWorkerCvReviewHandler_is_idempotent_when_session_already_confirmed()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            (Worker worker, CvUploadSession session) = await SeedConfirmedCvReviewSessionAsync(db);
+            executionContext.ReplaceClaim("worker_id", worker.Id.ToString());
+
+            int educationCountBefore = await db.Set<WorkerEducation>()
+                .AsNoTracking()
+                .CountAsync(x => x.WorkerId == worker.Id);
+
+            var handler = new ConfirmWorkerCvReviewCommandHandler(sp);
+            await ((IRequestHandler<ConfirmWorkerCvReviewCommand, Unit>)handler).HandleAsync(
+                new ConfirmWorkerCvReviewCommand
+                {
+                    CvUploadSessionId = session.Id,
+                },
+                CancellationToken.None);
+
+            CvUploadSession? reloadedSession = await db.Set<CvUploadSession>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == session.Id);
+            reloadedSession.Should().NotBeNull();
+            reloadedSession!.Status.Should().Be(CvUploadSessionStatus.Confirmed);
+
+            int educationCountAfter = await db.Set<WorkerEducation>()
+                .AsNoTracking()
+                .CountAsync(x => x.WorkerId == worker.Id);
+            educationCountAfter.Should().Be(educationCountBefore);
+        }
+
         #endregion Methods
 
         #region Utils
@@ -156,6 +192,40 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             db.Set<Worker>().Add(worker);
             await db.SaveChangesAsync();
             return worker;
+        }
+
+        private static async Task<(Worker worker, CvUploadSession session)> SeedConfirmedCvReviewSessionAsync(AdaIsAkademiDbContext db)
+        {
+            Worker worker = await SeedWorkerAsync(db);
+
+            var session = new CvUploadSession(
+                worker.Id,
+                $"workers/{worker.Id}/cv/sample.pdf",
+                "sample.pdf",
+                "application/pdf",
+                1024,
+                CvFileFormat.Pdf);
+            session.MarkAsExtracting();
+            session.MarkAsAwaitingReview(
+                """
+                {
+                  "educations": [
+                    {
+                      "school": "Ada University",
+                      "department": "Computer Engineering",
+                      "educationType": "Bachelor",
+                      "startYear": "2020",
+                      "endYear": "2024",
+                      "isOngoing": false
+                    }
+                  ]
+                }
+                """);
+            session.Confirm();
+
+            db.Set<CvUploadSession>().Add(session);
+            await db.SaveChangesAsync();
+            return (worker, session);
         }
 
         #endregion Utils

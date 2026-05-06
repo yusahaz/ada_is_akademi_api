@@ -1,5 +1,6 @@
 ﻿namespace Azoxia.AdaIsAkademi.Api
 {
+    using System;
     using Azoxia.AdaIsAkademi.Api.Automation;
     using Azoxia.AdaIsAkademi.Api.DependencyInjection;
     using Azoxia.Core.Api;
@@ -36,26 +37,78 @@
                 {
                     options.AddPolicy("Frontend", policy =>
                     {
-                        if (allowedOrigins.Length == 0)
+                        string[] effectiveOrigins = allowedOrigins.Length == 0
+                            ? [
+                                "https://adaisakademi.com",
+                                "https://*.adaisakademi.com",
+                                "http://localhost:3000",
+                                "http://localhost:5173",
+                                "https://localhost:3000",
+                                "https://localhost:5173"
+                            ]
+                            : allowedOrigins;
+
+                        bool isLocalDevelopmentOrigin(string origin)
                         {
-                            policy
-                                .WithOrigins(
-                                    "https://adaisakademi.com",
-                                    "https://*.adaisakademi.com",
-                                    "http://localhost:3000",
-                                    "http://localhost:5173",
-                                    "https://localhost:3000",
-                                    "https://localhost:5173")
-                                .SetIsOriginAllowedToAllowWildcardSubdomains()
-                                .AllowAnyHeader()
-                                .AllowAnyMethod()
-                                .AllowCredentials();
-                            return;
+                            if (!builder.Environment.IsDevelopment())
+                            {
+                                return false;
+                            }
+
+                            if (!Uri.TryCreate(origin, UriKind.Absolute, out Uri? uri))
+                            {
+                                return false;
+                            }
+
+                            return string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(uri.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase);
+                        }
+
+                        bool isConfiguredOrigin(string origin)
+                        {
+                            if (isLocalDevelopmentOrigin(origin))
+                            {
+                                return true;
+                            }
+
+                            if (!Uri.TryCreate(origin, UriKind.Absolute, out Uri? originUri))
+                            {
+                                return false;
+                            }
+
+                            foreach (string configuredOrigin in effectiveOrigins)
+                            {
+                                if (!Uri.TryCreate(configuredOrigin, UriKind.Absolute, out Uri? configuredUri))
+                                {
+                                    continue;
+                                }
+
+                                if (configuredUri.Host.StartsWith("*.", StringComparison.Ordinal))
+                                {
+                                    string wildcardSuffix = configuredUri.Host[1..];
+                                    bool isWildcardMatch =
+                                        string.Equals(originUri.Scheme, configuredUri.Scheme, StringComparison.OrdinalIgnoreCase)
+                                        && originUri.Host.EndsWith(wildcardSuffix, StringComparison.OrdinalIgnoreCase);
+                                    if (isWildcardMatch)
+                                    {
+                                        return true;
+                                    }
+
+                                    continue;
+                                }
+
+                                bool isExactMatch = string.Equals(origin, configuredOrigin, StringComparison.OrdinalIgnoreCase);
+                                if (isExactMatch)
+                                {
+                                    return true;
+                                }
+                            }
+
+                            return false;
                         }
 
                         policy
-                            .WithOrigins(allowedOrigins)
-                            .SetIsOriginAllowedToAllowWildcardSubdomains()
+                            .SetIsOriginAllowed(isConfiguredOrigin)
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials();

@@ -90,6 +90,14 @@ namespace Azoxia.AdaIsAkademi.Application
                 .Filter(x => x.Id == command.CvUploadSessionId && x.WorkerId == workerId)
                 .FirstOrDefaultAsync(cancellationToken);
             session = session.ThrowIfNull(AzoxiaErrorCodes.NotFound);
+            if (session.Status == CvUploadSessionStatus.Confirmed)
+            {
+                return Unit.Value;
+            }
+
+            // Apply flow is allowed only once while review is pending; terminal non-confirmed states stay invalid.
+            (session.Status == CvUploadSessionStatus.AwaitingReview)
+                .ThrowIfFalse(DomainErrorCodes.CvUploadSessionInvalidStatusTransition);
 
             Worker? worker = await UnitOfWork
                 .GetRepository<Worker>()

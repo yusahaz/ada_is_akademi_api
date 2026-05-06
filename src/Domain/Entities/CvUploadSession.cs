@@ -92,6 +92,8 @@ namespace Azoxia.AdaIsAkademi.Domain
 
         /// <summary>
         /// Confirms worker approval for extracted fields.
+        /// Application flow must call this only from <see cref="CvUploadSessionStatus.AwaitingReview"/> after applying payload writes.
+        /// Repeated confirmation retries are handled idempotently in Application when status is already <see cref="CvUploadSessionStatus.Confirmed"/>.
         /// </summary>
         protected internal void Confirm()
         {
