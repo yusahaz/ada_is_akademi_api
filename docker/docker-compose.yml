@@ -58,10 +58,8 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: ${MINIO_BUCKET:-ada-is-akademi}
     entrypoint: ["/bin/sh", "-c"]
-    command: >
-      mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
-      mc mb --ignore-existing ada/"$$MINIO_BUCKET" &&
-      mc anonymous set download ada/"$$MINIO_BUCKET" || true
+    command:
+      - 'mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; mc mb --ignore-existing ada/"$$MINIO_BUCKET"'
 
   ada-is-akademi-dbview:
     image: dpage/pgadmin4:latest
@@ -120,9 +118,10 @@ services:
         condition: service_completed_successfully
 
   ada-is-akademi-backup:
+    profiles: ["backup"]
     build:
-      context: .
-      dockerfile: backup/Dockerfile
+      context: ./backup
+      dockerfile: Dockerfile
     container_name: ada-is-akademi-backup
     restart: unless-stopped
     environment:
