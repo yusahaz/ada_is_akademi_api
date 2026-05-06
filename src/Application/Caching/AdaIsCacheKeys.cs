@@ -74,6 +74,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "DashboardMonetizationSummary", "default");
 
         /// <summary>
+        /// Cache key for financial reconciliation summary counters and per-currency totals.
+        /// </summary>
+        internal static CacheKey DashboardFinancialReconciliationSummaryKey() =>
+            new(QueryNamespace, "DashboardFinancialReconciliationSummary", "default");
+
+        /// <summary>
         /// Cache key for overdue alarms CSV export package.
         /// </summary>
         internal static CacheKey OverdueAlarmExportPackageKey() =>

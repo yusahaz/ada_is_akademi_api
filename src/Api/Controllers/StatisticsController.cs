@@ -55,6 +55,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetMonetizationSummaryQuery(), cancellationToken);
 
+        /// <summary>Returns financial reconciliation summary for receivables and payouts.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get financial reconciliation summary")]
+        [EndpointDescription("Returns commission receivable/payout status counters and per-currency amount totals for reconciliation workflows.")]
+        [ProducesResponseType(typeof(ApiResponse<FinancialReconciliationSummaryModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> FinancialReconciliationSummary(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            GetFinancialReconciliationSummaryQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetFinancialReconciliationSummaryQuery(), cancellationToken);
+
         /// <summary>Returns dashboard summary counters.</summary>
         [HttpPost]
         [Consumes("application/json")]

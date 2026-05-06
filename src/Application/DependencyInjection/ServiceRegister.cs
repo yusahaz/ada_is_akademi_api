@@ -137,6 +137,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<ExportSystemUserNotificationDispatchesCsvQuery, SystemUserNotificationDispatchExportPackageModel>, ExportSystemUserNotificationDispatchesCsvQueryHandler>();
             services.AddScoped<IRequestHandler<GetOverdueJobSummaryQuery, OverdueJobSummaryModel>, GetOverdueJobSummaryQueryHandler>();
             services.AddScoped<IRequestHandler<GetMonetizationSummaryQuery, MonetizationSummaryModel>, GetMonetizationSummaryQueryHandler>();
+            services.AddScoped<IRequestHandler<GetFinancialReconciliationSummaryQuery, FinancialReconciliationSummaryModel>, GetFinancialReconciliationSummaryQueryHandler>();
             services.AddScoped<IRequestHandler<GetJobPostingByIdQuery, JobPostingDetailModel>, GetJobPostingByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetSystemUserMeQuery, SystemUserMeModel>, GetSystemUserMeQueryHandler>();
             services.AddScoped<IRequestHandler<ListSystemUsersQuery, PagedQueryResultModel<SystemUserListItemModel>>, ListSystemUsersQueryHandler>();
@@ -225,6 +226,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ExportSystemUserNotificationDispatchesCsvQuery>, ExportSystemUserNotificationDispatchesCsvQueryValidator>();
             services.AddScoped<IRequestValidator<GetOverdueJobSummaryQuery>, GetOverdueJobSummaryQueryValidator>();
             services.AddScoped<IRequestValidator<GetMonetizationSummaryQuery>, GetMonetizationSummaryQueryValidator>();
+            services.AddScoped<IRequestValidator<GetFinancialReconciliationSummaryQuery>, GetFinancialReconciliationSummaryQueryValidator>();
             services.AddScoped<IRequestValidator<GetJobPostingByIdQuery>, GetJobPostingByIdQueryValidator>();
             services.AddScoped<IRequestValidator<GetSystemUserMeQuery>, GetSystemUserMeQueryValidator>();
             services.AddScoped<IRequestValidator<ListSystemUsersQuery>, ListSystemUsersQueryValidator>();
