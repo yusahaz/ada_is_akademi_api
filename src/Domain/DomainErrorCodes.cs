@@ -24,6 +24,27 @@ namespace Azoxia.AdaIsAkademi.Domain
             ErrorMessage: "Commission receivable period is invalid.");
 
         /// <summary>
+        /// CV extraction preview payload is missing when transitioning to awaiting review.
+        /// </summary>
+        public static readonly ErrorCode CvUploadSessionExtractedPayloadRequired = new(
+            Code: "AZX_ADA_DOMAIN_034",
+            ErrorMessage: "Extracted CV payload is required.");
+
+        /// <summary>
+        /// Uploaded CV file size is outside the supported range.
+        /// </summary>
+        public static readonly ErrorCode CvUploadSessionFileSizeOutOfRange = new(
+            Code: "AZX_ADA_DOMAIN_035",
+            ErrorMessage: "CV file size must be between 1 byte and 10 MB.");
+
+        /// <summary>
+        /// CV upload session cannot transition from current status.
+        /// </summary>
+        public static readonly ErrorCode CvUploadSessionInvalidStatusTransition = new(
+            Code: "AZX_ADA_DOMAIN_033",
+            ErrorMessage: "This operation is not allowed for the current CV upload session status.");
+
+        /// <summary>
         /// Only active employers may create job postings.
         /// </summary>
         public static readonly ErrorCode EmployerCannotCreateJobPosting = new(

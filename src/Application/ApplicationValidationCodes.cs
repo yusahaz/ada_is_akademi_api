@@ -206,6 +206,48 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "ContentType cannot exceed 128 characters.");
 
         /// <summary>
+        /// CV content type is required at upload confirm stage.
+        /// </summary>
+        internal static readonly ErrorCode WorkerCvContentTypeRequired = new(
+            Code: "AZX_ADA_APP_VAL_963",
+            ErrorMessage: "ContentType is required for CV upload.");
+
+        /// <summary>
+        /// CV content type exceeds accepted length.
+        /// </summary>
+        internal static readonly ErrorCode WorkerCvContentTypeMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_964",
+            ErrorMessage: "ContentType cannot exceed 128 characters for CV upload.");
+
+        /// <summary>
+        /// CV file format is not supported by extraction pipeline.
+        /// </summary>
+        internal static readonly ErrorCode WorkerCvFileFormatNotSupported = new(
+            Code: "AZX_ADA_APP_VAL_965",
+            ErrorMessage: "Only PDF and DOCX CV formats are supported.");
+
+        /// <summary>
+        /// CV file name exceeds accepted length.
+        /// </summary>
+        internal static readonly ErrorCode WorkerCvFileNameMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_966",
+            ErrorMessage: "FileName cannot exceed 256 characters for CV upload.");
+
+        /// <summary>
+        /// CV file name is required to infer file format and keep auditability.
+        /// </summary>
+        internal static readonly ErrorCode WorkerCvFileNameRequired = new(
+            Code: "AZX_ADA_APP_VAL_967",
+            ErrorMessage: "FileName is required for CV upload.");
+
+        /// <summary>
+        /// CV file size is outside accepted range.
+        /// </summary>
+        internal static readonly ErrorCode WorkerCvFileSizeOutOfRange = new(
+            Code: "AZX_ADA_APP_VAL_968",
+            ErrorMessage: "FileSizeBytes must be between 1 and 10485760.");
+
+        /// <summary>
         /// Expected salary currency must be a three-letter ISO code when provided.
         /// </summary>
         internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryCurrencyLength = new(

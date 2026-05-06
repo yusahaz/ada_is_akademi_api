@@ -121,6 +121,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Persists uploaded CV object metadata and opens extraction session.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Confirm worker CV upload")]
+        [EndpointDescription("Persists worker-owned CV upload metadata after PUT success and returns created upload session id.")]
+        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ConfirmCvUpload(
+            [FromBody] ConfirmWorkerCvUploadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<int>(command, cancellationToken);
+
         /// <summary>Soft deletes worker and its linked system user.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -205,6 +216,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse<ObjectStorageUploadInitModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> InitProfilePhotoUpload(
             [FromBody] InitWorkerProfilePhotoUploadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand<ObjectStorageUploadInitModel>(command, cancellationToken);
+
+        /// <summary>Begins worker CV upload (presigned PUT).</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Init worker CV upload")]
+        [EndpointDescription("Returns worker-scoped object key plus presigned PUT URL for PDF/DOCX CV upload.")]
+        [ProducesResponseType(typeof(ApiResponse<ObjectStorageUploadInitModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> InitCvUpload(
+            [FromBody] InitWorkerCvUploadCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand<ObjectStorageUploadInitModel>(command, cancellationToken);
 

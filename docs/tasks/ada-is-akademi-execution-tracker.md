@@ -13,7 +13,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Last Updated: 2026-05-06 (UTC+3)
 - Current Phase: Faz 2 (profil zenginleştirme checklist kapalı)
 - Current Task: —
-- Next Task: **CV pipeline** epik (PRD §5.4 / tracker Deferred): domain `CvUploadSession` + MinIO + Hangfire extraction — teknik borç kalemleri kapatıldı.
+- Next Task: **CV pipeline phase 2**: extraction command/job + review/confirm/discard akışı ve worker read-model query.
 - Blockers: Yok
 
 ## Phase Checklist
@@ -72,6 +72,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-07 - Görev klasörü: `docs/tasks/README.md` eklendi (kebab-case adlandırma, tracker ilişkisi, ne zaman yeni task dosyası açılır).
 - [x] 2026-05-07 - Domain: beklenen maaş kolonlarından `Money` örneklemesi `Worker.GetExpectedSalaryMinMoney` / `GetExpectedSalaryMaxMoney` olarak taşındı; Application `WorkerExpectedSalaryMappings` kaldırıldı; gözden geçirme task checklist güncellendi.
 - [x] 2026-05-06 - Teknik borç: Core `IEntityFilterContext.AsSplitQuery`; Application worker/employer/job posting ve SystemUser auth akışlarında çoklu Include + split query; API DataProtection `SetApplicationName` + opsiyonel PKCS12 `ProtectKeysWithCertificate`; `deployment.md` / `appsettings`; agent workflow ezber yasağı netligi.
+- [x] 2026-05-06 - CV pipeline phase 1: `CvUploadSession` domain (status + format enum + lifecycle guard), persistence mapping+migration (`20260506060812_AddCvUploadSession`), worker API komutları (`InitWorkerCvUploadCommand`, `ConfirmWorkerCvUploadCommand`) ve `Workers` controller endpointleri eklendi; build + ApplicationTests geçti.
 - [x] 2026-05-06 - Hata modeli + maaş okuma: BCL `ArgumentNullException`/`ArgumentException` kaldırıldı; `GuardExtensions` + `AzoxiaErrorCodes`/`DomainErrorCodes`. Worker üzerinde beklenen maaş `Money` projeksiyonu entity’den çıkarıldı (kurallar: entity’de `public` instance metot yok); `GetWorkerSelfDetail` / `GetWorkerSelfFullDetail` handler’larında `MapWorkerExpectedSalary`; profil tamamlanma maaş kontrolü skalar alanlarla. `WorkerExpectedSalaryProjection` DI sınıfı yok. Katman `.cursor/rules` güncellendi. Commit `f199dbc` push `main`.
 
 ## Profil / medya / eşleştirme (iş planı özeti)
@@ -86,7 +87,7 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 
 ## Deferred Backlog
 - [x] **(Öncelik — ürün)** Worker profil fotoğrafı + employer logo: API’de presigned PUT init + confirm + presigned GET görüntüleme; kalıcı object key alanları (`Worker.ProfilePhotoObjectKey`, `Employer.LogoObjectKey`); `IObjectStoragePresigner` ile MinIO/S3 uçları (`ObjectStorageConfig` — Azoxia Core `IConfig` bölümü). *İstemci Flutter/web bu repoda yok; URL sözleşmesi `Workers` / `Employers` controller açıklamalarında.*
-- [ ] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): `CvUploadSession`, MinIO’ya dosya, Hangfire ile extraction, worker onay ekranı — şu an domain/API’de yok; worker profili yapılandırılmış CRUD ile dolduruluyor.
+- [ ] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): phase 1 tamam (upload session + init/confirm API). Kalan: Hangfire extraction, preview/review-confirm-discard akışı, worker profile apply adımı.
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)
 - [x] Query splitting/performance warning cleanup (EF `AsSplitQuery` repository akışı + çoklu Include sorguları)
 - [x] DataProtection key encryption policy (`SetApplicationName`, opsiyonel PKCS#12 ile `ProtectKeysWithCertificate`, deployment notu)
@@ -95,7 +96,7 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 ## Session Handoff Template
 Her yeni oturum başında bu blok güncellenir:
 
-- Handoff Summary: Teknik borç (split query + DataProtection) ve workflow kural güçlendirmesi işlendi; tracker güncellendi.
-- Nerede kaldık: Sıradaki ürün işi **CV pipeline** (`CvUploadSession` epik).
-- Bir sonraki tek adım: **CV pipeline** — `CvUploadSession` domain + persistence + migration (ardından komut/API/Hangfire).
-- Risk/Not: Teknik borç kapatıldı; Core repo yerel ise `AsSplitQuery` icin Core Persistence commit’ini ayrica senkronlayin.
+- Handoff Summary: CV pipeline phase 1 tamamlandı (`CvUploadSession` + migration + init/confirm API); teknik borç kalemleri kapalı.
+- Nerede kaldık: CV pipeline phase 2 (extraction/review) bekliyor.
+- Bir sonraki tek adım: extraction tetikleme komutu + Hangfire recurring/job + status transition (Uploaded -> Extracting -> AwaitingReview/Failed).
+- Risk/Not: Core repo yerel ise `AsSplitQuery` commit’i ayrı remote’a push edilmeli.

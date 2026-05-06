@@ -50,12 +50,14 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<BanEmployerCommand, Unit>, BanEmployerCommandHandler>();
             services.AddScoped<IRequestHandler<GenerateCommissionReceivableCommand, int>, GenerateCommissionReceivableCommandHandler>();
             services.AddScoped<IRequestHandler<InitEmployerLogoUploadCommand, ObjectStorageUploadInitModel>, InitEmployerLogoUploadCommandHandler>();
+            services.AddScoped<IRequestHandler<InitWorkerCvUploadCommand, ObjectStorageUploadInitModel>, InitWorkerCvUploadCommandHandler>();
             services.AddScoped<IRequestHandler<InitWorkerProfilePhotoUploadCommand, ObjectStorageUploadInitModel>, InitWorkerProfilePhotoUploadCommandHandler>();
             services.AddScoped<IRequestHandler<CreateWorkerPayoutCommand, int>, CreateWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<MarkWorkerPayoutAsProcessingCommand, Unit>, MarkWorkerPayoutAsProcessingCommandHandler>();
             services.AddScoped<IRequestHandler<FailWorkerPayoutCommand, Unit>, FailWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<RetryWorkerPayoutCommand, Unit>, RetryWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<ConfirmEmployerLogoUploadCommand, Unit>, ConfirmEmployerLogoUploadCommandHandler>();
+            services.AddScoped<IRequestHandler<ConfirmWorkerCvUploadCommand, int>, ConfirmWorkerCvUploadCommandHandler>();
             services.AddScoped<IRequestHandler<ConfirmWorkerProfilePhotoUploadCommand, Unit>, ConfirmWorkerProfilePhotoUploadCommandHandler>();
             services.AddScoped<IRequestHandler<ConfirmWorkerPayoutCommand, Unit>, ConfirmWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<SetEmployerCommissionRateCommand, Unit>, SetEmployerCommissionRateCommandHandler>();
@@ -175,6 +177,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<BanEmployerCommand>, BanEmployerCommandValidator>();
             services.AddScoped<IRequestValidator<GenerateCommissionReceivableCommand>, GenerateCommissionReceivableCommandValidator>();
             services.AddScoped<IRequestValidator<InitEmployerLogoUploadCommand>, InitEmployerLogoUploadCommandValidator>();
+            services.AddScoped<IRequestValidator<InitWorkerCvUploadCommand>, InitWorkerCvUploadCommandValidator>();
             services.AddScoped<IRequestValidator<InitWorkerProfilePhotoUploadCommand>, InitWorkerProfilePhotoUploadCommandValidator>();
             services.AddScoped<IRequestValidator<CreateWorkerPayoutCommand>, CreateWorkerPayoutCommandValidator>();
             services.AddScoped<IRequestValidator<MarkWorkerPayoutAsProcessingCommand>, MarkWorkerPayoutAsProcessingCommandValidator>();
@@ -194,6 +197,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ClearEmployerLogoCommand>, ClearEmployerLogoCommandValidator>();
             services.AddScoped<IRequestValidator<ClearWorkerProfilePhotoCommand>, ClearWorkerProfilePhotoCommandValidator>();
             services.AddScoped<IRequestValidator<ConfirmEmployerLogoUploadCommand>, ConfirmEmployerLogoUploadCommandValidator>();
+            services.AddScoped<IRequestValidator<ConfirmWorkerCvUploadCommand>, ConfirmWorkerCvUploadCommandValidator>();
             services.AddScoped<IRequestValidator<ConfirmWorkerProfilePhotoUploadCommand>, ConfirmWorkerProfilePhotoUploadCommandValidator>();
             services.AddScoped<IRequestValidator<CompleteJobPostingCommand>, CompleteJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<CreateShiftAssignmentCommand>, CreateShiftAssignmentCommandValidator>();
