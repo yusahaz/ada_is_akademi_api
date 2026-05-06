@@ -343,6 +343,8 @@ Ozellikle kritik:
 
 `api_dataprotection_keys` silinirse daha once uretilen bazi token/cookie dogrulamalari etkilenebilir.
 
+**Opsiyonel anahtar XML sifrelemesi:** API icinde `DataProtection:ProtectKeysCertificatePath` gecerli bir dosya yoluna ayarlanirsa (ve dosya container icinde okunabilirse), kalici anahtar dosyalari ek olarak X.509 ile `ProtectKeysWithCertificate` ile korunur. Yukleme `X509CertificateLoader.LoadPkcs12FromFile` ile yapilir — dosya tipik olarak **PKCS#12 (.pfx/.p12)** olmalidir; parola zorunluysa `DataProtection:ProtectKeysCertificatePassword` kullanilir. Uygulama adi `SetApplicationName("Azoxia.AdaIsAkademi.Api")` ile sabittir; birden fazla API ornegi ayni anahtar hacmini paylasirken bu adin eslesmesi gerekir.
+
 ## 10) Backup ve Restore
 
 ### 10.1 Backup kapsami

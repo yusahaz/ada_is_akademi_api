@@ -13,7 +13,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - Last Updated: 2026-05-06 (UTC+3)
 - Current Phase: Faz 2 (profil zenginleştirme checklist kapalı)
 - Current Task: —
-- Next Task: **Deferred Backlog** sıradaki seçilebilir iş — birincil ürün kalemi **CV pipeline** (`CvUploadSession`, PRD §5.3); alternatif teknik borç: query splitting uyarıları, DataProtection production politikası.
+- Next Task: **CV pipeline** epik (PRD §5.4 / tracker Deferred): domain `CvUploadSession` + MinIO + Hangfire extraction — teknik borç kalemleri kapatıldı.
 - Blockers: Yok
 
 ## Phase Checklist
@@ -71,6 +71,7 @@ Bu dosya, her iş tamamlandığında güncellenen **tek kaynak** takip alanıdı
 - [x] 2026-05-07 - Mimari envanter: `/ada-is-akademi-plan` kapsamında katman kurallarıyla hizalı kod yapısı gözden geçirildi; özet ve takip maddeleri `docs/tasks/codebase-structure-review-2026-05.md` dosyasına işlendi.
 - [x] 2026-05-07 - Görev klasörü: `docs/tasks/README.md` eklendi (kebab-case adlandırma, tracker ilişkisi, ne zaman yeni task dosyası açılır).
 - [x] 2026-05-07 - Domain: beklenen maaş kolonlarından `Money` örneklemesi `Worker.GetExpectedSalaryMinMoney` / `GetExpectedSalaryMaxMoney` olarak taşındı; Application `WorkerExpectedSalaryMappings` kaldırıldı; gözden geçirme task checklist güncellendi.
+- [x] 2026-05-06 - Teknik borç: Core `IEntityFilterContext.AsSplitQuery`; Application worker/employer/job posting ve SystemUser auth akışlarında çoklu Include + split query; API DataProtection `SetApplicationName` + opsiyonel PKCS12 `ProtectKeysWithCertificate`; `deployment.md` / `appsettings`; agent workflow ezber yasağı netligi.
 - [x] 2026-05-06 - Hata modeli + maaş okuma: BCL `ArgumentNullException`/`ArgumentException` kaldırıldı; `GuardExtensions` + `AzoxiaErrorCodes`/`DomainErrorCodes`. Worker üzerinde beklenen maaş `Money` projeksiyonu entity’den çıkarıldı (kurallar: entity’de `public` instance metot yok); `GetWorkerSelfDetail` / `GetWorkerSelfFullDetail` handler’larında `MapWorkerExpectedSalary`; profil tamamlanma maaş kontrolü skalar alanlarla. `WorkerExpectedSalaryProjection` DI sınıfı yok. Katman `.cursor/rules` güncellendi. Commit `f199dbc` push `main`.
 
 ## Profil / medya / eşleştirme (iş planı özeti)
@@ -87,14 +88,14 @@ Detaylı checklist: **`docs/tasks/worker-employer-profile-enrichment.md`**
 - [x] **(Öncelik — ürün)** Worker profil fotoğrafı + employer logo: API’de presigned PUT init + confirm + presigned GET görüntüleme; kalıcı object key alanları (`Worker.ProfilePhotoObjectKey`, `Employer.LogoObjectKey`); `IObjectStoragePresigner` ile MinIO/S3 uçları (`ObjectStorageConfig` — Azoxia Core `IConfig` bölümü). *İstemci Flutter/web bu repoda yok; URL sözleşmesi `Workers` / `Employers` controller açıklamalarında.*
 - [ ] **(Ürün)** CV yükleme + çıkarma pipeline (PRD §5.3): `CvUploadSession`, MinIO’ya dosya, Hangfire ile extraction, worker onay ekranı — şu an domain/API’de yok; worker profili yapılandırılmış CRUD ile dolduruluyor.
 - [ ] Finansal mutabakat ve ileri raporlama detayları (ayrı faza alınacak)
-- [ ] Query splitting/performance warning cleanup (Sprint 1/2 sonrası teknik borç)
-- [ ] DataProtection key encryption policy (production hardening)
+- [x] Query splitting/performance warning cleanup (EF `AsSplitQuery` repository akışı + çoklu Include sorguları)
+- [x] DataProtection key encryption policy (`SetApplicationName`, opsiyonel PKCS#12 ile `ProtectKeysWithCertificate`, deployment notu)
 - [ ] Sprint 8: çok bölge / çok dil hazırlık backlog'u (bilinçli erteleme — talep gelince açılacak)
 
 ## Session Handoff Template
 Her yeni oturum başında bu blok güncellenir:
 
-- Handoff Summary: Katman kurallarıyla uyumlu Azoxia-only guard’lar; beklenen maaş `Money` eşlemesi yalnızca worker self-detail handler’larında; `main` üzerinde `f199dbc` push edildi.
-- Nerede kaldık: Profil zenginleştirme checklist tamam; sıradaki iş Deferred backlog’dan seçilmeli.
-- Bir sonraki tek adım: CV pipeline epik analizi (domain taslağı + migration ihtiyacı) veya küçük teknik borç (query splitting / DataProtection).
-- Risk/Not: CV pipeline büyük kapsam; başlamadan önce `.cursor/rules/*` ve `docs/tasks/` ile ürün onayı netleştirilmeli.
+- Handoff Summary: Teknik borç (split query + DataProtection) ve workflow kural güçlendirmesi işlendi; tracker güncellendi.
+- Nerede kaldık: Sıradaki ürün işi **CV pipeline** (`CvUploadSession` epik).
+- Bir sonraki tek adım: **CV pipeline** — `CvUploadSession` domain + persistence + migration (ardından komut/API/Hangfire).
+- Risk/Not: Teknik borç kapatıldı; Core repo yerel ise `AsSplitQuery` icin Core Persistence commit’ini ayrica senkronlayin.

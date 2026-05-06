@@ -7,6 +7,8 @@
     using Hangfire.InMemory;
     using Microsoft.AspNetCore.DataProtection;
     using System.IO;
+    using System.Security.Cryptography;
+    using System.Security.Cryptography.X509Certificates;
     using System.Text.Json.Serialization;
 
     /// <summary>
@@ -39,8 +41,20 @@
                         options.SerializerOptions.Converters.Add(
                             item: new JsonStringEnumConverter());
                     });
-                builder.Services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo("/home/app/.aspnet/DataProtection-Keys"));
+                IDataProtectionBuilder dataProtection = builder.Services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo("/home/app/.aspnet/DataProtection-Keys"))
+                    .SetApplicationName("Azoxia.AdaIsAkademi.Api");
+
+                string? certificatePath = builder.Configuration["DataProtection:ProtectKeysCertificatePath"];
+                if (!string.IsNullOrWhiteSpace(certificatePath) && File.Exists(certificatePath))
+                {
+                    string password = builder.Configuration["DataProtection:ProtectKeysCertificatePassword"] ?? string.Empty;
+                    X509Certificate2 certificate = X509CertificateLoader.LoadPkcs12FromFile(
+                        certificatePath,
+                        password,
+                        X509KeyStorageFlags.EphemeralKeySet);
+                    dataProtection.ProtectKeysWithCertificate(certificate);
+                }
                 builder.Services.AddHangfire(configuration => configuration
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
