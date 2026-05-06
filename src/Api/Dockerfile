@@ -19,11 +19,11 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["AdaIsAkademi/src/Api/Api.csproj", "AdaIsAkademi/src/Api/"]
-COPY ["AdaIsAkademi/src/Application/Application.csproj", "AdaIsAkademi/src/Application/"]
-COPY ["AdaIsAkademi/src/Domain/Domain.csproj", "AdaIsAkademi/src/Domain/"]
-COPY ["AdaIsAkademi/src/Infrastructure/Infrastructure.csproj", "AdaIsAkademi/src/Infrastructure/"]
-COPY ["AdaIsAkademi/src/Persistence/Persistence.csproj", "AdaIsAkademi/src/Persistence/"]
+COPY ["src/Api/Api.csproj", "src/Api/"]
+COPY ["src/Application/Application.csproj", "src/Application/"]
+COPY ["src/Domain/Domain.csproj", "src/Domain/"]
+COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
+COPY ["src/Persistence/Persistence.csproj", "src/Persistence/"]
 COPY ["Core/src/Api/Api.csproj", "Core/src/Api/"]
 COPY ["Core/src/Application/Application.csproj", "Core/src/Application/"]
 COPY ["Core/src/Core/Core.csproj", "Core/src/Core/"]
@@ -31,11 +31,11 @@ COPY ["Core/src/Infrastructure/Infrastructure.csproj", "Core/src/Infrastructure/
 COPY ["Core/src/Persistence/Persistence.csproj", "Core/src/Persistence/"]
 COPY ["Core/src/Generators/Generators.csproj", "Core/src/Generators/"]
 
-RUN dotnet restore "AdaIsAkademi/src/Api/Api.csproj"
+RUN dotnet restore "src/Api/Api.csproj"
 
-COPY AdaIsAkademi/ ./AdaIsAkademi/
+COPY src/ ./src/
 COPY Core/ ./Core/
-WORKDIR /src/AdaIsAkademi/src/Api
+WORKDIR /src/src/Api
 RUN dotnet build "Api.csproj" --configuration $BUILD_CONFIGURATION --no-restore --output /app/build
 
 FROM build AS publish
