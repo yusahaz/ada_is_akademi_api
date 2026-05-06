@@ -76,12 +76,21 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasColumnOrder(columnOrder++)
                 .IsRequired(false);
 
+            builder.Property(e => e.IsRead)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired();
+
+            builder.Property(e => e.ReadAt)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
             builder.Property(e => e.SentAt)
                 .HasColumnOrder(columnOrder++)
                 .IsRequired(false);
 
             builder.HasIndex(e => new { e.WorkerId, e.Status, e.CreatedAt });
             builder.HasIndex(e => new { e.SystemUserId, e.Status });
+            builder.HasIndex(e => new { e.SystemUserId, e.IsRead, e.CreatedAt });
             builder.HasIndex(e => e.JobPostingId);
 
             builder.HasOne(e => e.Worker)

@@ -100,7 +100,9 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<DiscardWorkerCvReviewCommand, Unit>, DiscardWorkerCvReviewCommandHandler>();
             services.AddScoped<IRequestHandler<RequestSystemUserEmailVerificationCommand, Unit>, RequestSystemUserEmailVerificationCommandHandler>();
             services.AddScoped<IRequestHandler<LoginSystemUserCommand, SystemUserTokenModel>, LoginSystemUserCommandHandler>();
+            services.AddScoped<IRequestHandler<MarkAllNotificationsAsReadCommand, Unit>, MarkAllNotificationsAsReadCommandHandler>();
             services.AddScoped<IRequestHandler<LogoutSystemUserCommand, Unit>, LogoutSystemUserCommandHandler>();
+            services.AddScoped<IRequestHandler<MarkNotificationAsReadCommand, Unit>, MarkNotificationAsReadCommandHandler>();
             services.AddScoped<IRequestHandler<SuspendEmployerCommand, Unit>, SuspendEmployerCommandHandler>();
             services.AddScoped<IRequestHandler<SuspendSystemUserCommand, Unit>, SuspendSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<SubmitJobPostingApplicationCommand, int>, SubmitJobPostingApplicationCommandHandler>();
@@ -140,6 +142,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<GetFinancialReconciliationSummaryQuery, FinancialReconciliationSummaryModel>, GetFinancialReconciliationSummaryQueryHandler>();
             services.AddScoped<IRequestHandler<ListFinancialReconciliationRowsQuery, PagedQueryResultModel<FinancialReconciliationListItemModel>>, ListFinancialReconciliationRowsQueryHandler>();
             services.AddScoped<IRequestHandler<GetJobPostingByIdQuery, JobPostingDetailModel>, GetJobPostingByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<ListMyNotificationsQuery, PagedQueryResultModel<SystemUserNotificationListItemModel>>, ListMyNotificationsQueryHandler>();
             services.AddScoped<IRequestHandler<GetSystemUserMeQuery, SystemUserMeModel>, GetSystemUserMeQueryHandler>();
             services.AddScoped<IRequestHandler<ListSystemUsersQuery, PagedQueryResultModel<SystemUserListItemModel>>, ListSystemUsersQueryHandler>();
             services.AddScoped<IRequestHandler<GetWorkerPersonalizedNotificationPreviewQuery, WorkerNotificationPreviewModel>, GetWorkerPersonalizedNotificationPreviewQueryHandler>();
@@ -230,6 +233,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<GetFinancialReconciliationSummaryQuery>, GetFinancialReconciliationSummaryQueryValidator>();
             services.AddScoped<IRequestValidator<ListFinancialReconciliationRowsQuery>, ListFinancialReconciliationRowsQueryValidator>();
             services.AddScoped<IRequestValidator<GetJobPostingByIdQuery>, GetJobPostingByIdQueryValidator>();
+            services.AddScoped<IRequestValidator<ListMyNotificationsQuery>, ListMyNotificationsQueryValidator>();
             services.AddScoped<IRequestValidator<GetSystemUserMeQuery>, GetSystemUserMeQueryValidator>();
             services.AddScoped<IRequestValidator<ListSystemUsersQuery>, ListSystemUsersQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerPersonalizedNotificationPreviewQuery>, GetWorkerPersonalizedNotificationPreviewQueryValidator>();
@@ -248,7 +252,9 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ListOpenJobPostingsQuery>, ListOpenJobPostingsQueryValidator>();
             services.AddScoped<IRequestValidator<ListSemanticMatchedJobPostingsQuery>, ListSemanticMatchedJobPostingsQueryValidator>();
             services.AddScoped<IRequestValidator<LoginSystemUserCommand>, LoginSystemUserCommandValidator>();
+            services.AddScoped<IRequestValidator<MarkAllNotificationsAsReadCommand>, MarkAllNotificationsAsReadCommandValidator>();
             services.AddScoped<IRequestValidator<LogoutSystemUserCommand>, LogoutSystemUserCommandValidator>();
+            services.AddScoped<IRequestValidator<MarkNotificationAsReadCommand>, MarkNotificationAsReadCommandValidator>();
             services.AddScoped<IRequestValidator<PublishJobPostingCommand>, PublishJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<ReactivateSystemUserCommand>, ReactivateSystemUserCommandValidator>();
             services.AddScoped<IRequestValidator<RegisterAdminCommand>, RegisterAdminCommandValidator>();

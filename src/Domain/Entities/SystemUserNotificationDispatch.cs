@@ -95,6 +95,20 @@ namespace Azoxia.AdaIsAkademi.Domain
             FailureReason = null;
         }
 
+        /// <summary>
+        /// Marks the dispatch row as read by the recipient.
+        /// </summary>
+        protected internal void MarkAsRead()
+        {
+            if (IsRead)
+            {
+                return;
+            }
+
+            IsRead = true;
+            ReadAt = DateTimeOffset.UtcNow;
+        }
+
         #endregion Utils
 
         #region Properties
@@ -133,6 +147,16 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Last delivery attempt instant.
         /// </summary>
         public DateTimeOffset? LastAttemptAt { get; private set; }
+
+        /// <summary>
+        /// Indicates whether the user already read this notification.
+        /// </summary>
+        public bool IsRead { get; private set; }
+
+        /// <summary>
+        /// Read timestamp in UTC when the user opened this notification.
+        /// </summary>
+        public DateTimeOffset? ReadAt { get; private set; }
 
         /// <summary>
         /// Number of failed attempts.

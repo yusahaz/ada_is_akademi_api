@@ -396,7 +396,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [EndpointSummary("Update worker profile")]
-        [EndpointDescription("Updates nationality and university fields for the authenticated worker.")]
+        [EndpointDescription("Updates first name, last name, nationality, and university fields for the authenticated worker.")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> UpdateProfile(
             [FromBody] UpdateWorkerProfileCommand command,

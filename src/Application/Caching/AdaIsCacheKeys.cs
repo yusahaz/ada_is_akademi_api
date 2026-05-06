@@ -286,6 +286,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "SystemUserList", JsonSerializer.Serialize(query));
 
         /// <summary>
+        /// Cache key for authenticated system-user notification inbox pages.
+        /// </summary>
+        internal static CacheKey SystemUserNotificationInboxKey(int systemUserId, bool? isRead, int limit, int offset) =>
+            new(QueryNamespace, "SystemUserNotificationInbox", $"{systemUserId}:{isRead?.ToString() ?? "all"}:{limit}:{offset}");
+
+        /// <summary>
         /// Invalidation tag for aggregate-wide <see cref="SystemUserGroup"/> read models.
         /// </summary>
         internal static CacheDependency SystemUserGroupAllDependency() =>

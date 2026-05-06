@@ -115,6 +115,20 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Nationality length cannot exceed 128 characters.");
 
         /// <summary>
+        /// First name length cannot exceed 128 characters for worker profile updates.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerProfileFirstNameMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_1961",
+            ErrorMessage: "FirstName length cannot exceed 128 characters.");
+
+        /// <summary>
+        /// Last name length cannot exceed 128 characters for worker profile updates.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerProfileLastNameMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_1962",
+            ErrorMessage: "LastName length cannot exceed 128 characters.");
+
+        /// <summary>
         /// University length cannot exceed 512 characters for worker profile updates.
         /// </summary>
         internal static readonly ErrorCode UpdateWorkerProfileUniversityMaxLength = new(
@@ -694,6 +708,27 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode ListMyShiftAssignmentsOffset = new(
             Code: "AZX_ADA_APP_VAL_941",
             ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Limit must be between 1 and 200 for notification inbox list query.
+        /// </summary>
+        internal static readonly ErrorCode ListMyNotificationsLimit = new(
+            Code: "AZX_ADA_APP_VAL_974",
+            ErrorMessage: "Limit must be between 1 and 200.");
+
+        /// <summary>
+        /// Offset must be zero or positive for notification inbox list query.
+        /// </summary>
+        internal static readonly ErrorCode ListMyNotificationsOffset = new(
+            Code: "AZX_ADA_APP_VAL_975",
+            ErrorMessage: "Offset must be greater than or equal to zero.");
+
+        /// <summary>
+        /// Notification dispatch id must be greater than zero when marking as read.
+        /// </summary>
+        internal static readonly ErrorCode MarkNotificationAsReadNotificationId = new(
+            Code: "AZX_ADA_APP_VAL_976",
+            ErrorMessage: "NotificationId must be greater than zero.");
 
         /// <summary>
         /// Limit must be between 1 and 200 for list employers query.

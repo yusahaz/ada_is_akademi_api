@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Azoxia.AdaIsAkademi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 {
     [DbContext(typeof(AdaIsAkademiDbContext))]
-    partial class AdaIsAkademiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506135719_AddSystemUserNotificationReadState")]
+    partial class AddSystemUserNotificationReadState
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1502,47 +1505,47 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(12);
+                        .HasColumnOrder(13);
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(13);
+                        .HasColumnOrder(14);
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(17);
+                        .HasColumnOrder(18);
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(18);
+                        .HasColumnOrder(19);
 
                     b.Property<DateTimeOffset?>("EmbeddingUpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(8);
 
                     b.Property<decimal?>("ExpectedSalaryMaxAmount")
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(11);
 
                     b.Property<string>("ExpectedSalaryMaxCurrency")
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(12);
 
                     b.Property<decimal?>("ExpectedSalaryMinAmount")
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(9);
 
                     b.Property<string>("ExpectedSalaryMinCurrency")
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(10);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
-                        .HasColumnOrder(16);
+                        .HasColumnOrder(17);
 
                     b.Property<string>("Nationality")
                         .HasMaxLength(128)
@@ -1556,6 +1559,11 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.PrimitiveCollection<float[]>("SkillEmbedding")
                         .HasColumnType("real[]")
+                        .HasColumnOrder(7);
+
+                    b.Property<string>("StudentNumber")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
                         .HasColumnOrder(6);
 
                     b.Property<int>("SystemUserId")
@@ -1569,12 +1577,12 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(14);
+                        .HasColumnOrder(15);
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(15);
+                        .HasColumnOrder(16);
 
                     b.HasKey("Id");
 

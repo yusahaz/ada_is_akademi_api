@@ -248,7 +248,7 @@ Worker profili aşağıdaki bölümlerden oluşur:
 
 | Bölüm | Entity | Açıklama |
 |-------|--------|----------|
-| Temel | `Worker` | Ad, soyad, uyruk, doğum tarihi, üniversite, öğrenci no |
+| Temel | `Worker` | Ad, soyad, uyruk, doğum tarihi, üniversite |
 | Hakkında | `Worker` | Opsiyonel kısa tanıtım metni (bio); karakter üst sınırı API'de doğrulanır |
 | Profil fotoğrafı | `Worker` (veya ilişkili kullanıcı özeti) | Nesne MinIO'da saklanır; DB'de object key veya versiyon; istemciye presigned GET / kısa ömürlü URL |
 | Sosyal medya | `Worker` | `WorkerSocialLink` benzeri value object listesi: platform adı/kodu + URL (JSON veya owned collection) |

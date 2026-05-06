@@ -95,6 +95,45 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetSystemUserMeQuery(), cancellationToken);
 
+        /// <summary>Lists authenticated user's notifications with paging/filter.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List my notifications")]
+        [EndpointDescription("Returns inbox notifications for the authenticated user with optional read-state filter.")]
+        [ProducesResponseType(typeof(PageableApiResponse<SystemUserNotificationListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> MyNotifications(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ListMyNotificationsQuery? query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<SystemUserNotificationListItemModel, PagedQueryResultModel<SystemUserNotificationListItemModel>>(
+                query ?? new ListMyNotificationsQuery(),
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
+        /// <summary>Marks one inbox notification as read.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Mark notification as read")]
+        [EndpointDescription("Marks a single inbox notification as read when it belongs to the authenticated user.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> MarkNotificationAsRead(
+            [FromBody] MarkNotificationAsReadCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Marks all unread inbox notifications as read.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Mark all notifications as read")]
+        [EndpointDescription("Marks all unread inbox notifications as read for the authenticated user.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> MarkAllNotificationsAsRead(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] MarkAllNotificationsAsReadCommand? command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command ?? new MarkAllNotificationsAsReadCommand(), cancellationToken);
+
         /// <summary>Reactivates a banned system user.</summary>
         [HttpPost]
         [Consumes("application/json")]
