@@ -1,9 +1,11 @@
 namespace Azoxia.AdaIsAkademi.SeedRunner;
 
 using Azoxia.AdaIsAkademi.Persistence;
+using Azoxia.Core.Identity;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// CLI entry that loads configuration and runs <see cref="SeedPipeline"/>.
@@ -44,10 +46,15 @@ internal static class Program
             Console.WriteLine($"[SeedRunner] Connection string kaynağı: {ResolveConnectionSource(options, configuration)}");
             Console.WriteLine($"[SeedRunner] Connection string özeti: {DescribeConnectionString(connectionString)}");
 
-            var optionsBuilder = new DbContextOptionsBuilder<AdaIsAkademiDbContext>();
-            optionsBuilder.UseNpgsql(connectionString).UseLazyLoadingProxies();
+            ServiceCollection services = new();
+            services.AddLogging();
+            services.AddSingleton<IExecutionContext, SeedExecutionContext>();
+            services.AddDbContext<AdaIsAkademiDbContext>(optionsBuilder =>
+                optionsBuilder.UseNpgsql(connectionString).UseLazyLoadingProxies());
 
-            await using var db = new AdaIsAkademiDbContext(optionsBuilder.Options);
+            await using ServiceProvider serviceProvider = services.BuildServiceProvider();
+            await using AsyncServiceScope scope = serviceProvider.CreateAsyncScope();
+            AdaIsAkademiDbContext db = scope.ServiceProvider.GetRequiredService<AdaIsAkademiDbContext>();
             await SeedPipeline.RunAsync(db, options, CancellationToken.None);
             Console.WriteLine($"[SeedRunner] Tamamlandı. Süre={timer.Elapsed.TotalSeconds:F1}s");
             return 0;
