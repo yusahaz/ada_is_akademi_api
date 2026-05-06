@@ -169,9 +169,11 @@ services:
     depends_on:
       ada-is-akademi-db:
         condition: service_healthy
+      ada-is-akademi-migrate:
+        condition: service_completed_successfully
 
   ada-is-akademi-migrate:
-    profiles: ["migrate"]
+    profiles: ["migrate", "seed"]
     image: mcr.microsoft.com/dotnet/sdk:10.0-alpine
     container_name: ada-is-akademi-migrate
     restart: "no"
