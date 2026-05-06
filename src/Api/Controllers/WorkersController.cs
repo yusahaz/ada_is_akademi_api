@@ -132,6 +132,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand<int>(command, cancellationToken);
 
+        /// <summary>Confirms extracted CV preview for one upload session.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Confirm worker CV review")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> ConfirmCvReview(
+            [FromBody] ConfirmWorkerCvReviewCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Soft deletes worker and its linked system user.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -140,6 +150,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> Delete(
             [FromBody] DeleteWorkerCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Discards extracted CV preview for one upload session.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Discard worker CV review")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> DiscardCvReview(
+            [FromBody] DiscardWorkerCvReviewCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 

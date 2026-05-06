@@ -41,6 +41,7 @@ namespace Azoxia.AdaIsAkademi.Infrastructure.DependencyInjection
             });
 
             services.AddScoped<IPushNotificationSender, FakePushNotificationSender>();
+            services.AddScoped<ICvExtractionService, FakeCvExtractionService>();
         }
 
         #endregion Methods

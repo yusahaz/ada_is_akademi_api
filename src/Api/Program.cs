@@ -62,6 +62,7 @@
                 builder.Services.AddHangfireServer();
                 builder.Services.AddScoped<OverdueAlarmRecurringJob>();
                 builder.Services.AddScoped<EmbeddingRefreshRecurringJob>();
+                builder.Services.AddScoped<CvExtractionRecurringJob>();
                 builder.Services.AddScoped<RetryFailedSystemUserNotificationsRecurringJob>();
             };
 
@@ -76,6 +77,10 @@
                     recurringJobId: "embedding-refresh-sweep",
                     methodCall: x => x.ExecuteAsync(),
                     cronExpression: "0 * * * *");
+                RecurringJob.AddOrUpdate<CvExtractionRecurringJob>(
+                    recurringJobId: "cv-extraction-sweep",
+                    methodCall: x => x.ExecuteAsync(),
+                    cronExpression: "*/15 * * * *");
                 RecurringJob.AddOrUpdate<RetryFailedSystemUserNotificationsRecurringJob>(
                     recurringJobId: "notification-retry-sweep",
                     methodCall: x => x.ExecuteAsync(),

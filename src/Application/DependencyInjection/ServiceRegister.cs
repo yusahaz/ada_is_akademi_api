@@ -62,6 +62,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<ConfirmWorkerPayoutCommand, Unit>, ConfirmWorkerPayoutCommandHandler>();
             services.AddScoped<IRequestHandler<SetEmployerCommissionRateCommand, Unit>, SetEmployerCommissionRateCommandHandler>();
             services.AddScoped<IRequestHandler<BanSystemUserCommand, Unit>, BanSystemUserCommandHandler>();
+            services.AddScoped<IRequestHandler<RunCvExtractionSweepCommand, int>, RunCvExtractionSweepCommandHandler>();
             services.AddScoped<IRequestHandler<RunOverdueAlarmSweepCommand, int>, RunOverdueAlarmSweepCommandHandler>();
             services.AddScoped<IRequestHandler<RunEmbeddingRefreshSweepCommand, int>, RunEmbeddingRefreshSweepCommandHandler>();
             services.AddScoped<IRequestHandler<RetryFailedSystemUserNotificationsCommand, int>, RetryFailedSystemUserNotificationsCommandHandler>();
@@ -95,6 +96,8 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<RemoveJobPostingSkillCommand, Unit>, RemoveJobPostingSkillCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveWorkerReferenceCommand, Unit>, RemoveWorkerReferenceCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveWorkerSkillCommand, Unit>, RemoveWorkerSkillCommandHandler>();
+            services.AddScoped<IRequestHandler<ConfirmWorkerCvReviewCommand, Unit>, ConfirmWorkerCvReviewCommandHandler>();
+            services.AddScoped<IRequestHandler<DiscardWorkerCvReviewCommand, Unit>, DiscardWorkerCvReviewCommandHandler>();
             services.AddScoped<IRequestHandler<RequestSystemUserEmailVerificationCommand, Unit>, RequestSystemUserEmailVerificationCommandHandler>();
             services.AddScoped<IRequestHandler<LoginSystemUserCommand, SystemUserTokenModel>, LoginSystemUserCommandHandler>();
             services.AddScoped<IRequestHandler<LogoutSystemUserCommand, Unit>, LogoutSystemUserCommandHandler>();
@@ -186,6 +189,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ConfirmWorkerPayoutCommand>, ConfirmWorkerPayoutCommandValidator>();
             services.AddScoped<IRequestValidator<SetEmployerCommissionRateCommand>, SetEmployerCommissionRateCommandValidator>();
             services.AddScoped<IRequestValidator<BanSystemUserCommand>, BanSystemUserCommandValidator>();
+            services.AddScoped<IRequestValidator<RunCvExtractionSweepCommand>, RunCvExtractionSweepCommandValidator>();
             services.AddScoped<IRequestValidator<RunOverdueAlarmSweepCommand>, RunOverdueAlarmSweepCommandValidator>();
             services.AddScoped<IRequestValidator<RunEmbeddingRefreshSweepCommand>, RunEmbeddingRefreshSweepCommandValidator>();
             services.AddScoped<IRequestValidator<RetryFailedSystemUserNotificationsCommand>, RetryFailedSystemUserNotificationsCommandValidator>();
@@ -198,6 +202,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ClearWorkerProfilePhotoCommand>, ClearWorkerProfilePhotoCommandValidator>();
             services.AddScoped<IRequestValidator<ConfirmEmployerLogoUploadCommand>, ConfirmEmployerLogoUploadCommandValidator>();
             services.AddScoped<IRequestValidator<ConfirmWorkerCvUploadCommand>, ConfirmWorkerCvUploadCommandValidator>();
+            services.AddScoped<IRequestValidator<ConfirmWorkerCvReviewCommand>, ConfirmWorkerCvReviewCommandValidator>();
             services.AddScoped<IRequestValidator<ConfirmWorkerProfilePhotoUploadCommand>, ConfirmWorkerProfilePhotoUploadCommandValidator>();
             services.AddScoped<IRequestValidator<CompleteJobPostingCommand>, CompleteJobPostingCommandValidator>();
             services.AddScoped<IRequestValidator<CreateShiftAssignmentCommand>, CreateShiftAssignmentCommandValidator>();
@@ -257,6 +262,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<RemoveJobPostingSkillCommand>, RemoveJobPostingSkillCommandValidator>();
             services.AddScoped<IRequestValidator<RemoveWorkerReferenceCommand>, RemoveWorkerReferenceCommandValidator>();
             services.AddScoped<IRequestValidator<RemoveWorkerSkillCommand>, RemoveWorkerSkillCommandValidator>();
+            services.AddScoped<IRequestValidator<DiscardWorkerCvReviewCommand>, DiscardWorkerCvReviewCommandValidator>();
             services.AddScoped<IRequestValidator<RequestSystemUserEmailVerificationCommand>, RequestSystemUserEmailVerificationCommandValidator>();
             services.AddScoped<IRequestValidator<SuspendEmployerCommand>, SuspendEmployerCommandValidator>();
             services.AddScoped<IRequestValidator<SuspendSystemUserCommand>, SuspendSystemUserCommandValidator>();

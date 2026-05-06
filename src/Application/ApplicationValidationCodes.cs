@@ -248,6 +248,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "FileSizeBytes must be between 1 and 10485760.");
 
         /// <summary>
+        /// CV upload session identifier must be positive for review actions.
+        /// </summary>
+        internal static readonly ErrorCode WorkerCvUploadSessionIdRequired = new(
+            Code: "AZX_ADA_APP_VAL_969",
+            ErrorMessage: "CvUploadSessionId must be greater than zero.");
+
+        /// <summary>
         /// Expected salary currency must be a three-letter ISO code when provided.
         /// </summary>
         internal static readonly ErrorCode UpdateWorkerMatchingExpectedSalaryCurrencyLength = new(
