@@ -2,7 +2,7 @@ name: AdaIsAkademi
 
 services:
   ada-is-akademi-db:
-    image: postgres:17-alpine
+    image: pgvector/pgvector:pg17
     container_name: ada-is-akademi-db
     restart: unless-stopped
     environment:
@@ -174,12 +174,11 @@ services:
 
   ada-is-akademi-migrate:
     profiles: ["migrate", "seed"]
-    image: mcr.microsoft.com/dotnet/sdk:10.0-alpine
+    build:
+      context: ..
+      dockerfile: tools/AdaIsAkademi.Migrator/Dockerfile
     container_name: ada-is-akademi-migrate
     restart: "no"
-    working_dir: /workspace
-    volumes:
-      - ../:/workspace
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       DbConfig__Provider: 30
@@ -188,15 +187,6 @@ services:
       DbConfig__Database: ${DB_NAME}
       DbConfig__Username: ${DB_USER}
       DbConfig__Password: ${DB_PASS}
-    command:
-      - /bin/sh
-      - -c
-      - >
-        dotnet tool install --global dotnet-ef --version 10.* &&
-        export PATH="$$PATH:/root/.dotnet/tools" &&
-        dotnet ef database update
-        --project src/Persistence/Persistence.csproj
-        --startup-project src/Api/Api.csproj
     depends_on:
       ada-is-akademi-db:
         condition: service_healthy
