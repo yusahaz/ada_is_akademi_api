@@ -50,7 +50,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         protected SystemUser() { }
 
         /// <summary>
-        /// Creates a pending user with hashed password material.
+        /// Creates an active user with hashed password material.
         /// </summary>
         /// <param name="email">Login email.</param>
         /// <param name="password">Plaintext password to hash.</param>
@@ -62,7 +62,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         {
             Email = email;
             Type = type;
-            AccountStatus = AccountStatus.Pending;
+            AccountStatus = AccountStatus.Active;
             PasswordSalt = GeneratePasswordSalt();
             PasswordHash = GeneratePasswordHash(password);
         }
