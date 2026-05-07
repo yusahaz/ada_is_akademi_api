@@ -99,10 +99,13 @@ namespace Azoxia.AdaIsAkademi.Application
         protected override async Task<SystemUserTokenModel> HandleAsync(LoginSystemUserCommand command, CancellationToken cancellationToken)
         {
             ITokenService tokenService = ServiceProvider.GetRequiredService<ITokenService>();
+            string normalizedEmail = command.Email.Trim().ToLowerInvariant();
 
             Logger.LogInformation(
-                "Login request received. Email={Email}, SystemUserType={SystemUserType}, Platform={Platform}, DeviceIdentifier={DeviceIdentifier}, HasDeviceToken={HasDeviceToken}.",
+                "Login request received. Email={Email}, EmailLength={EmailLength}, TrimmedEmailLength={TrimmedEmailLength}, SystemUserType={SystemUserType}, Platform={Platform}, DeviceIdentifier={DeviceIdentifier}, HasDeviceToken={HasDeviceToken}.",
                 command.Email,
+                command.Email.Length,
+                normalizedEmail.Length,
                 (int)command.SystemUserType,
                 (int)command.Platform,
                 command.DeviceIdentifier,
@@ -111,17 +114,49 @@ namespace Azoxia.AdaIsAkademi.Application
             SystemUser? user = await UnitOfWork
                 .GetRepository<SystemUser>()
                 .Filter(x =>
-                    x.Email == command.Email
+                    x.Email.ToLower() == normalizedEmail
                     && (command.SystemUserType == SystemUserType.Admin || x.Type == command.SystemUserType))
                 .AsSplitQuery()
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(cancellationToken);
+            if (user is not null)
+            {
+                Logger.LogInformation(
+                    "Login user lookup succeeded. Id={Id}, Email={Email}, Type={Type}, AccountStatus={AccountStatus}, IsLocked={IsLocked}, IsDeleted={IsDeleted}, CreatedAt={CreatedAt}, CreatedBy={CreatedBy}, UpdatedAt={UpdatedAt}, UpdatedBy={UpdatedBy}, DeletedAt={DeletedAt}, DeletedBy={DeletedBy}, EmailVerificationExpiresAt={EmailVerificationExpiresAt}, HasEmailVerificationToken={HasEmailVerificationToken}, EmailVerifiedAt={EmailVerifiedAt}, FailedLoginAttempts={FailedLoginAttempts}, FirstName={FirstName}, LastFailedLoginAt={LastFailedLoginAt}, LastName={LastName}, LastPasswordChangeAt={LastPasswordChangeAt}, LastSuccessfulLoginAt={LastSuccessfulLoginAt}, HasPasswordHash={HasPasswordHash}, HasPasswordSalt={HasPasswordSalt}, Phone={Phone}.",
+                    user.Id,
+                    user.Email,
+                    (int)user.Type,
+                    (int)user.AccountStatus,
+                    user.IsLocked,
+                    user.IsDeleted,
+                    user.CreatedAt,
+                    user.CreatedBy,
+                    user.UpdatedAt,
+                    user.UpdatedBy,
+                    user.DeletedAt,
+                    user.DeletedBy,
+                    user.EmailVerificationExpiresAt,
+                    !user.EmailVerificationToken.IsNullOrWhiteSpace(),
+                    user.EmailVerifiedAt,
+                    user.FailedLoginAttempts,
+                    user.FirstName,
+                    user.LastFailedLoginAt,
+                    user.LastName,
+                    user.LastPasswordChangeAt,
+                    user.LastSuccessfulLoginAt,
+                    !user.PasswordHash.IsNullOrWhiteSpace(),
+                    !user.PasswordSalt.IsNullOrWhiteSpace(),
+                    user.Phone);
+            }
+
             if (user is null)
             {
                 Logger.LogWarning(
-                    "Login user lookup failed. Email={Email}, SystemUserType={SystemUserType}.",
+                    "Login user lookup failed. Email={Email}, EmailLength={EmailLength}, TrimmedEmailLength={TrimmedEmailLength}, SystemUserType={SystemUserType}.",
                     command.Email,
+                    command.Email.Length,
+                    normalizedEmail.Length,
                     (int)command.SystemUserType);
 
                 ApplicationValidationCodes.LoginSystemUserAuthenticationFailed.Throw();
