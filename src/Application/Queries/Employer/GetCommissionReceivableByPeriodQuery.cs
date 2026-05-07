@@ -88,8 +88,12 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.CreatedAt,
                 entity.EmployerId,
                 entity.Id,
+                $"{entity.PeriodStart:yyyy-MM}",
                 entity.PeriodEnd,
-                entity.PeriodStart);
+                entity.PeriodStart,
+                "Invoiced",
+                entity.PeriodEnd.AddDays(14),
+                null);
 
             await CacheService.SetAsync(
                 cacheKey,

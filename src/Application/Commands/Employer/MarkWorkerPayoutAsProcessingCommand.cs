@@ -14,7 +14,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Marks worker payout as processing by employer.
     /// </summary>
     public class MarkWorkerPayoutAsProcessingCommand :
-        CommandBase
+        CommandBase<WorkerPayoutSnapshotModel>
     {
         #region Properties
 
@@ -43,12 +43,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class MarkWorkerPayoutAsProcessingCommandHandler(IServiceProvider serviceProvider) :
-        CommandHandlerBase<MarkWorkerPayoutAsProcessingCommand>(serviceProvider)
+        CommandHandlerBase<MarkWorkerPayoutAsProcessingCommand, WorkerPayoutSnapshotModel>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<Unit> HandleAsync(MarkWorkerPayoutAsProcessingCommand command, CancellationToken cancellationToken)
+        protected override async Task<WorkerPayoutSnapshotModel> HandleAsync(MarkWorkerPayoutAsProcessingCommand command, CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
             int employerId = executionContext.RequireAdaIsEmployerActorId();
@@ -78,7 +78,11 @@ namespace Azoxia.AdaIsAkademi.Application
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutWorkerDependency(payout.WorkerId), cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
 
-            return Unit.Value;
+            return new WorkerPayoutSnapshotModel(
+                payout.Id,
+                payout.Status,
+                payout.Status == WorkerPayoutStatus.Processing,
+                payout.ProcessingMarkedAt ?? DateTimeOffset.UtcNow);
         }
 
         #endregion Utils

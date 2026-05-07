@@ -3,6 +3,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests.Support
     using Azoxia.AdaIsAkademi.Application.Services;
     using Azoxia.AdaIsAkademi.Persistence;
     using Azoxia.Core.Application.Caching;
+    using Azoxia.Core.Application;
     using Azoxia.Core.Identity;
     using Azoxia.Core.Persistence;
     using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests.Support
             services.AddScoped<IUnitOfWork, UnitOfWork<AdaIsAkademiDbContext>>();
             services.AddScoped<IWorkerProfileCompletionEvaluator, WorkerProfileCompletionEvaluator>();
             services.AddScoped<IWorkerEmployerProfileAccess, WorkerEmployerProfileAccess>();
+            services.AddScoped<IPermissionResolver, PermissionResolver>();
             services.AddSingleton<IObjectStoragePresigner, TestObjectStoragePresigner>();
             services.AddSingleton<ICacheService, NullCacheService>();
             services.AddSingleton<IExecutionContext>(executionContext ?? new TestExecutionContext());

@@ -14,7 +14,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Retries failed worker payout and returns it to pending.
     /// </summary>
     public class RetryWorkerPayoutCommand :
-        CommandBase
+        CommandBase<WorkerPayoutSnapshotModel>
     {
         #region Properties
 
@@ -43,12 +43,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class RetryWorkerPayoutCommandHandler(IServiceProvider serviceProvider) :
-        CommandHandlerBase<RetryWorkerPayoutCommand>(serviceProvider)
+        CommandHandlerBase<RetryWorkerPayoutCommand, WorkerPayoutSnapshotModel>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<Unit> HandleAsync(RetryWorkerPayoutCommand command, CancellationToken cancellationToken)
+        protected override async Task<WorkerPayoutSnapshotModel> HandleAsync(RetryWorkerPayoutCommand command, CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
             int employerId = executionContext.RequireAdaIsEmployerActorId();
@@ -76,7 +76,11 @@ namespace Azoxia.AdaIsAkademi.Application
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutWorkerDependency(payout.WorkerId), cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
 
-            return Unit.Value;
+            return new WorkerPayoutSnapshotModel(
+                payout.Id,
+                payout.Status,
+                false,
+                DateTimeOffset.UtcNow);
         }
 
         #endregion Utils

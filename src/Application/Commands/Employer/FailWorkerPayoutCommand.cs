@@ -14,7 +14,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Marks processing worker payout as failed.
     /// </summary>
     public class FailWorkerPayoutCommand :
-        CommandBase
+        CommandBase<WorkerPayoutSnapshotModel>
     {
         #region Properties
 
@@ -44,12 +44,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class FailWorkerPayoutCommandHandler(IServiceProvider serviceProvider) :
-        CommandHandlerBase<FailWorkerPayoutCommand>(serviceProvider)
+        CommandHandlerBase<FailWorkerPayoutCommand, WorkerPayoutSnapshotModel>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<Unit> HandleAsync(FailWorkerPayoutCommand command, CancellationToken cancellationToken)
+        protected override async Task<WorkerPayoutSnapshotModel> HandleAsync(FailWorkerPayoutCommand command, CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
             int employerId = executionContext.RequireAdaIsEmployerActorId();
@@ -78,7 +78,11 @@ namespace Azoxia.AdaIsAkademi.Application
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutWorkerDependency(payout.WorkerId), cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
 
-            return Unit.Value;
+            return new WorkerPayoutSnapshotModel(
+                payout.Id,
+                payout.Status,
+                false,
+                payout.FailedAt ?? DateTimeOffset.UtcNow);
         }
 
         #endregion Utils

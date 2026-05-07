@@ -14,7 +14,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Confirms processing payout by payout owner worker.
     /// </summary>
     public class ConfirmWorkerPayoutCommand :
-        CommandBase
+        CommandBase<WorkerPayoutSnapshotModel>
     {
         #region Properties
 
@@ -43,12 +43,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class ConfirmWorkerPayoutCommandHandler(IServiceProvider serviceProvider) :
-        CommandHandlerBase<ConfirmWorkerPayoutCommand>(serviceProvider)
+        CommandHandlerBase<ConfirmWorkerPayoutCommand, WorkerPayoutSnapshotModel>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<Unit> HandleAsync(ConfirmWorkerPayoutCommand command, CancellationToken cancellationToken)
+        protected override async Task<WorkerPayoutSnapshotModel> HandleAsync(ConfirmWorkerPayoutCommand command, CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
             int workerId = executionContext.RequireAdaIsWorkerActorId();
@@ -76,7 +76,11 @@ namespace Azoxia.AdaIsAkademi.Application
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutWorkerDependency(workerId), cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
 
-            return Unit.Value;
+            return new WorkerPayoutSnapshotModel(
+                payout.Id,
+                payout.Status,
+                false,
+                payout.PaidAt ?? DateTimeOffset.UtcNow);
         }
 
         #endregion Utils

@@ -82,6 +82,10 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
+            await CacheService.InvalidateByDependencyAsync(
+                AdaIsCacheKeys.PermissionResolverGroupPermissionAllDependency(),
+                cancellationToken);
+
             return permission.Id;
         }
 

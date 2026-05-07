@@ -40,6 +40,22 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand<int>(command, cancellationToken);
 
+        /// <summary>Lists employer locations with paging.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List employer locations")]
+        [ProducesResponseType(typeof(PageableApiResponse<EmployerLocationListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListLocations(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ListEmployerLocationsQuery? query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<EmployerLocationListItemModel, PagedQueryResultModel<EmployerLocationListItemModel>>(
+                query ?? new ListEmployerLocationsQuery(),
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
         /// <summary>Adds employer supervisor for authenticated employer.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -49,6 +65,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             [FromBody] AddEmployerSupervisorCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand<int>(command, cancellationToken);
+
+        /// <summary>Lists supervisors for employer settings.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List employer supervisors")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EmployerSupervisorListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListSupervisors(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ListEmployerSupervisorsQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new ListEmployerSupervisorsQuery(), cancellationToken);
 
         /// <summary>Bans an employer.</summary>
         [HttpPost]
@@ -86,11 +112,11 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("Create worker payout")]
         [EndpointDescription("Creates or returns existing worker payout row for a checked-out assignment.")]
-        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WorkerPayoutSnapshotModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> CreateWorkerPayout(
             [FromBody] CreateWorkerPayoutCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand<int>(command, cancellationToken);
+            => ExecuteCommand<WorkerPayoutSnapshotModel>(command, cancellationToken);
 
         /// <summary>Soft deletes an employer and linked employer users.</summary>
         [HttpPost]
@@ -120,11 +146,11 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("Fail worker payout")]
         [EndpointDescription("Marks payout as failed and increments retry counter.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WorkerPayoutSnapshotModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> FailWorkerPayout(
             [FromBody] FailWorkerPayoutCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+            => ExecuteCommand<WorkerPayoutSnapshotModel>(command, cancellationToken);
 
         /// <summary>Generates idempotent commission receivable for employer period.</summary>
         [HttpPost]
@@ -169,6 +195,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             [FromBody] GetEmployerCommissionPolicyQuery query,
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
+
+        /// <summary>Returns employer spot dashboard summary counters.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Spot dashboard summary")]
+        [ProducesResponseType(typeof(ApiResponse<SpotDashboardSummaryModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> SpotDashboardSummary(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] GetSpotDashboardSummaryQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetSpotDashboardSummaryQuery(), cancellationToken);
 
         /// <summary>Gets commission receivable detail by employer and period.</summary>
         [HttpPost]
@@ -247,6 +283,38 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
                 result => result.Offset,
                 cancellationToken);
 
+        /// <summary>Lists worker payouts for employer billing UI.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List worker payouts")]
+        [ProducesResponseType(typeof(PageableApiResponse<WorkerPayoutListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListWorkerPayouts(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ListWorkerPayoutsQuery? query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<WorkerPayoutListItemModel, PagedQueryResultModel<WorkerPayoutListItemModel>>(
+                query ?? new ListWorkerPayoutsQuery(),
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
+        /// <summary>Lists disputes for employer dispute center.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List employer disputes")]
+        [ProducesResponseType(typeof(PageableApiResponse<EmployerDisputeListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListDisputes(
+            [FromBody] ListEmployerDisputesQuery query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<EmployerDisputeListItemModel, PagedQueryResultModel<EmployerDisputeListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
         /// <summary>Lists employer commission summaries for monetization management.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -263,11 +331,11 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("Mark worker payout as processing")]
         [EndpointDescription("Employer marks payout as paid and waits for worker confirmation.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WorkerPayoutSnapshotModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> MarkWorkerPayoutAsProcessing(
             [FromBody] MarkWorkerPayoutAsProcessingCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+            => ExecuteCommand<WorkerPayoutSnapshotModel>(command, cancellationToken);
 
         /// <summary>Removes employer supervisor for authenticated employer.</summary>
         [HttpPost]
@@ -279,16 +347,36 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Updates an employer location.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update employer location")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateLocation(
+            [FromBody] UpdateEmployerLocationCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Soft deletes an employer location.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Delete employer location")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> DeleteLocation(
+            [FromBody] DeleteEmployerLocationCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Retries a failed worker payout.</summary>
         [HttpPost]
         [Consumes("application/json")]
         [EndpointSummary("Retry worker payout")]
         [EndpointDescription("Moves failed payout back to pending when retry threshold allows.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WorkerPayoutSnapshotModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> RetryWorkerPayout(
             [FromBody] RetryWorkerPayoutCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+            => ExecuteCommand<WorkerPayoutSnapshotModel>(command, cancellationToken);
 
         /// <summary>Sets employer commission rate policy.</summary>
         [HttpPost]
@@ -300,6 +388,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             [FromBody] SetEmployerCommissionRateCommand command,
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
+
+        /// <summary>Returns worker portfolio summary rows for employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker portfolio")]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<WorkerPortfolioListItemModel>>), StatusCodes.Status200OK)]
+        public Task<IActionResult> WorkerPortfolio(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] GetWorkerPortfolioQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetWorkerPortfolioQuery(), cancellationToken);
 
         /// <summary>Suspends an employer.</summary>
         [HttpPost]

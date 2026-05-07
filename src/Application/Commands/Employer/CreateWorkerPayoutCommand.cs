@@ -15,7 +15,7 @@ namespace Azoxia.AdaIsAkademi.Application
     /// Creates idempotent worker payout row from a checked-out assignment.
     /// </summary>
     public class CreateWorkerPayoutCommand :
-        CommandBase<int>
+        CommandBase<WorkerPayoutSnapshotModel>
     {
         #region Properties
 
@@ -47,12 +47,12 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class CreateWorkerPayoutCommandHandler(IServiceProvider serviceProvider) :
-        CommandHandlerBase<CreateWorkerPayoutCommand, int>(serviceProvider)
+        CommandHandlerBase<CreateWorkerPayoutCommand, WorkerPayoutSnapshotModel>(serviceProvider)
     {
         #region Utils
 
         /// <inheritdoc />
-        protected override async Task<int> HandleAsync(CreateWorkerPayoutCommand command, CancellationToken cancellationToken)
+        protected override async Task<WorkerPayoutSnapshotModel> HandleAsync(CreateWorkerPayoutCommand command, CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
             int employerId = executionContext.RequireAdaIsEmployerActorId();
@@ -63,7 +63,15 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefaultAsync(cancellationToken);
             if (existing is not null)
             {
-                return existing.Id;
+                DateTimeOffset existingUpdatedAt = existing.PaidAt
+                    ?? existing.FailedAt
+                    ?? existing.ProcessingMarkedAt
+                    ?? existing.CreatedAt;
+                return new WorkerPayoutSnapshotModel(
+                    existing.Id,
+                    existing.Status,
+                    existing.Status == WorkerPayoutStatus.Processing,
+                    existingUpdatedAt);
             }
 
             ShiftAssignment? assignment = await UnitOfWork
@@ -108,7 +116,11 @@ namespace Azoxia.AdaIsAkademi.Application
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutAllDependency(), cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
 
-            return payout.Id;
+            return new WorkerPayoutSnapshotModel(
+                payout.Id,
+                payout.Status,
+                false,
+                payout.CreatedAt);
         }
 
         #endregion Utils

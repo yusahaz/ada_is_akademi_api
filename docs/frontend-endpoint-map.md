@@ -110,6 +110,7 @@ Her endpointte asagidaki sirayla implement edin:
 - `POST JobApplications/Withdraw` -> `WithdrawJobPostingApplicationCommand` -> `ApiResponse`
 - `POST JobApplications/MyApplications` -> `ListMyJobApplicationsQuery` (bos body `{}` destekli) -> `PageableApiResponse<WorkerJobApplicationListItemModel>`
 - `POST ShiftAssignments/MyAssignments` -> `ListMyShiftAssignmentsQuery` (bos body `{}` destekli) -> `PageableApiResponse<WorkerShiftAssignmentListItemModel>`
+- `POST ShiftAssignments/ListHistory` -> `ListShiftAssignmentsHistoryQuery` -> `PageableApiResponse<ShiftAssignmentHistoryListItemModel>`
 - `POST ShiftAssignments/CheckIn` -> `CheckInShiftAssignmentCommand` -> `ApiResponse`
 - `POST ShiftAssignments/CheckOut` -> `CheckOutShiftAssignmentCommand` -> `ApiResponse`
 
@@ -121,6 +122,7 @@ Her endpointte asagidaki sirayla implement edin:
 - `POST Workers/GetDetail` -> `GetWorkerDetailQuery` -> `ApiResponse<WorkerEmployerSafeFullDetailModel>`
 - `POST Workers/RecordEmployerWorkerProfileView` -> `RecordEmployerWorkerProfileViewCommand` -> `ApiResponse<RecordEmployerWorkerProfileViewResultModel>`
 - `POST Workers/GetProfilePhotoViewUrl` -> `GetWorkerProfilePhotoViewUrlQuery` -> `ApiResponse<MediaBlobViewUrlModel>`
+- `POST Workers/SemanticSearch` -> `SemanticSearchWorkersQuery` -> `PageableApiResponse<SemanticSearchedWorkerListItemModel>`
 
 ### Is ilani yonetimi
 
@@ -140,10 +142,13 @@ Her endpointte asagidaki sirayla implement edin:
 - `POST JobApplications/Reject` -> `RejectJobPostingApplicationCommand` -> `ApiResponse`
 - `POST ShiftAssignments/Create` -> `CreateShiftAssignmentCommand` -> `ApiResponse<int>`
 - `POST ShiftAssignments/SupervisorCheckIn` -> `SupervisorCheckInShiftAssignmentCommand` -> `ApiResponse`
-- `POST Employers/CreateWorkerPayout` -> `CreateWorkerPayoutCommand` -> `ApiResponse<int>`
-- `POST Employers/MarkWorkerPayoutAsProcessing` -> `MarkWorkerPayoutAsProcessingCommand` -> `ApiResponse`
-- `POST Employers/FailWorkerPayout` -> `FailWorkerPayoutCommand` -> `ApiResponse`
-- `POST Employers/RetryWorkerPayout` -> `RetryWorkerPayoutCommand` -> `ApiResponse`
+- `POST Employers/CreateWorkerPayout` -> `CreateWorkerPayoutCommand` -> `ApiResponse<WorkerPayoutSnapshotModel>`
+- `POST Employers/MarkWorkerPayoutAsProcessing` -> `MarkWorkerPayoutAsProcessingCommand` -> `ApiResponse<WorkerPayoutSnapshotModel>`
+- `POST Employers/FailWorkerPayout` -> `FailWorkerPayoutCommand` -> `ApiResponse<WorkerPayoutSnapshotModel>`
+- `POST Employers/RetryWorkerPayout` -> `RetryWorkerPayoutCommand` -> `ApiResponse<WorkerPayoutSnapshotModel>`
+- `POST Employers/ListWorkerPayouts` -> `ListWorkerPayoutsQuery` -> `PageableApiResponse<WorkerPayoutListItemModel>`
+- `POST Employers/SpotDashboardSummary` -> `GetSpotDashboardSummaryQuery` -> `ApiResponse<SpotDashboardSummaryModel>`
+- `POST Employers/WorkerPortfolio` -> `GetWorkerPortfolioQuery` -> `ApiResponse<IReadOnlyList<WorkerPortfolioListItemModel>>`
 - `POST Employers/GenerateCommissionReceivable` -> `GenerateCommissionReceivableCommand` -> `ApiResponse<int>`
 - `POST Employers/SetCommissionPolicy` -> `SetEmployerCommissionRateCommand` -> `ApiResponse`
 - `POST Employers/GetCommissionEstimate` -> `GetEmployerCommissionEstimateQuery` -> `ApiResponse<EmployerCommissionEstimateModel>`
@@ -158,8 +163,13 @@ Her endpointte asagidaki sirayla implement edin:
 - `POST Employers/GetById` -> `GetEmployerByIdQuery` -> `ApiResponse<EmployerDetailModel>`
 - `POST Employers/GetDetail` -> `GetEmployerDetailQuery` -> `ApiResponse<EmployerFullDetailModel>`
 - `POST Employers/AddLocation` -> `AddEmployerLocationCommand` -> `ApiResponse<int>`
+- `POST Employers/ListLocations` -> `ListEmployerLocationsQuery` -> `PageableApiResponse<EmployerLocationListItemModel>`
+- `POST Employers/UpdateLocation` -> `UpdateEmployerLocationCommand` -> `ApiResponse`
+- `POST Employers/DeleteLocation` -> `DeleteEmployerLocationCommand` -> `ApiResponse`
+- `POST Employers/ListSupervisors` -> `ListEmployerSupervisorsQuery` -> `ApiResponse<IReadOnlyList<EmployerSupervisorListItemModel>>`
 - `POST Employers/AddSupervisor` -> `AddEmployerSupervisorCommand` -> `ApiResponse<int>`
 - `POST Employers/RemoveSupervisor` -> `RemoveEmployerSupervisorCommand` -> `ApiResponse`
+- `POST Employers/ListDisputes` -> `ListEmployerDisputesQuery` -> `PageableApiResponse<EmployerDisputeListItemModel>`
 - `POST Employers/UpdateSocialLinks` -> `UpdateEmployerSocialLinksCommand` -> `ApiResponse`
 - `POST Employers/InitLogoUpload` -> `InitEmployerLogoUploadCommand` -> `ApiResponse<ObjectStorageUploadInitModel>`
 - `POST Employers/ConfirmLogoUpload` -> `ConfirmEmployerLogoUploadCommand` -> `ApiResponse`

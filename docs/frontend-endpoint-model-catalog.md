@@ -1,4 +1,4 @@
-# Frontend Endpoint Model Catalog
+﻿# Frontend Endpoint Model Catalog
 
 Bu dosya endpoint map icindeki request/response modellerinin alan bazli dokumantasyonudur.
 
@@ -1169,4 +1169,54 @@ Bu dosya endpoint map icindeki request/response modellerinin alan bazli dokumant
 - Kaynak: `C:/WorkingFolder/Azoxia/AdaIsAkademi/src/Application/Queries/Assignment/WorkerShiftAssignmentListItemModel.cs`
 
 - Alanlar: Bu modelde public property bulunamadi (record ctor veya ozel pattern olabilir).
+
+## Spot-market ek modelleri
+
+### SpotDashboardSummaryModel
+
+- Kaynak: `C:/WorkingFolder/Azoxia/AdaIsAkademi/src/Application/Queries/Employer/SpotDashboardSummaryModel.cs`
+- Alanlar:
+  - `DailyFillRatePercent` (`decimal`)
+  - `ActiveWorkerCount` (`int`)
+  - `OpenPostingCount` (`int`)
+  - `PendingApplicationCount` (`int`)
+  - `ActiveAnomalyCount` (`int`)
+  - `PendingPayoutCount` (`int`)
+
+### WorkerPayoutSnapshotModel
+
+- Kaynak: `C:/WorkingFolder/Azoxia/AdaIsAkademi/src/Application/Commands/Employer/WorkerPayoutSnapshotModel.cs`
+- Alanlar:
+  - `WorkerPayoutId` (`int`)
+  - `Status` (`WorkerPayoutStatus`)
+  - `IsLocked` (`bool`)
+  - `UpdatedAt` (`DateTimeOffset`)
+
+### WorkerPayoutListItemModel
+
+- Kaynak: `C:/WorkingFolder/Azoxia/AdaIsAkademi/src/Application/Queries/Employer/WorkerPayoutListItemModel.cs`
+- Alanlar:
+  - `WorkerPayoutId`, `AssignmentId`, `WorkerId`, `WorkerName`
+  - `Amount`, `Currency`, `Status`
+  - `IsLocked`, `LockReason`, `LockedBy`, `LockedUntil`
+  - `CreatedAt`, `UpdatedAt`
+
+### SemanticSearchedWorkerListItemModel
+
+- Kaynak: `C:/WorkingFolder/Azoxia/AdaIsAkademi/src/Application/Queries/Worker/SemanticSearchedWorkerListItemModel.cs`
+- Alanlar:
+  - `WorkerId`, `FullName`
+  - `SemanticScore`, `ReliabilityScore`
+  - `LastWorkedAt`
+  - `Skills[]`, `Languages[]`
+  - `City`
+
+### EmployerSupervisorListItemModel
+
+- Kaynak: `C:/WorkingFolder/Azoxia/AdaIsAkademi/src/Application/Queries/Employer/EmployerSupervisorListItemModel.cs`
+- Alanlar:
+  - `SystemUserId`, `FullName`, `Email`
+  - `AssignedLocationIds[]`
+  - `GroupIds[]`
+  - `ScopeType` (`MembershipScopeType`)
 

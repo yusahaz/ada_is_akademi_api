@@ -1,6 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 WORKDIR /
 
+RUN apk add --no-cache krb5-libs
+
 COPY src/ /src/
 COPY Core/ /Core/
 

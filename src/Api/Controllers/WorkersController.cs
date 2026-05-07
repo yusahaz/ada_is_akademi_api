@@ -105,11 +105,11 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [Consumes("application/json")]
         [EndpointSummary("Confirm worker payout")]
         [EndpointDescription("Worker confirms payout transfer and closes payout lifecycle.")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WorkerPayoutSnapshotModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> ConfirmPayout(
             [FromBody] ConfirmWorkerPayoutCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+            => ExecuteCommand<WorkerPayoutSnapshotModel>(command, cancellationToken);
 
         /// <summary>Persists uploaded profile photo object key after PUT success.</summary>
         [HttpPost]
@@ -260,6 +260,22 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             [FromBody] ListWorkersQuery query,
             CancellationToken cancellationToken)
             => ExecutePageQuery<WorkerListItemModel, PagedQueryResultModel<WorkerListItemModel>>(
+                query,
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
+        /// <summary>Runs employer-scoped semantic worker search.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Semantic search workers")]
+        [ProducesResponseType(typeof(PageableApiResponse<SemanticSearchedWorkerListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> SemanticSearch(
+            [FromBody] SemanticSearchWorkersQuery query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<SemanticSearchedWorkerListItemModel, PagedQueryResultModel<SemanticSearchedWorkerListItemModel>>(
                 query,
                 result => result.Items,
                 result => result.TotalCount,

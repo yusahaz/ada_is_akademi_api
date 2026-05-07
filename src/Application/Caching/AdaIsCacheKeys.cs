@@ -417,6 +417,33 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static CacheDependency CommissionAuditLogAllDependency() =>
             new(nameof(CommissionAuditLog), "all");
 
+        /// <summary>
+        /// Cache key for per-user permission resolver effective rule sets.
+        /// </summary>
+        internal static CacheKey PermissionResolverCacheKey(int systemUserId, int? employerId) =>
+            new(
+                "auth",
+                "PermissionResolver",
+                $"{systemUserId.ToString(CultureInfo.InvariantCulture)}:{employerId?.ToString(CultureInfo.InvariantCulture) ?? "null"}");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide permission resolver memberships.
+        /// </summary>
+        internal static CacheDependency PermissionResolverMembershipAllDependency() =>
+            new(nameof(SystemUserGroupMembership), "all");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide permission resolver group permission rules.
+        /// </summary>
+        internal static CacheDependency PermissionResolverGroupPermissionAllDependency() =>
+            new(nameof(SystemUserGroupPermission), "all");
+
+        /// <summary>
+        /// Invalidation tag for aggregate-wide permission resolver group definitions (activation/deactivation).
+        /// </summary>
+        internal static CacheDependency PermissionResolverGroupAllDependency() =>
+            new(nameof(SystemUserGroup), "all");
+
         #endregion Methods
     }
 }

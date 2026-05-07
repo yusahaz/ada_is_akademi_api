@@ -110,6 +110,10 @@ namespace Azoxia.AdaIsAkademi.Application
                     SystemUserGroupMembership membership = new(adminGroup.Id, user.Id);
                     UnitOfWork.Add(membership);
                     await UnitOfWork.SaveChangesAsync(cancellationToken);
+
+                    await CacheService.InvalidateByDependencyAsync(
+                        AdaIsCacheKeys.PermissionResolverMembershipAllDependency(),
+                        cancellationToken);
                 }
             }
 

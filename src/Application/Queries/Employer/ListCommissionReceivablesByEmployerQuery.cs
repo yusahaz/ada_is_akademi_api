@@ -97,8 +97,12 @@ namespace Azoxia.AdaIsAkademi.Application
                             x.Amount.Currency,
                             x.CreatedAt,
                             x.Id,
+                            $"{x.PeriodStart:yyyy-MM}",
                             x.PeriodEnd,
-                            x.PeriodStart),
+                            x.PeriodStart,
+                            "Invoiced",
+                            x.PeriodEnd.AddDays(14),
+                            null),
                         cancellationToken))
                 .ToList();
 

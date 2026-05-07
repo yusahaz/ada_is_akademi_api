@@ -11,7 +11,11 @@ namespace Azoxia.AdaIsAkademi.Application
         DateTimeOffset CreatedAt,
         int EmployerId,
         int Id,
+    string Period,
         DateOnly PeriodEnd,
-        DateOnly PeriodStart) :
+    DateOnly PeriodStart,
+    string Status,
+    DateOnly DueDate,
+    string? InvoicePdfUrl) :
         ModelBase;
 }
