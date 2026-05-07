@@ -87,11 +87,42 @@ namespace Azoxia.AdaIsAkademi.Application
                         x.Status,
                         x.AppliedAt,
                         x.Note,
+                        x.JobPosting.Title,
+                        x.JobPosting.Employer.Name,
+                        x.JobPosting.Employer.LogoObjectKey,
+                        x.JobPosting.EmployerLocation.Address.City + ", " + x.JobPosting.EmployerLocation.Address.Country,
                         x.JobPosting.ShiftDate,
                         x.JobPosting.ShiftStartTime,
-                        x.JobPosting.ShiftEndTime),
+                        x.JobPosting.ShiftEndTime,
+                        null),
                     cancellationToken))
                 .ToList();
+
+            if (rows.Count > 0)
+            {
+                List<int> applicationIds = rows
+                    .Select(x => x.ApplicationId)
+                    .ToList();
+
+                Dictionary<int, int> assignmentByApplicationId = (await UnitOfWork
+                    .GetRepository<ShiftAssignment>()
+                    .Filter(x => applicationIds.Contains(x.JobApplicationId))
+                    .AsNoTracking()
+                    .ToListAsync(
+                        x => new { x.JobApplicationId, x.Id },
+                        cancellationToken))
+                    .GroupBy(x => x.JobApplicationId)
+                    .ToDictionary(x => x.Key, x => x.Max(y => y.Id));
+
+                rows = rows
+                    .Select(x => x with
+                    {
+                        AssignmentId = assignmentByApplicationId.TryGetValue(x.ApplicationId, out int assignmentId)
+                            ? assignmentId
+                            : null
+                    })
+                    .ToList();
+            }
 
             PagedQueryResultModel<WorkerJobApplicationListItemModel> result =
                 new(rows, totalCount, query.Limit, query.Offset);
@@ -101,7 +132,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 result,
                 AdaIsCacheKeys.DetailReadModelOptions(
                     AdaIsCacheKeys.WorkerDependency(workerId),
-                    AdaIsCacheKeys.JobApplicationAllDependency()),
+                    AdaIsCacheKeys.JobApplicationAllDependency(),
+                    AdaIsCacheKeys.ShiftAssignmentAllDependency()),
                 cancellationToken);
 
             return result;

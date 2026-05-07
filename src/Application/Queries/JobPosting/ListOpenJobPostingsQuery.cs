@@ -95,7 +95,14 @@ namespace Azoxia.AdaIsAkademi.Application
                         x.Wage.Amount,
                         x.Wage.Currency,
                         x.EmployerId,
-                        x.HeadCount),
+                        x.Employer.Name,
+                        x.Employer.LogoObjectKey,
+                        x.EmployerLocation.Address.City + ", " + x.EmployerLocation.Address.Country,
+                        x.HeadCount,
+                        x.Applications.Count,
+                        x.Skills.Select(skill => skill.Tag.Value).ToList(),
+                        x.Skills.Where(skill => skill.IsRequired).Select(skill => skill.Tag.Value).ToList(),
+                        x.Description),
                     cancellationToken);
 
             List<JobPostingSummaryModel> list = rows.ToList();

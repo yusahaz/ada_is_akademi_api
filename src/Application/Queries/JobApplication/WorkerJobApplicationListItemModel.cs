@@ -12,8 +12,13 @@ namespace Azoxia.AdaIsAkademi.Application
         JobApplicationStatus Status,
         DateTimeOffset AppliedAt,
         string? Note,
+        string JobTitle,
+        string EmployerName,
+        string? EmployerLogoObjectKey,
+        string LocationText,
         DateOnly ShiftDate,
         TimeOnly ShiftStartTime,
-        TimeOnly ShiftEndTime) :
+        TimeOnly ShiftEndTime,
+        int? AssignmentId) :
         ModelBase;
 }

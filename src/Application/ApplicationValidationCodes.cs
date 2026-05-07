@@ -892,6 +892,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Password cannot be null, empty, or whitespace.");
 
         /// <summary>
+        /// System user type is required and must be one of Admin, Employer, or Worker for login.
+        /// </summary>
+        internal static readonly ErrorCode LoginSystemUserTypeRequired = new(
+            Code: "AZX_ADA_APP_VAL_977",
+            ErrorMessage: "SystemUserType must be Admin, Employer, or Worker.");
+
+        /// <summary>
         /// Credentials are invalid or the account is not eligible for login.
         /// </summary>
         internal static readonly ErrorCode LoginSystemUserAuthenticationFailed = new(

@@ -39,6 +39,11 @@ namespace Azoxia.AdaIsAkademi.Application
         public string Password { get; set; }
 
         /// <summary>
+        /// Declares which audience panel is attempting login (Admin/Employer/Worker).
+        /// </summary>
+        public SystemUserType SystemUserType { get; set; }
+
+        /// <summary>
         /// Client platform for device registration.
         /// </summary>
         public DevicePlatform Platform { get; set; }
@@ -70,6 +75,14 @@ namespace Azoxia.AdaIsAkademi.Application
                 failures.Add(ApplicationValidationCodes.LoginSystemUserDeviceIdentifierRequired.ForField(nameof(request.DeviceIdentifier)));
             }
 
+            bool isKnownType = request.SystemUserType is SystemUserType.Admin
+                or SystemUserType.Employer
+                or SystemUserType.Worker;
+            if (!isKnownType)
+            {
+                failures.Add(ApplicationValidationCodes.LoginSystemUserTypeRequired.ForField(nameof(request.SystemUserType)));
+            }
+
             return new ValidationResult(failures);
         }
 
@@ -88,7 +101,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             SystemUser? user = await UnitOfWork
                 .GetRepository<SystemUser>()
-                .Filter(x => x.Email == command.Email)
+                .Filter(x =>
+                    x.Email == command.Email
+                    && (command.SystemUserType == SystemUserType.Admin || x.Type == command.SystemUserType))
                 .AsSplitQuery()
                 .Include(x => x.Devices)
                 .Include(x => x.RefreshTokens)

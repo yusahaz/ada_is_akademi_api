@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
+    using System.Collections.Generic;
     using Azoxia.Core.Application.Models;
     using System;
 
@@ -15,6 +16,13 @@ namespace Azoxia.AdaIsAkademi.Application
         decimal WageAmount,
         string WageCurrency,
         int EmployerId,
-        int HeadCount) :
+        string EmployerName,
+        string? EmployerLogoObjectKey,
+        string LocationText,
+        int HeadCount,
+        int ApplicationCount,
+        IReadOnlyList<string> Tags,
+        IReadOnlyList<string> RequiredTags,
+        string Description) :
         ModelBase;
 }
