@@ -157,13 +157,13 @@ services:
     command:
       - --reset
       - --workers
-      - "10000"
+      - "100"
       - --employers
-      - "2000"
+      - "100"
       - --open-postings
-      - "5000"
+      - "50"
       - --closed-postings
-      - "5000"
+      - "50"
       - --seed
       - "12345"
       - --allow-production
