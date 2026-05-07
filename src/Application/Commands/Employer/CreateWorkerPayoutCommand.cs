@@ -98,15 +98,13 @@ namespace Azoxia.AdaIsAkademi.Application
                 grossAmount,
                 commissionAmount);
 
+            // Persist payout + audit append in a single unit-of-work commit to avoid partial writes.
             UnitOfWork.Add(payout);
-            await UnitOfWork.SaveChangesAsync(cancellationToken);
-
             UnitOfWork.Add(new CommissionAuditLog(
                 employerId,
                 CommissionAuditEventType.WorkerPayoutCreated,
                 commissionAmount,
                 assignmentId: assignment.Id,
-                workerPayoutId: payout.Id,
                 note: "created_from_checked_out_assignment"));
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 

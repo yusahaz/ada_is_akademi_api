@@ -85,9 +85,20 @@ namespace Azoxia.AdaIsAkademi.Application
                 return new PagedQueryResultModel<SemanticSearchedWorkerListItemModel>([], 0, query.Limit, query.Offset);
             }
 
+            int prefetchSize = checked(query.Limit * 4);
+            List<int> pagedCandidateWorkerIds = candidateWorkerIds
+                .OrderBy(x => x)
+                .Skip(query.Offset)
+                .Take(prefetchSize)
+                .ToList();
+            if (pagedCandidateWorkerIds.Count == 0)
+            {
+                return new PagedQueryResultModel<SemanticSearchedWorkerListItemModel>([], candidateWorkerIds.Count, query.Limit, query.Offset);
+            }
+
             List<SemanticSearchedWorkerListItemModel> rows = (await UnitOfWork
                 .GetRepository<Worker>()
-                .Filter(x => candidateWorkerIds.Contains(x.Id) && !x.IsDeleted)
+                .Filter(x => pagedCandidateWorkerIds.Contains(x.Id) && !x.IsDeleted)
                 .AsNoTracking()
                 .AsSplitQuery()
                 .Include(x => x.SystemUser)
@@ -116,8 +127,8 @@ namespace Azoxia.AdaIsAkademi.Application
                 .ThenByDescending(x => x.ReliabilityScore)
                 .ToList();
 
-            int totalCount = rows.Count;
-            IReadOnlyList<SemanticSearchedWorkerListItemModel> paged = rows.Skip(query.Offset).Take(query.Limit).ToList();
+            int totalCount = candidateWorkerIds.Count;
+            IReadOnlyList<SemanticSearchedWorkerListItemModel> paged = rows.Take(query.Limit).ToList();
             PagedQueryResultModel<SemanticSearchedWorkerListItemModel> result = new(paged, totalCount, query.Limit, query.Offset);
 
             await CacheService.SetAsync(

@@ -55,22 +55,41 @@ namespace Azoxia.AdaIsAkademi.Application
                 return cached;
             }
 
-            List<int> workerIds = (await UnitOfWork
+            List<ShiftAssignment> assignments = (await UnitOfWork
                 .GetRepository<ShiftAssignment>()
                 .Filter(x => x.JobPosting.EmployerId == employerId)
                 .AsNoTracking()
-                .ToListAsync(x => x.WorkerId, cancellationToken))
-                .Distinct()
+                .ToListAsync(cancellationToken))
                 .ToList();
-
-            if (workerIds.Count == 0)
+            if (assignments.Count == 0)
             {
                 return [];
             }
 
-            IReadOnlyList<WorkerPortfolioListItemModel> rows = (await UnitOfWork
+            List<(int WorkerId, decimal Reliability, int Completed, int NoShow, int Dispute, DateTimeOffset? LastWorkedAt)> topWorkerStats = assignments
+                .GroupBy(x => x.WorkerId)
+                .Select(group =>
+                {
+                    List<ShiftAssignment> workerAssignments = group.ToList();
+                    int completed = workerAssignments.Count(x => x.Status == ShiftAssignmentStatus.CheckedOut);
+                    int noShow = workerAssignments.Count(x => x.Status == ShiftAssignmentStatus.Pending && x.CheckedInAt == null);
+                    int dispute = workerAssignments.Count(x => x.Status != ShiftAssignmentStatus.CheckedOut);
+                    DateTimeOffset? lastWorkedAt = workerAssignments
+                        .Where(x => x.CheckedOutAt.HasValue)
+                        .OrderByDescending(x => x.CheckedOutAt)
+                        .Select(x => x.CheckedOutAt)
+                        .FirstOrDefault();
+                    decimal reliability = decimal.Max(0m, decimal.Min(100m, 100m - (noShow * 12m) - (dispute * 8m) + (completed * 2m)));
+                    return (WorkerId: group.Key, Reliability: reliability, Completed: completed, NoShow: noShow, Dispute: dispute, LastWorkedAt: lastWorkedAt);
+                })
+                .OrderByDescending(x => x.Reliability)
+                .ThenByDescending(x => x.Completed)
+                .Take(query.Limit)
+                .ToList();
+            List<int> topWorkerIds = topWorkerStats.Select(x => x.WorkerId).ToList();
+            Dictionary<int, WorkerPortfolioListItemModel> workerRowsById = (await UnitOfWork
                 .GetRepository<Worker>()
-                .Filter(x => workerIds.Contains(x.Id) && !x.IsDeleted)
+                .Filter(x => topWorkerIds.Contains(x.Id) && !x.IsDeleted)
                 .AsNoTracking()
                 .Include(x => x.SystemUser)
                 .ToListAsync(
@@ -83,42 +102,22 @@ namespace Azoxia.AdaIsAkademi.Application
                         0,
                         null),
                     cancellationToken))
-                .ToList();
+                .ToDictionary(x => x.WorkerId);
 
-            Dictionary<int, List<ShiftAssignment>> assignmentsByWorker = (await UnitOfWork
-                .GetRepository<ShiftAssignment>()
-                .Filter(x => x.JobPosting.EmployerId == employerId && workerIds.Contains(x.WorkerId))
-                .AsNoTracking()
-                .ToListAsync(cancellationToken))
-                .GroupBy(x => x.WorkerId)
-                .ToDictionary(x => x.Key, x => x.ToList());
-
-            IReadOnlyList<WorkerPortfolioListItemModel> projected = rows
-                .Select(row =>
+            IReadOnlyList<WorkerPortfolioListItemModel> projected = topWorkerStats
+                .Where(x => workerRowsById.ContainsKey(x.WorkerId))
+                .Select(x =>
                 {
-                    assignmentsByWorker.TryGetValue(row.WorkerId, out List<ShiftAssignment>? assignments);
-                    assignments ??= [];
-                    int completed = assignments.Count(x => x.Status == ShiftAssignmentStatus.CheckedOut);
-                    int noShow = assignments.Count(x => x.Status == ShiftAssignmentStatus.Pending && x.CheckedInAt == null);
-                    int dispute = assignments.Count(x => x.Status != ShiftAssignmentStatus.CheckedOut);
-                    DateTimeOffset? lastWorkedAt = assignments
-                        .Where(x => x.CheckedOutAt.HasValue)
-                        .OrderByDescending(x => x.CheckedOutAt)
-                        .Select(x => x.CheckedOutAt)
-                        .FirstOrDefault();
-                    decimal reliability = decimal.Max(0m, decimal.Min(100m, 100m - (noShow * 12m) - (dispute * 8m) + (completed * 2m)));
+                    WorkerPortfolioListItemModel row = workerRowsById[x.WorkerId];
                     return row with
                     {
-                        ReliabilityScore = reliability,
-                        CompletedAssignmentCount = completed,
-                        NoShowCount = noShow,
-                        DisputeCount = dispute,
-                        LastWorkedAt = lastWorkedAt
+                        ReliabilityScore = x.Reliability,
+                        CompletedAssignmentCount = x.Completed,
+                        NoShowCount = x.NoShow,
+                        DisputeCount = x.Dispute,
+                        LastWorkedAt = x.LastWorkedAt
                     };
                 })
-                .OrderByDescending(x => x.ReliabilityScore)
-                .ThenByDescending(x => x.CompletedAssignmentCount)
-                .Take(query.Limit)
                 .ToList();
 
             await CacheService.SetAsync(

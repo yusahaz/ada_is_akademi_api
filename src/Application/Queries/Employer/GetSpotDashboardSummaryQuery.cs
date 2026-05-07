@@ -54,10 +54,18 @@ namespace Azoxia.AdaIsAkademi.Application
                 .Filter(x => x.JobPosting.EmployerId == employerId && x.Status == JobApplicationStatus.Accepted)
                 .CountAsync(cancellationToken));
 
-            int activeWorkerCount = checked((int)await UnitOfWork
-                .GetRepository<Worker>()
-                .Filter(x => !x.IsDeleted && x.SystemUser.AccountStatus == AccountStatus.Active)
-                .CountAsync(cancellationToken));
+            List<int> employerWorkerIds = (await UnitOfWork
+                .GetRepository<ShiftAssignment>()
+                .Filter(x =>
+                    x.JobPosting.EmployerId == employerId
+                    && !x.Worker.IsDeleted
+                    && x.Worker.SystemUser.AccountStatus == AccountStatus.Active)
+                .AsNoTracking()
+                .ToListAsync(x => x.WorkerId, cancellationToken))
+                .ToList();
+            int activeWorkerCount = employerWorkerIds
+                .Distinct()
+                .Count();
 
             int activeAnomalyCount = checked((int)await UnitOfWork
                 .GetRepository<ShiftAssignment>()
