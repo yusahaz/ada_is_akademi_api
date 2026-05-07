@@ -7,6 +7,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Validation;
     using Azoxia.Core.Extensions;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
     using System;
     using System.Security.Claims;
 
@@ -99,6 +100,14 @@ namespace Azoxia.AdaIsAkademi.Application
         {
             ITokenService tokenService = ServiceProvider.GetRequiredService<ITokenService>();
 
+            Logger.LogInformation(
+                "Login request received. Email={Email}, SystemUserType={SystemUserType}, Platform={Platform}, DeviceIdentifier={DeviceIdentifier}, HasDeviceToken={HasDeviceToken}.",
+                command.Email,
+                (int)command.SystemUserType,
+                (int)command.Platform,
+                command.DeviceIdentifier,
+                !command.DeviceToken.IsNullOrWhiteSpace());
+
             SystemUser? user = await UnitOfWork
                 .GetRepository<SystemUser>()
                 .Filter(x =>
@@ -110,6 +119,11 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefaultAsync(cancellationToken);
             if (user is null)
             {
+                Logger.LogWarning(
+                    "Login user lookup failed. Email={Email}, SystemUserType={SystemUserType}.",
+                    command.Email,
+                    (int)command.SystemUserType);
+
                 ApplicationValidationCodes.LoginSystemUserAuthenticationFailed.Throw();
             }
 
