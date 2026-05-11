@@ -155,10 +155,11 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       ConnectionStrings__AdaIs: Host=ada-is-akademi-db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS}
     command:
+      - --reset
       - --workers
       - "100"
       - --employers
-      - "20"
+      - "100"
       - --open-postings
       - "50"
       - --closed-postings

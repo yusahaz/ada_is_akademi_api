@@ -903,7 +903,7 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static readonly ErrorCode LoginSystemUserAuthenticationFailed = new(
             Code: "AZX_ADA_APP_VAL_925",
-            ErrorMessage: "Email/password combination is invalid or the account cannot sign in.");
+            ErrorMessage: "Sign-in failed: credentials are invalid or the account is locked/inactive.");
 
         /// <summary>
         /// Device identifier is required when logging out a system user.
