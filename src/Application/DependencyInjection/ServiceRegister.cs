@@ -153,6 +153,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<GetJobPostingByIdQuery, JobPostingDetailModel>, GetJobPostingByIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListMyNotificationsQuery, PagedQueryResultModel<SystemUserNotificationListItemModel>>, ListMyNotificationsQueryHandler>();
             services.AddScoped<IRequestHandler<GetSystemUserMeQuery, SystemUserMeModel>, GetSystemUserMeQueryHandler>();
+            services.AddScoped<IRequestHandler<GetSystemUserByIdQuery, SystemUserMeModel>, GetSystemUserByIdQueryHandler>();
             services.AddScoped<IRequestHandler<ListSystemUsersQuery, PagedQueryResultModel<SystemUserListItemModel>>, ListSystemUsersQueryHandler>();
             services.AddScoped<IRequestHandler<GetWorkerPersonalizedNotificationPreviewQuery, WorkerNotificationPreviewModel>, GetWorkerPersonalizedNotificationPreviewQueryHandler>();
             services.AddScoped<IRequestHandler<GetWorkerProfilePhotoViewUrlQuery, MediaBlobViewUrlModel>, GetWorkerProfilePhotoViewUrlQueryHandler>();
@@ -253,6 +254,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<GetJobPostingByIdQuery>, GetJobPostingByIdQueryValidator>();
             services.AddScoped<IRequestValidator<ListMyNotificationsQuery>, ListMyNotificationsQueryValidator>();
             services.AddScoped<IRequestValidator<GetSystemUserMeQuery>, GetSystemUserMeQueryValidator>();
+            services.AddScoped<IRequestValidator<GetSystemUserByIdQuery>, GetSystemUserByIdQueryValidator>();
             services.AddScoped<IRequestValidator<ListSystemUsersQuery>, ListSystemUsersQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerPersonalizedNotificationPreviewQuery>, GetWorkerPersonalizedNotificationPreviewQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerProfilePhotoViewUrlQuery>, GetWorkerProfilePhotoViewUrlQueryValidator>();

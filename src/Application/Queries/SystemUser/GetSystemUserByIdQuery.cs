@@ -53,7 +53,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 user.Phone,
                 user.AccountStatus,
                 user.IsLocked,
-                user.EmployerId,
+                null,
                 null);
         }
     }

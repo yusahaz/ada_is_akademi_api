@@ -37,17 +37,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
 
         [HttpPost]
         [Consumes("application/json")]
-        [EndpointSummary("Admin commission revenue series")]
-        [ProducesResponseType(typeof(ApiResponse<CommissionRevenueSeriesModel>), StatusCodes.Status200OK)]
-        public Task<IActionResult> CommissionRevenueSeries(
-            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] GetCommissionRevenueSeriesQuery? query,
-            CancellationToken cancellationToken)
-            => EnsureAdmin() is IActionResult deny
-                ? Task.FromResult(deny)
-                : ExecuteQuery(query ?? new GetCommissionRevenueSeriesQuery(), cancellationToken);
-
-        [HttpPost]
-        [Consumes("application/json")]
         [EndpointSummary("Admin list employers")]
         [ProducesResponseType(typeof(PageableApiResponse<EmployerListItemModel>), StatusCodes.Status200OK)]
         public Task<IActionResult> ListEmployers(
@@ -73,17 +62,6 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             => EnsureAdmin() is IActionResult deny
                 ? Task.FromResult(deny)
                 : ExecuteQuery(query, cancellationToken);
-
-        [HttpPost]
-        [Consumes("application/json")]
-        [EndpointSummary("Admin update employer profile")]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-        public Task<IActionResult> UpdateEmployerProfile(
-            [FromBody] UpdateEmployerProfileCommand command,
-            CancellationToken cancellationToken)
-            => EnsureAdmin() is IActionResult deny
-                ? Task.FromResult(deny)
-                : ExecuteCommand(command, cancellationToken);
 
         [HttpPost]
         [Consumes("application/json")]
