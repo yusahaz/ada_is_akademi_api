@@ -23,6 +23,8 @@ namespace Azoxia.AdaIsAkademi.Infrastructure.DependencyInjection
         {
             ObjectStorageConfig objectStorage =
                 Config.GetOrCreateConfig<ObjectStorageConfig>(configuration);
+            EmailConfig emailConfig =
+                Config.GetOrCreateConfig<EmailConfig>(configuration);
 
             services.AddScoped<IObjectStoragePresigner>(_ =>
             {
@@ -41,6 +43,10 @@ namespace Azoxia.AdaIsAkademi.Infrastructure.DependencyInjection
             });
 
             services.AddScoped<IPushNotificationSender, FakePushNotificationSender>();
+            services.AddScoped<IEmailNotificationSender>(serviceProvider =>
+                new Services.SmtpEmailNotificationSender(
+                    emailConfig,
+                    serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Services.SmtpEmailNotificationSender>>()));
             services.AddScoped<ICvExtractionService, FakeCvExtractionService>();
         }
 

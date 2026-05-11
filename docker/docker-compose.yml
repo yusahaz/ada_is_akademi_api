@@ -17,7 +17,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
 
   ada-is-akademi-redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     container_name: ada-is-akademi-redis
     restart: unless-stopped
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
@@ -31,7 +31,7 @@ services:
       test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping"]
 
   ada-is-akademi-minio:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
     container_name: ada-is-akademi-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -62,7 +62,7 @@ services:
       - 'mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; mc mb --ignore-existing ada/"$$MINIO_BUCKET"'
 
   ada-is-akademi-dbview:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:9.0
     container_name: ada-is-akademi-dbview
     restart: unless-stopped
     environment:
@@ -77,16 +77,29 @@ services:
     build:
       context: ..
       dockerfile: src/Api/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+        BUILD_VERSION: ${API_IMAGE_VERSION:-latest}
     image: ada-is-akademi-api:latest
     container_name: ada-is-akademi-api
     restart: unless-stopped
     ports:
       - ${API_PORT}:8080
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     volumes:
       - api_dataprotection_keys:/home/app/.aspnet/DataProtection-Keys
     environment:
       ASPNETCORE_URLS: ${ASPNETCORE_URLS}
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      # Local Vite / dev frontends (override via docker/.env if needed)
+      Cors__AllowedOrigins__0: ${CORS_ORIGIN_VITE:-http://localhost:5173}
+      Cors__AllowedOrigins__1: ${CORS_ORIGIN_VITE_ALT:-http://127.0.0.1:5173}
+      Cors__AllowedOrigins__2: ${CORS_ORIGIN_ALT:-http://localhost:3000}
       JwtConfig__Issuer: ${JWT_ISSUER}
       JwtConfig__Audience: ${JWT_AUDIENCE}
       JwtConfig__Key: ${JWT_SIGNING_KEY}
@@ -102,11 +115,22 @@ services:
       RedisConfig__ConnectionString: ${REDIS_CONFIG_CONNECTION:-ada-is-akademi-redis:6379,password=${REDIS_PASSWORD}}
       RedisConfig__InstanceName: ${REDIS_CONFIG_INSTANCE_NAME:-ada-is-akademi}
       ObjectStorageConfig__ServiceUrl: ${OBJECT_STORAGE_SERVICE_URL:-http://ada-is-akademi-minio:9000}
+      # Host port must match MINIO_PORT so presigned URLs work in the browser (img src / direct uploads).
+      ObjectStorageConfig__PublicServiceUrl: ${OBJECT_STORAGE_PUBLIC_SERVICE_URL:-http://localhost:${MINIO_PORT:-9000}}
       ObjectStorageConfig__AccessKey: ${OBJECT_STORAGE_ACCESS_KEY:-${MINIO_ROOT_USER}}
       ObjectStorageConfig__SecretKey: ${OBJECT_STORAGE_SECRET_KEY:-${MINIO_ROOT_PASSWORD}}
       ObjectStorageConfig__BucketName: ${OBJECT_STORAGE_BUCKET_NAME:-${MINIO_BUCKET:-ada-is-akademi}}
       ObjectStorageConfig__ForcePathStyle: ${OBJECT_STORAGE_FORCE_PATH_STYLE:-true}
       ObjectStorageConfig__RegionName: ${OBJECT_STORAGE_REGION_NAME:-us-east-1}
+      EmailConfig__Enabled: ${EMAIL_ENABLED:-false}
+      EmailConfig__Host: ${EMAIL_HOST:-}
+      EmailConfig__Port: ${EMAIL_PORT:-587}
+      EmailConfig__FromName: ${EMAIL_FROM_NAME:-Ada Is Akademi}
+      EmailConfig__FromEmail: ${EMAIL_FROM_EMAIL:-}
+      EmailConfig__Username: ${EMAIL_USERNAME:-}
+      EmailConfig__Password: ${EMAIL_PASSWORD:-}
+      EmailConfig__UseSsl: ${EMAIL_USE_SSL:-false}
+      EmailConfig__UseAuthentication: ${EMAIL_USE_AUTHENTICATION:-true}
     depends_on:
       ada-is-akademi-db:
         condition: service_healthy
@@ -154,22 +178,32 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       ConnectionStrings__AdaIs: Host=ada-is-akademi-db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS}
+      ObjectStorage__ServiceUrl: http://ada-is-akademi-minio:9000
+      ObjectStorage__AccessKey: ${MINIO_ROOT_USER}
+      ObjectStorage__SecretKey: ${MINIO_ROOT_PASSWORD}
+      ObjectStorage__BucketName: ${MINIO_BUCKET:-ada-is-akademi}
+      ObjectStorage__ForcePathStyle: "true"
+      ObjectStorage__RegionName: us-east-1
     command:
       - --reset
       - --workers
-      - "10000"
+      - "300"
       - --employers
-      - "2000"
+      - "45"
       - --open-postings
-      - "5000"
+      - "120"
       - --closed-postings
-      - "5000"
+      - "80"
       - --seed
       - "12345"
       - --allow-production
     depends_on:
       ada-is-akademi-db:
         condition: service_healthy
+      ada-is-akademi-minio:
+        condition: service_healthy
+      ada-is-akademi-minio-init:
+        condition: service_completed_successfully
       ada-is-akademi-migrate:
         condition: service_completed_successfully
 

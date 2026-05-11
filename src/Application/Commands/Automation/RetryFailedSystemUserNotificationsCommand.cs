@@ -49,6 +49,8 @@ namespace Azoxia.AdaIsAkademi.Application
         {
             IPushNotificationSender sender = ServiceProvider.GetService<IPushNotificationSender>()
                 ?? new NoopPushNotificationSender();
+            IEmailNotificationSender emailSender = ServiceProvider.GetService<IEmailNotificationSender>()
+                ?? new NoopEmailNotificationSender();
 
             List<SystemUserNotificationDispatch> failedRows = (await UnitOfWork
                     .GetRepository<SystemUserNotificationDispatch>()
@@ -92,7 +94,19 @@ namespace Azoxia.AdaIsAkademi.Application
                         row.MarkAsFailed(result.ErrorMessage ?? result.ErrorCode);
                         if (hasVerifiedEmail)
                         {
-                            row.MarkAsSent(NotificationChannel.Email, "push_retry_failed");
+                            EmailNotificationSendResult emailResult = await emailSender.SendAsync(
+                                systemUser.Email!,
+                                row.Title,
+                                row.Body,
+                                cancellationToken);
+                            if (emailResult.IsSuccess)
+                            {
+                                row.MarkAsSent(NotificationChannel.Email, "push_retry_failed");
+                            }
+                            else
+                            {
+                                row.MarkAsSent(NotificationChannel.InApp, "push_retry_failed_email_send_failed");
+                            }
                         }
                         else
                         {
@@ -102,7 +116,19 @@ namespace Azoxia.AdaIsAkademi.Application
                 }
                 else if (hasVerifiedEmail)
                 {
-                    row.MarkAsSent(NotificationChannel.Email, "missing_push_token");
+                    EmailNotificationSendResult emailResult = await emailSender.SendAsync(
+                        systemUser.Email!,
+                        row.Title,
+                        row.Body,
+                        cancellationToken);
+                    if (emailResult.IsSuccess)
+                    {
+                        row.MarkAsSent(NotificationChannel.Email, "missing_push_token");
+                    }
+                    else
+                    {
+                        row.MarkAsSent(NotificationChannel.InApp, "missing_push_token_email_send_failed");
+                    }
                 }
                 else
                 {
@@ -131,6 +157,16 @@ namespace Azoxia.AdaIsAkademi.Application
                 string body,
                 CancellationToken cancellationToken)
                 => Task.FromResult(new PushNotificationSendResult(IsSuccess: true));
+        }
+
+        private sealed class NoopEmailNotificationSender : IEmailNotificationSender
+        {
+            public Task<EmailNotificationSendResult> SendAsync(
+                string toEmail,
+                string subject,
+                string body,
+                CancellationToken cancellationToken)
+                => Task.FromResult(new EmailNotificationSendResult(IsSuccess: true));
         }
 
         #endregion Utils

@@ -5,20 +5,38 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
+    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Identity;
+    using Azoxia.Core.Extensions;
     using Microsoft.Extensions.DependencyInjection;
+    using SystemUserType = Azoxia.AdaIsAkademi.Domain.SystemUserType;
 
     /// <summary>
-    /// Lists supervisors for authenticated employer.
+    /// Lists supervisors for employer.
     /// </summary>
     public class ListEmployerSupervisorsQuery :
-        QueryBase<IReadOnlyList<EmployerSupervisorListItemModel>>;
+        QueryBase<IReadOnlyList<EmployerSupervisorListItemModel>>
+    {
+        /// <summary>
+        /// Optional employer id for admin queries. When supplied, caller must be an admin.
+        /// Otherwise the authenticated employer actor id claim is used.
+        /// </summary>
+        public int? EmployerId { get; set; }
+    }
 
     internal class ListEmployerSupervisorsQueryValidator : IRequestValidator<ListEmployerSupervisorsQuery>
     {
         /// <inheritdoc />
         public ValidationResult Validate(ListEmployerSupervisorsQuery request)
-            => new([]);
+        {
+            List<ValidationFailure> failures = [];
+            if (request.EmployerId.HasValue && request.EmployerId.Value <= 0)
+            {
+                failures.Add(AzoxiaErrorCodes.RequestValidationFailed.ForField(nameof(ListEmployerSupervisorsQuery.EmployerId)));
+            }
+
+            return new ValidationResult(failures);
+        }
     }
 
     internal class ListEmployerSupervisorsQueryHandler(IServiceProvider serviceProvider) :
@@ -30,7 +48,17 @@ namespace Azoxia.AdaIsAkademi.Application
             CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
-            int employerId = executionContext.RequireAdaIsEmployerActorId();
+            int employerId;
+            if (query.EmployerId.HasValue)
+            {
+                bool isAdmin = executionContext.GetClaim("system_user_type") == ((int)SystemUserType.Admin).ToString();
+                isAdmin.ThrowIfFalse(AzoxiaErrorCodes.RequestValidationFailed);
+                employerId = query.EmployerId.Value;
+            }
+            else
+            {
+                employerId = executionContext.RequireAdaIsEmployerActorId();
+            }
 
             CacheKey cacheKey = new("query", "EmployerSupervisors", employerId.ToString());
             IReadOnlyList<EmployerSupervisorListItemModel>? cached =
@@ -40,45 +68,25 @@ namespace Azoxia.AdaIsAkademi.Application
                 return cached;
             }
 
-            List<ShiftSupervisor> supervisors = (await UnitOfWork
-                .GetRepository<ShiftSupervisor>()
+            List<Supervisor> supervisors = (await UnitOfWork
+                .GetRepository<Supervisor>()
                 .Filter(x => x.EmployerId == employerId && x.IsActive)
                 .AsNoTracking()
                 .Include(x => x.SystemUser)
                 .ToListAsync(cancellationToken))
                 .ToList();
 
-            int[] supervisorUserIds = supervisors.Select(x => x.SystemUserId).Distinct().ToArray();
-            List<SystemUserGroupMembership> memberships = supervisorUserIds.Length == 0
-                ? []
-                : (await UnitOfWork
-                    .GetRepository<SystemUserGroupMembership>()
-                    .Filter(x => supervisorUserIds.Contains(x.SystemUserId) && x.IsActive)
-                    .AsNoTracking()
-                    .ToListAsync(cancellationToken))
-                .ToList();
-
             IReadOnlyList<EmployerSupervisorListItemModel> rows = supervisors
                 .GroupBy(x => x.SystemUserId)
                 .Select(group =>
                 {
-                    ShiftSupervisor sample = group.First();
+                    Supervisor sample = group.First();
                     List<int> assignedLocationIds = group.Where(x => x.LocationId.HasValue).Select(x => x.LocationId!.Value).Distinct().ToList();
-                    List<int> groupIds = memberships
-                        .Where(x => x.SystemUserId == group.Key)
-                        .Select(x => x.SystemUserGroupId)
-                        .Distinct()
-                        .ToList();
-                    MembershipScopeType scopeType = assignedLocationIds.Count > 0
-                        ? MembershipScopeType.LocationScoped
-                        : MembershipScopeType.EmployerScoped;
                     return new EmployerSupervisorListItemModel(
                         group.Key,
                         $"{sample.SystemUser.FirstName ?? string.Empty} {sample.SystemUser.LastName ?? string.Empty}".Trim(),
                         sample.SystemUser.Email,
-                        assignedLocationIds,
-                        groupIds,
-                        scopeType);
+                        assignedLocationIds);
                 })
                 .OrderBy(x => x.FullName)
                 .ToList();
@@ -86,9 +94,7 @@ namespace Azoxia.AdaIsAkademi.Application
             await CacheService.SetAsync(
                 cacheKey,
                 rows,
-                AdaIsCacheKeys.DetailReadModelOptions(
-                    AdaIsCacheKeys.EmployerDependency(employerId),
-                    AdaIsCacheKeys.SystemUserGroupAllDependency()),
+                AdaIsCacheKeys.DetailReadModelOptions(AdaIsCacheKeys.EmployerDependency(employerId)),
                 cancellationToken);
 
             return rows;
