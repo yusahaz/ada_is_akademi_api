@@ -42,6 +42,9 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    networks:
+      - coolify
+      - default
 
   ada-is-akademi-minio:
     image: minio/minio:RELEASE.2024-11-07T00-52-20Z
@@ -62,11 +65,15 @@ services:
       timeout: 10s
       retries: 8
       start_period: 90s
+    networks:
+      - default
 
   ada-is-akademi-minio-init:
     image: minio/mc:latest
     container_name: ada-is-akademi-minio-init
     restart: "no"
+    networks:
+      - default
     depends_on:
       ada-is-akademi-minio:
         condition: service_healthy
@@ -78,18 +85,6 @@ services:
     command:
       - 'mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; mc mb --ignore-existing ada/"$$MINIO_BUCKET"'
 
-  ada-is-akademi-dbview:
-    image: dpage/pgadmin4:9.0
-    container_name: ada-is-akademi-dbview
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${DBVIEW_USER}
-      PGADMIN_DEFAULT_PASSWORD: ${DBVIEW_PASSWORD}
-    ports:
-      - ${DBVIEW_PORT}:80
-    volumes:
-      - dbview_data:/var/lib/pgadmin
-
   ada-is-akademi-api:
     build:
       context: ..
@@ -100,6 +95,8 @@ services:
     image: ada-is-akademi-api:latest
     container_name: ada-is-akademi-api
     restart: unless-stopped
+    networks:
+      - default
     ports:
       - ${API_PORT}:8080
     healthcheck:
@@ -182,6 +179,9 @@ services:
         condition: service_healthy
       ada-is-akademi-minio:
         condition: service_healthy
+    networks:
+      - coolify
+      - default
 
   ada-is-akademi-seedrunner:
     profiles: ["seed"]
@@ -221,6 +221,9 @@ services:
         condition: service_completed_successfully
       ada-is-akademi-migrate:
         condition: service_completed_successfully
+    networks:
+      - coolify
+      - default
 
   ada-is-akademi-migrate:
     profiles: ["migrate", "seed"]
@@ -240,6 +243,9 @@ services:
     depends_on:
       ada-is-akademi-db:
         condition: service_healthy
+    networks:
+      - coolify
+      - default
 
 volumes:
   db_data:
