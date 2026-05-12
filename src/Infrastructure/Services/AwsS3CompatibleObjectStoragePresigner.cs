@@ -1,6 +1,5 @@
 namespace Azoxia.AdaIsAkademi.Infrastructure
 {
-    using Amazon;
     using Amazon.Runtime;
     using Amazon.S3;
     using Amazon.S3.Model;
@@ -43,17 +42,23 @@ namespace Azoxia.AdaIsAkademi.Infrastructure
             _ = _options.SecretKey.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
             _ = _options.BucketName.ThrowIfNullOrWhiteSpace(AzoxiaErrorCodes.StringNullOrWhiteSpace);
 
+            // Presigned URLs must use a host:port the browser can reach; ServiceUrl may be intra-network only.
+            string signingBaseUrl =
+                !_options.PublicServiceUrl.IsNullOrWhiteSpace()
+                    ? _options.PublicServiceUrl!.Trim().TrimEnd('/')
+                    : _options.ServiceUrl.TrimEnd('/');
+
             AmazonS3Config config =
                 new()
                 {
-                    ServiceURL = _options.ServiceUrl.TrimEnd('/'),
+                    ServiceURL = signingBaseUrl,
                     ForcePathStyle = _options.ForcePathStyle,
+                    UseHttp = signingBaseUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase),
                 };
 
             if (!_options.RegionName.IsNullOrWhiteSpace())
             {
-                config.RegionEndpoint =
-                    RegionEndpoint.GetBySystemName(_options.RegionName);
+                config.AuthenticationRegion = _options.RegionName;
             }
 
             AWSCredentials credentials =

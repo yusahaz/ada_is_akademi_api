@@ -43,38 +43,18 @@ namespace Azoxia.AdaIsAkademi.Application
             Employer? employer = await UnitOfWork.GetRepository<Employer>().GetByIdAsync(command.EmployerId, cancellationToken);
             employer = employer.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
-            IEnumerable<int> locationIdsRaw = await UnitOfWork.GetRepository<EmployerLocation>()
+            IEnumerable<int> employerBoundUserIds = await UnitOfWork.GetRepository<SystemUser>()
                 .Filter(x => x.EmployerId == employer.Id)
                 .AsNoTracking()
                 .ToListAsync(x => x.Id, cancellationToken);
-            List<int> locationIds = locationIdsRaw.ToList();
 
-            IEnumerable<int> supervisorUserIdsRaw = await UnitOfWork.GetRepository<ShiftSupervisor>()
+            IEnumerable<int> supervisorUserIdsRaw = await UnitOfWork.GetRepository<Supervisor>()
                 .Filter(x => x.EmployerId == employer.Id)
                 .AsNoTracking()
                 .ToListAsync(x => x.SystemUserId, cancellationToken);
-            List<int> supervisorUserIds = supervisorUserIdsRaw.ToList();
 
-            IEnumerable<int> employerScopedMembershipUserIdsRaw = await UnitOfWork.GetRepository<SystemUserGroupMembership>()
-                .Filter(x => x.ScopeType == MembershipScopeType.EmployerScoped && x.ScopeId == employer.Id)
-                .AsNoTracking()
-                .ToListAsync(x => x.SystemUserId, cancellationToken);
-            List<int> employerScopedMembershipUserIds = employerScopedMembershipUserIdsRaw.ToList();
-
-            IEnumerable<int> locationScopedMembershipUserIdsRaw = locationIds.Count == 0
-                ? []
-                : await UnitOfWork.GetRepository<SystemUserGroupMembership>()
-                    .Filter(x =>
-                        x.ScopeType == MembershipScopeType.LocationScoped
-                        && x.ScopeId.HasValue
-                        && locationIds.Contains(x.ScopeId.Value))
-                    .AsNoTracking()
-                    .ToListAsync(x => x.SystemUserId, cancellationToken);
-            List<int> locationScopedMembershipUserIds = locationScopedMembershipUserIdsRaw.ToList();
-
-            IReadOnlyList<int> systemUserIds = supervisorUserIds
-                .Concat(employerScopedMembershipUserIds)
-                .Concat(locationScopedMembershipUserIds)
+            IReadOnlyList<int> systemUserIds = employerBoundUserIds
+                .Concat(supervisorUserIdsRaw)
                 .Distinct()
                 .ToList();
 

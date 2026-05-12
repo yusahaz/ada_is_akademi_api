@@ -79,10 +79,6 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerDependency(command.WorkerId),
-                cancellationToken);
-
             return skill.Id;
         }
 

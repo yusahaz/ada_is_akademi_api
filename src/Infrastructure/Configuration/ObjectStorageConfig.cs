@@ -40,6 +40,14 @@ namespace Azoxia.AdaIsAkademi.Infrastructure.Configuration
         /// </summary>
         public string? ServiceUrl { get; set; }
 
+        /// <summary>
+        /// Gets or sets the base URL embedded in presigned GET/PUT URLs for browsers and external clients.
+        /// Use when <see cref="ServiceUrl"/> is only reachable inside Docker/Kubernetes (e.g. <c>http://minio:9000</c>)
+        /// while developers hit MinIO via <c>http://localhost:{published-port}</c>.
+        /// When empty, <see cref="ServiceUrl"/> is used for signing.
+        /// </summary>
+        public string? PublicServiceUrl { get; set; }
+
         #endregion Properties
     }
 }

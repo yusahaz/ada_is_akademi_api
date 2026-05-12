@@ -419,6 +419,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteCommand(command, cancellationToken);
 
+        /// <summary>Updates authenticated worker CV options payload.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update worker CV options")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateCvTemplatePreference(
+            [FromBody] UpdateWorkerCvTemplatePreferenceCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Replaces outbound social links visible on worker self endpoints.</summary>
         [HttpPost]
         [Consumes("application/json")]

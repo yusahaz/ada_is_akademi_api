@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
+    using Azoxia.AdaIsAkademi.Application.Services;
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application;
     using Azoxia.Core.Application.Commands;
@@ -132,7 +133,7 @@ namespace Azoxia.AdaIsAkademi.Application
             user.IssueRefreshToken(refreshToken, device.Id, refreshExpiresAt);
             device.RecordActivity();
 
-            Claim[] claims = await BuildClaimsAsync(user, cancellationToken);
+            Claim[] claims = await SystemUserClaimsBuilder.BuildAsync(user, UnitOfWork, cancellationToken);
             (string accessToken, DateTime accessExpiresAt) = tokenService.GenerateAccessToken(claims);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
@@ -144,39 +145,6 @@ namespace Azoxia.AdaIsAkademi.Application
                 accessExpiresAt,
                 refreshToken,
                 refreshExpiresAt);
-        }
-
-        private async Task<Claim[]> BuildClaimsAsync(SystemUser user, CancellationToken cancellationToken)
-        {
-            List<Claim> claims =
-            [
-                new("system_user_id", user.Id.ToString()),
-                new("system_user_type", ((int)user.Type).ToString()),
-                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Email, user.Email),
-            ];
-
-            Worker? worker = await UnitOfWork
-                .GetRepository<Worker>()
-                .Filter(x => x.SystemUserId == user.Id)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancellationToken);
-            if (worker is not null)
-            {
-                claims.Add(new Claim("worker_id", worker.Id.ToString()));
-            }
-
-            ShiftSupervisor? supervisor = await UnitOfWork
-                .GetRepository<ShiftSupervisor>()
-                .Filter(x => x.SystemUserId == user.Id && x.IsActive)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancellationToken);
-            if (supervisor is not null)
-            {
-                claims.Add(new Claim("employer_id", supervisor.EmployerId.ToString()));
-            }
-
-            return [.. claims];
         }
 
         #endregion Utils

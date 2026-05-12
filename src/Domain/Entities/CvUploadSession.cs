@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
     using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
@@ -8,7 +9,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     /// Tracks worker CV upload lifecycle from object-storage upload through extraction and worker review.
     /// </summary>
     public class CvUploadSession :
-        EntityBase
+        EntityAggregateRoot
     {
         #region Fields
 
@@ -44,6 +45,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             FileFormat = fileFormat;
             Status = CvUploadSessionStatus.Uploaded;
             CreatedAt = DateTimeOffset.UtcNow;
+            RaiseDomainEvent(() => new CvUploadedEvent(Id, WorkerId));
         }
 
         #endregion Ctors
@@ -75,6 +77,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = CvUploadSessionStatus.AwaitingReview;
             ExtractionCompletedAt = DateTimeOffset.UtcNow;
             FailureReason = null;
+            RaiseDomainEvent(() => new CvExtractionCompletedEvent(Id, WorkerId));
         }
 
         /// <summary>
@@ -88,6 +91,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = CvUploadSessionStatus.Failed;
             FailureReason = reason.IsNullOrWhiteSpace() ? null : reason.Trim();
             ExtractionCompletedAt = DateTimeOffset.UtcNow;
+            RaiseDomainEvent(() => new CvExtractionFailedEvent(Id, WorkerId, FailureReason));
         }
 
         /// <summary>
@@ -102,6 +106,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             Status = CvUploadSessionStatus.Confirmed;
             ReviewedAt = DateTimeOffset.UtcNow;
+            RaiseDomainEvent(() => new CvImportConfirmedEvent(Id, WorkerId));
         }
 
         /// <summary>
@@ -114,6 +119,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             Status = CvUploadSessionStatus.Discarded;
             ReviewedAt = DateTimeOffset.UtcNow;
+            RaiseDomainEvent(() => new CvImportDiscardedEvent(Id, WorkerId));
         }
 
         #endregion Utils

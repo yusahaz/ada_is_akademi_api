@@ -13,6 +13,7 @@ namespace Azoxia.AdaIsAkademi.Application
         int SystemUserId,
         string? Nationality,
         string? University,
+        string? CvOptions,
         string? Bio,
         string? ProfilePhotoObjectKey,
         DateTimeOffset? EmbeddingUpdatedAt,

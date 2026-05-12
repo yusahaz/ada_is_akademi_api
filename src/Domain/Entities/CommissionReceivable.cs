@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
     using Azoxia.Core.Extensions;
     using Azoxia.Core.ValueTypes;
@@ -8,7 +9,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     /// Represents a commission receivable row for an employer and billing period.
     /// </summary>
     public class CommissionReceivable :
-        EntityBase
+        EntityAggregateRoot
     {
         #region Ctors
 
@@ -38,6 +39,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             PeriodEnd = periodEnd;
             PeriodStart = periodStart;
             CreatedAt = DateTimeOffset.UtcNow;
+            RaiseDomainEvent(() => new CommissionReceivableCreatedEvent(Id, EmployerId, Amount.Amount, Amount.Currency));
         }
 
         #endregion Ctors

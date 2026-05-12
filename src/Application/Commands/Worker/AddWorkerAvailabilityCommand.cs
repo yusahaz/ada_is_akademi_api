@@ -29,8 +29,7 @@ namespace Azoxia.AdaIsAkademi.Application
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             WorkerAvailability item = worker.AddAvailability(command.DayOfWeek, command.TimeFrom, command.TimeTo);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await InvalidateWorkerAsync(workerId, cancellationToken);
-            return item.Id;
+return item.Id;
         }
     }
 }

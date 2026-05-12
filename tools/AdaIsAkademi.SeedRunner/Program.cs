@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.SeedRunner;
 
+using Azoxia.AdaIsAkademi.Domain.Events;
 using Azoxia.AdaIsAkademi.Persistence;
 using Azoxia.Core.Identity;
 using System.Diagnostics;
@@ -25,11 +26,12 @@ internal static class Program
 
             SeedOptions options = SeedOptions.Parse(args);
             Console.WriteLine(
-                $"[SeedRunner] Seçenekler: reset={options.Reset}, workers={options.Workers}, employers={options.Employers}, openPostings={options.OpenPostings}, closedPostings={options.ClosedPostings}, seed={options.Seed}, allowProduction={options.AllowProduction}");
+                $"[SeedRunner] Seçenekler: reset={options.Reset}, workers={options.Workers}, employers={options.Employers}, openPostings={options.OpenPostings}, closedPostings={options.ClosedPostings}, seed={options.Seed}, allowProduction={options.AllowProduction}, skipMedia={options.SkipMediaUpload}");
 
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.Seed.json", optional: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             string? connectionString = options.ConnectionString
@@ -49,13 +51,35 @@ internal static class Program
             ServiceCollection services = new();
             services.AddLogging();
             services.AddSingleton<IExecutionContext, SeedExecutionContext>();
+            services.AddScoped<IDomainEventDispatcher, SeedNoOpDomainEventDispatcher>();
             services.AddDbContext<AdaIsAkademiDbContext>(optionsBuilder =>
                 optionsBuilder.UseNpgsql(connectionString).UseLazyLoadingProxies());
 
             await using ServiceProvider serviceProvider = services.BuildServiceProvider();
             await using AsyncServiceScope scope = serviceProvider.CreateAsyncScope();
             AdaIsAkademiDbContext db = scope.ServiceProvider.GetRequiredService<AdaIsAkademiDbContext>();
-            await SeedPipeline.RunAsync(db, options, CancellationToken.None);
+            ObjectStorageMediaUploader? mediaUploader = ObjectStorageMediaUploader.TryCreate(configuration);
+            if (mediaUploader is null)
+            {
+                Console.WriteLine("[SeedRunner] ObjectStorage yapılandırması yok; DB'de object key yazılır, dosya yüklemesi atlanır.");
+            }
+            else if (!mediaUploader.CanUploadForScale(options))
+            {
+                Console.WriteLine(
+                    $"[SeedRunner] Worker/işveren sayısı çok yüksek; MinIO ikili yükleme atlandı (sınır: workers≤2500, employers≤500). --skip-media-upload veya daha küçük bir seed kullanın.");
+            }
+
+            try
+            {
+                await SeedPipeline.RunAsync(db, options, mediaUploader, CancellationToken.None);
+            }
+            finally
+            {
+                if (mediaUploader is not null)
+                {
+                    await mediaUploader.DisposeAsync();
+                }
+            }
             Console.WriteLine($"[SeedRunner] Tamamlandı. Süre={timer.Elapsed.TotalSeconds:F1}s");
             return 0;
         }

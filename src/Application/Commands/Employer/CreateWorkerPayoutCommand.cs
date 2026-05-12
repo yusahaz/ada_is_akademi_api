@@ -108,12 +108,6 @@ namespace Azoxia.AdaIsAkademi.Application
                 note: "created_from_checked_out_assignment"));
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutDependency(payout.Id), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutEmployerDependency(employerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutWorkerDependency(assignment.WorkerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutAllDependency(), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
-
             return new WorkerPayoutSnapshotModel(
                 payout.Id,
                 payout.Status,

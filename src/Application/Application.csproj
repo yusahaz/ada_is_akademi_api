@@ -10,7 +10,7 @@
 		<RootNamespace>Azoxia.AdaIsAkademi.Application</RootNamespace>
 	</PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\src\Application\Application.csproj" />
+    <ProjectReference Include="..\..\Core\src\Application\Application.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 

@@ -36,13 +36,5 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             result.Errors.Should().HaveCount(2);
         }
 
-        [Fact]
-        public void List_system_user_groups_validator_should_fail_for_invalid_paging()
-        {
-            ValidationResult result = new ListSystemUserGroupsQueryValidator().Validate(
-                new ListSystemUserGroupsQuery { Limit = 0, Offset = -1 });
-            result.IsValid.Should().BeFalse();
-            result.Errors.Should().HaveCount(2);
-        }
     }
 }

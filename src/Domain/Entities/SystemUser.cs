@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
     using Azoxia.Core.Extensions;
     using System.Security.Cryptography;
@@ -8,7 +9,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     /// Credentials and lifecycle state backing an application authentication principal.
     /// </summary>
     public class SystemUser :
-        DeletableEntityBase
+        DeletableAggregateRoot
     {
         #region Fields
 
@@ -225,6 +226,7 @@ namespace Azoxia.AdaIsAkademi.Domain
                 .ThrowIfFalse(DomainErrorCodes.SystemUserEmailVerificationExpiresAtInvalid);
             EmailVerificationToken = tokenHash;
             EmailVerificationExpiresAt = expiresAt;
+            RaiseDomainEvent(() => new EmailVerificationRequestedEvent(Id, Email));
         }
 
         /// <summary>
@@ -262,6 +264,51 @@ namespace Azoxia.AdaIsAkademi.Domain
         }
 
         /// <summary>
+        /// Binds an employer principal to its organization (JWT <c>employer_id</c> scope).
+        /// </summary>
+        protected internal void BindToEmployerOrganization(int employerId)
+        {
+            (Type == SystemUserType.Employer)
+                .ThrowIfFalse(DomainErrorCodes.SystemUserInvalidStatusTransition);
+            employerId.ThrowIfOutOfRange(1, int.MaxValue);
+            EmployerId = employerId;
+        }
+
+        /// <summary>
+        /// Promotes a worker login to employer-scoped supervisor.
+        /// </summary>
+        protected internal void PromoteToEmployerSupervisor(int employerId)
+        {
+            (Type == SystemUserType.Worker || Type == SystemUserType.Supervisor)
+                .ThrowIfFalse(DomainErrorCodes.SystemUserInvalidStatusTransition);
+            employerId.ThrowIfOutOfRange(1, int.MaxValue);
+            Type = SystemUserType.Supervisor;
+            EmployerId = employerId;
+        }
+
+        /// <summary>
+        /// Clears supervisor scope and returns the account to worker classification.
+        /// </summary>
+        protected internal void RevokeEmployerSupervisorRole()
+        {
+            (Type == SystemUserType.Supervisor)
+                .ThrowIfFalse(DomainErrorCodes.SystemUserInvalidStatusTransition);
+            Type = SystemUserType.Worker;
+            EmployerId = null;
+        }
+
+        /// <summary>
+        /// Binds employer scope for accounts created directly as <see cref="SystemUserType.Supervisor"/>.
+        /// </summary>
+        protected internal void InitializeEmployerScopedSupervisor(int employerId)
+        {
+            (Type == SystemUserType.Supervisor)
+                .ThrowIfFalse(DomainErrorCodes.SystemUserInvalidStatusTransition);
+            employerId.ThrowIfOutOfRange(1, int.MaxValue);
+            EmployerId = employerId;
+        }
+
+        /// <summary>
         /// Updates profile name and optional phone fields.
         /// </summary>
         protected internal void Update(
@@ -289,6 +336,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             AccountStatus = AccountStatus.Active;
             EmailVerificationToken = null;
             EmailVerificationExpiresAt = null;
+            RaiseDomainEvent(() => new EmailVerifiedEvent(Id, Email));
         }
 
         #endregion Utils
@@ -370,6 +418,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// </summary>
         public SystemUserType Type { get; private set; }
 
+        /// <summary>
+        /// Owning employer for <see cref="SystemUserType.Employer"/> and <see cref="SystemUserType.Supervisor"/> principals.
+        /// </summary>
+        public int? EmployerId { get; private set; }
+
 
         /// <summary>
         /// True when failed login threshold matches policy lock rules.
@@ -386,6 +439,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Active and historical refresh token rows for session continuity.
         /// </summary>
         public virtual IReadOnlyList<SystemUserRefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
+
+        /// <summary>
+        /// Employer organization linked for employer or supervisor accounts.
+        /// </summary>
+        public virtual Employer Employer { get; private set; }
 
         #endregion Properties
     }

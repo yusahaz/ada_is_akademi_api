@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application.Tests.Support
 {
+    using Azoxia.AdaIsAkademi.Application.DependencyInjection;
     using Azoxia.AdaIsAkademi.Application.Services;
     using Azoxia.AdaIsAkademi.Persistence;
     using Azoxia.Core.Application.Caching;
@@ -30,9 +31,9 @@ namespace Azoxia.AdaIsAkademi.Application.Tests.Support
             services.AddDbContext<AdaIsAkademiDbContext>(options =>
                 options.UseSqlite(holder.Connection));
             services.AddScoped<IUnitOfWork, UnitOfWork<AdaIsAkademiDbContext>>();
+            services.AddAdaIsDomainEventHandling();
             services.AddScoped<IWorkerProfileCompletionEvaluator, WorkerProfileCompletionEvaluator>();
             services.AddScoped<IWorkerEmployerProfileAccess, WorkerEmployerProfileAccess>();
-            services.AddScoped<IPermissionResolver, PermissionResolver>();
             services.AddSingleton<IObjectStoragePresigner, TestObjectStoragePresigner>();
             services.AddSingleton<ICacheService, NullCacheService>();
             services.AddSingleton<IExecutionContext>(executionContext ?? new TestExecutionContext());

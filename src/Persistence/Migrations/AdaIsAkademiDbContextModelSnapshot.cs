@@ -19,9 +19,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.7")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -846,6 +843,65 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.ToTable("JobPostingSkill", (string)null);
                 });
 
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.JobSkill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnOrder(0);
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnOrder(8);
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnOrder(9);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnOrder(2);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnOrder(7);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnOrder(1);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnOrder(6);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("JobSkill", (string)null);
+                });
+
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.OverdueJobAlarm", b =>
                 {
                     b.Property<int>("Id")
@@ -875,71 +931,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("OverdueJobAlarm", (string)null);
-                });
-
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.Permission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnOrder(0);
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(4);
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(5);
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(9);
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(10);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnOrder(2);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnOrder(8);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(1);
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(3);
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(6);
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(7);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("Name");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("Permission", (string)null);
                 });
 
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.ShiftAssignment", b =>
@@ -1013,7 +1004,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.ToTable("ShiftAssignment", (string)null);
                 });
 
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.ShiftSupervisor", b =>
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.Supervisor", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1046,7 +1037,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.HasIndex("EmployerId", "SystemUserId");
 
-                    b.ToTable("ShiftSupervisor", (string)null);
+                    b.ToTable("Supervisor", (string)null);
                 });
 
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUser", b =>
@@ -1064,21 +1055,21 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(16);
+                        .HasColumnOrder(17);
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(17);
+                        .HasColumnOrder(18);
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(21);
+                        .HasColumnOrder(22);
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(22);
+                        .HasColumnOrder(23);
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -1099,6 +1090,10 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnOrder(15);
 
+                    b.Property<int?>("EmployerId")
+                        .HasColumnType("integer")
+                        .HasColumnOrder(16);
+
                     b.Property<int>("FailedLoginAttempts")
                         .HasColumnType("integer")
                         .HasColumnOrder(9);
@@ -1110,7 +1105,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
-                        .HasColumnOrder(20);
+                        .HasColumnOrder(21);
 
                     b.Property<DateTimeOffset?>("LastFailedLoginAt")
                         .HasColumnType("timestamp with time zone")
@@ -1152,12 +1147,12 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(18);
+                        .HasColumnOrder(19);
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(19);
+                        .HasColumnOrder(20);
 
                     b.HasKey("Id");
 
@@ -1165,6 +1160,8 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("EmployerId");
 
                     b.ToTable("SystemUser", (string)null);
                 });
@@ -1207,146 +1204,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("SystemUserDevice", (string)null);
-                });
-
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnOrder(0);
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(6);
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(7);
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(11);
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(12);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnOrder(2);
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnOrder(5);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnOrder(10);
-
-                    b.Property<bool>("IsSystem")
-                        .HasColumnType("boolean")
-                        .HasColumnOrder(4);
-
-                    b.Property<int>("Level")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(3);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(1);
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(8);
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(9);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("Name");
-
-                    b.ToTable("SystemUserGroup", (string)null);
-                });
-
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserGroupMembership", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnOrder(0);
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnOrder(5);
-
-                    b.Property<int?>("ScopeId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(4);
-
-                    b.Property<int>("ScopeType")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(3);
-
-                    b.Property<int>("SystemUserGroupId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(1);
-
-                    b.Property<int>("SystemUserId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(2);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SystemUserId");
-
-                    b.HasIndex("SystemUserGroupId", "SystemUserId", "ScopeType", "ScopeId");
-
-                    b.ToTable("SystemUserGroupMembership", (string)null);
-                });
-
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserGroupPermission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnOrder(0);
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Effect")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(3);
-
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(2);
-
-                    b.Property<int>("SystemUserGroupId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(1);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PermissionId");
-
-                    b.HasIndex("SystemUserGroupId", "PermissionId")
-                        .IsUnique();
-
-                    b.ToTable("SystemUserGroupPermission", (string)null);
                 });
 
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserNotificationDispatch", b =>
@@ -1502,47 +1359,53 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(12);
+                        .HasColumnOrder(13);
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(13);
+                        .HasColumnOrder(14);
+
+                    b.Property<string>("CvOptions")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnName("CvOptions")
+                        .HasColumnOrder(6);
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(17);
+                        .HasColumnOrder(18);
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(18);
+                        .HasColumnOrder(19);
 
                     b.Property<DateTimeOffset?>("EmbeddingUpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(8);
 
                     b.Property<decimal?>("ExpectedSalaryMaxAmount")
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(11);
 
                     b.Property<string>("ExpectedSalaryMaxCurrency")
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(12);
 
                     b.Property<decimal?>("ExpectedSalaryMinAmount")
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(9);
 
                     b.Property<string>("ExpectedSalaryMinCurrency")
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(10);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
-                        .HasColumnOrder(16);
+                        .HasColumnOrder(17);
 
                     b.Property<string>("Nationality")
                         .HasMaxLength(128)
@@ -1556,7 +1419,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.PrimitiveCollection<float[]>("SkillEmbedding")
                         .HasColumnType("real[]")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(7);
 
                     b.Property<int>("SystemUserId")
                         .HasColumnType("integer")
@@ -1569,12 +1432,12 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnOrder(14);
+                        .HasColumnOrder(15);
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
-                        .HasColumnOrder(15);
+                        .HasColumnOrder(16);
 
                     b.HasKey("Id");
 
@@ -2270,16 +2133,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.Navigation("JobPosting");
                 });
 
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.Permission", b =>
-                {
-                    b.HasOne("Azoxia.AdaIsAkademi.Domain.Permission", "Parent")
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.ShiftAssignment", b =>
                 {
                     b.HasOne("Azoxia.AdaIsAkademi.Domain.JobApplication", "JobApplication")
@@ -2307,7 +2160,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.Navigation("Worker");
                 });
 
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.ShiftSupervisor", b =>
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.Supervisor", b =>
                 {
                     b.HasOne("Azoxia.AdaIsAkademi.Domain.Employer", "Employer")
                         .WithMany("Supervisors")
@@ -2333,6 +2186,16 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.Navigation("SystemUser");
                 });
 
+            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUser", b =>
+                {
+                    b.HasOne("Azoxia.AdaIsAkademi.Domain.Employer", "Employer")
+                        .WithMany()
+                        .HasForeignKey("EmployerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employer");
+                });
+
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserDevice", b =>
                 {
                     b.HasOne("Azoxia.AdaIsAkademi.Domain.SystemUser", "SystemUser")
@@ -2342,44 +2205,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("SystemUser");
-                });
-
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserGroupMembership", b =>
-                {
-                    b.HasOne("Azoxia.AdaIsAkademi.Domain.SystemUserGroup", "SystemUserGroup")
-                        .WithMany()
-                        .HasForeignKey("SystemUserGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Azoxia.AdaIsAkademi.Domain.SystemUser", "SystemUser")
-                        .WithMany()
-                        .HasForeignKey("SystemUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SystemUser");
-
-                    b.Navigation("SystemUserGroup");
-                });
-
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserGroupPermission", b =>
-                {
-                    b.HasOne("Azoxia.AdaIsAkademi.Domain.Permission", "Permission")
-                        .WithMany()
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Azoxia.AdaIsAkademi.Domain.SystemUserGroup", "SystemUserGroup")
-                        .WithMany("Permissions")
-                        .HasForeignKey("SystemUserGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("SystemUserGroup");
                 });
 
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserNotificationDispatch", b =>
@@ -2594,11 +2419,6 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     b.Navigation("Devices");
 
                     b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.SystemUserGroup", b =>
-                {
-                    b.Navigation("Permissions");
                 });
 
             modelBuilder.Entity("Azoxia.AdaIsAkademi.Domain.Worker", b =>

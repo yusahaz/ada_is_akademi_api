@@ -71,11 +71,6 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutDependency(payout.Id), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutEmployerDependency(payout.EmployerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerPayoutWorkerDependency(workerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
-
             return new WorkerPayoutSnapshotModel(
                 payout.Id,
                 payout.Status,

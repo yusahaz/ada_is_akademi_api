@@ -14,10 +14,6 @@ internal static class LookupStage
 
     private const string DemoAdminEmail = "admin@adaisakademi.test";
 
-    private const string DemoAdminPassword = "Ada!Test123";
-
-    private const string DefaultAdminGroupName = "Default Admin";
-
     #endregion Fields
 
     #region Utils
@@ -78,32 +74,11 @@ internal static class LookupStage
 
         if (adminUser is null)
         {
-            adminUser = new SystemUser(DemoAdminEmail, DemoAdminPassword, SystemUserType.Admin);
+            adminUser = new SystemUser(DemoAdminEmail, SeedConstants.DefaultPassword, SystemUserType.Admin);
             adminUser.Update("Seed", "Admin", phone: null);
             adminUser.Reactivate();
             db.Set<SystemUser>().Add(adminUser);
             await db.SaveChangesAsync(cancellationToken);
-
-            SystemUserGroup? adminGroup = await db.Set<SystemUserGroup>()
-                .FirstOrDefaultAsync(g => g.Name == DefaultAdminGroupName, cancellationToken);
-
-            if (adminGroup is not null)
-            {
-                bool hasMembership = await db.Set<SystemUserGroupMembership>()
-                    .AnyAsync(
-                        m => m.SystemUserGroupId == adminGroup.Id
-                            && m.SystemUserId == adminUser.Id
-                            && m.ScopeType == MembershipScopeType.Global
-                            && m.ScopeId == null,
-                        cancellationToken);
-
-                if (!hasMembership)
-                {
-                    db.Set<SystemUserGroupMembership>()
-                        .Add(new SystemUserGroupMembership(adminGroup.Id, adminUser.Id));
-                    await db.SaveChangesAsync(cancellationToken);
-                }
-            }
         }
 
         Console.WriteLine($"[LookupStage] Demo admin kontrolü tamamlandı. email={DemoAdminEmail}");

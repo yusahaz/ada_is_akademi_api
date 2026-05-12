@@ -80,6 +80,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "DashboardFinancialReconciliationSummary", "default");
 
         /// <summary>
+        /// Cache key for admin commission revenue chart buckets (depends on granularity preset).
+        /// </summary>
+        internal static CacheKey DashboardCommissionRevenueSeriesKey(CommissionRevenueGranularity granularity) =>
+            new(QueryNamespace, "DashboardCommissionRevenueSeries", granularity.ToString("D"));
+
+        /// <summary>
         /// Cache key for filtered financial reconciliation rows.
         /// </summary>
         internal static CacheKey FinancialReconciliationRowsKey(
@@ -202,6 +208,12 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "JobPostingOpenList", $"{limit}:{offset}:{countryCode ?? "all"}");
 
         /// <summary>
+        /// Cache key for global skill dictionary list by limit.
+        /// </summary>
+        internal static CacheKey GlobalSkillDictionaryKey(int limit) =>
+            new(QueryNamespace, "GlobalSkillDictionary", limit.ToString(CultureInfo.InvariantCulture));
+
+        /// <summary>
         /// Invalidation tag for a <see cref="JobPosting"/> aggregate instance.
         /// </summary>
         internal static CacheDependency JobPostingDependency(int jobPostingId) =>
@@ -292,18 +304,6 @@ namespace Azoxia.AdaIsAkademi.Application
             new(QueryNamespace, "SystemUserNotificationInbox", $"{systemUserId}:{isRead?.ToString() ?? "all"}:{limit}:{offset}");
 
         /// <summary>
-        /// Invalidation tag for aggregate-wide <see cref="SystemUserGroup"/> read models.
-        /// </summary>
-        internal static CacheDependency SystemUserGroupAllDependency() =>
-            new(nameof(SystemUserGroup), "all");
-
-        /// <summary>
-        /// Cache key for filtered system-user-group listing queries.
-        /// </summary>
-        internal static CacheKey SystemUserGroupListKey(ListSystemUserGroupsQuery query) =>
-            new(QueryNamespace, "SystemUserGroupList", JsonSerializer.Serialize(query));
-
-        /// <summary>
         /// Invalidation tag for aggregate-wide <see cref="JobApplication"/> counters.
         /// </summary>
         internal static CacheDependency JobApplicationAllDependency() =>
@@ -332,6 +332,15 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheKey WorkerShiftAssignmentListKey(int workerId, int limit, int offset) =>
             new(QueryNamespace, "WorkerShiftAssignmentList", $"{workerId}:{limit}:{offset}");
+
+        /// <summary>
+        /// Cache key for employer-scoped shift assignment list by paging window.
+        /// </summary>
+        internal static CacheKey EmployerShiftAssignmentListKey(int employerId, bool excludeCompleted, int limit, int offset) =>
+            new(
+                QueryNamespace,
+                "EmployerShiftAssignmentList",
+                $"{employerId}:{excludeCompleted}:{limit}:{offset}");
 
         /// <summary>
         /// Invalidation tag for aggregate-wide <see cref="OverdueJobAlarm"/> read models.
@@ -416,33 +425,6 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static CacheDependency CommissionAuditLogAllDependency() =>
             new(nameof(CommissionAuditLog), "all");
-
-        /// <summary>
-        /// Cache key for per-user permission resolver effective rule sets.
-        /// </summary>
-        internal static CacheKey PermissionResolverCacheKey(int systemUserId, int? employerId) =>
-            new(
-                "auth",
-                "PermissionResolver",
-                $"{systemUserId.ToString(CultureInfo.InvariantCulture)}:{employerId?.ToString(CultureInfo.InvariantCulture) ?? "null"}");
-
-        /// <summary>
-        /// Invalidation tag for aggregate-wide permission resolver memberships.
-        /// </summary>
-        internal static CacheDependency PermissionResolverMembershipAllDependency() =>
-            new(nameof(SystemUserGroupMembership), "all");
-
-        /// <summary>
-        /// Invalidation tag for aggregate-wide permission resolver group permission rules.
-        /// </summary>
-        internal static CacheDependency PermissionResolverGroupPermissionAllDependency() =>
-            new(nameof(SystemUserGroupPermission), "all");
-
-        /// <summary>
-        /// Invalidation tag for aggregate-wide permission resolver group definitions (activation/deactivation).
-        /// </summary>
-        internal static CacheDependency PermissionResolverGroupAllDependency() =>
-            new(nameof(SystemUserGroup), "all");
 
         #endregion Methods
     }

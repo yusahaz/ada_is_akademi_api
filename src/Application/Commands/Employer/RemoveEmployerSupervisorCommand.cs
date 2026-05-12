@@ -40,7 +40,15 @@ namespace Azoxia.AdaIsAkademi.Application
                 .FirstOrDefaultAsync(cancellationToken);
             employer = employer.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
-            employer.RemoveShiftSupervisor(command.SystemUserId);
+            employer.RemoveSupervisor(command.SystemUserId);
+
+            SystemUser? supervisorUser = await UnitOfWork
+                .GetRepository<SystemUser>()
+                .GetByIdAsync(command.SystemUserId, cancellationToken);
+            if (supervisorUser is not null && supervisorUser.Type == SystemUserType.Supervisor)
+            {
+                supervisorUser.RevokeEmployerSupervisorRole();
+            }
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerDependency(employerId), cancellationToken);

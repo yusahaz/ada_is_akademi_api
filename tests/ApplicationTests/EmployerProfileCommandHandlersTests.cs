@@ -65,7 +65,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             Employer employer = await SeedEmployerAsync(db);
             executionContext.ReplaceClaim("employer_id", employer.Id.ToString());
 
-            SystemUser supervisorUser = new("supervisor@test.local", "Password1!", SystemUserType.Employer);
+            SystemUser supervisorUser = new("supervisor@test.local", "Password1!", SystemUserType.Worker);
             db.Set<SystemUser>().Add(supervisorUser);
             await db.SaveChangesAsync();
 
@@ -84,7 +84,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 },
                 CancellationToken.None);
 
-            ShiftSupervisor? added = await db.Set<ShiftSupervisor>()
+            Supervisor? added = await db.Set<Supervisor>()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == supervisorId);
             added.Should().NotBeNull();
@@ -98,7 +98,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 },
                 CancellationToken.None);
 
-            ShiftSupervisor? removed = await db.Set<ShiftSupervisor>()
+            Supervisor? removed = await db.Set<Supervisor>()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == supervisorId);
             removed.Should().NotBeNull();
@@ -156,23 +156,18 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             location.SetGeofenceRadiusMetres(100);
             await db.SaveChangesAsync();
 
-            SystemUser supervisorUser = new("delete-supervisor@test.local", "Password1!", SystemUserType.Employer);
+            SystemUser supervisorUser = new("delete-supervisor@test.local", "Password1!", SystemUserType.Worker);
             SystemUser employerScopedUser = new("delete-employer-scoped@test.local", "Password1!", SystemUserType.Employer);
-            SystemUser locationScopedUser = new("delete-location-scoped@test.local", "Password1!", SystemUserType.Employer);
+            SystemUser locationScopedUser = new("delete-location-scoped@test.local", "Password1!", SystemUserType.Worker);
             SystemUser unrelatedUser = new("delete-unrelated@test.local", "Password1!", SystemUserType.Worker);
             db.Set<SystemUser>().AddRange(supervisorUser, employerScopedUser, locationScopedUser, unrelatedUser);
             await db.SaveChangesAsync();
 
-            employer.AddShiftSupervisor(supervisorUser.Id, location.Id);
-            await db.SaveChangesAsync();
-
-            SystemUserGroup group = new("Ops", null, false);
-            db.Set<SystemUserGroup>().Add(group);
-            await db.SaveChangesAsync();
-
-            db.Set<SystemUserGroupMembership>().AddRange(
-                new SystemUserGroupMembership(group.Id, employerScopedUser.Id, MembershipScopeType.EmployerScoped, employer.Id),
-                new SystemUserGroupMembership(group.Id, locationScopedUser.Id, MembershipScopeType.LocationScoped, location.Id));
+            employerScopedUser.BindToEmployerOrganization(employer.Id);
+            supervisorUser.PromoteToEmployerSupervisor(employer.Id);
+            employer.AddSupervisor(supervisorUser.Id, location.Id);
+            locationScopedUser.PromoteToEmployerSupervisor(employer.Id);
+            employer.AddSupervisor(locationScopedUser.Id, location.Id);
             await db.SaveChangesAsync();
 
             var handler = new DeleteEmployerCommandHandler(sp);

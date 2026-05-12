@@ -35,8 +35,7 @@ namespace Azoxia.AdaIsAkademi.Application
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             WorkerEducation item = worker.AddEducation(command.School, command.Department, command.EducationType, command.StartYear, command.EndYear, command.IsOngoing);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await InvalidateWorkerAsync(workerId, cancellationToken);
-            return item.Id;
+return item.Id;
         }
     }
 }

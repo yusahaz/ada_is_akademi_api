@@ -1,12 +1,13 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
 
     /// <summary>
     /// Hierarchical job classification node with an optional parent category.
     /// </summary>
     public class JobCategory :
-        CodedNamedEntityBase
+        CodedNamedAggregateRoot
     {
         #region Ctors
 
@@ -25,7 +26,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             string? description = null) :
             base(name, description)
         {
-
+            RaiseDomainEvent(() => new JobCategoryCreatedEvent(Id, Name));
         }
 
         #endregion Ctors

@@ -108,8 +108,6 @@ namespace Azoxia.AdaIsAkademi.Application
             ApplyPayload(worker, payload, command);
             session.Confirm();
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerDependency(workerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerAllDependency(), cancellationToken);
             return Unit.Value;
         }
 
@@ -312,8 +310,6 @@ namespace Azoxia.AdaIsAkademi.Application
 
             session.Discard();
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerDependency(workerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerAllDependency(), cancellationToken);
             return Unit.Value;
         }
 

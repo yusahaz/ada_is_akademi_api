@@ -1,11 +1,13 @@
-﻿namespace Azoxia.AdaIsAkademi.Api
+namespace Azoxia.AdaIsAkademi.Api
 {
     using System;
     using Azoxia.AdaIsAkademi.Api.Automation;
     using Azoxia.AdaIsAkademi.Api.DependencyInjection;
     using Azoxia.Core.Api;
+    using Azoxia.Core.Configuration;
+    using Azoxia.Core.Persistence.Configs;
     using Hangfire;
-    using Hangfire.InMemory;
+    using Hangfire.PostgreSql;
     using Microsoft.AspNetCore.DataProtection;
     using System.IO;
     using System.Security.Cryptography;
@@ -140,10 +142,37 @@
                         X509KeyStorageFlags.EphemeralKeySet);
                     dataProtection.ProtectKeysWithCertificate(certificate);
                 }
+                string hangfireConnectionString =
+                    builder.Configuration["Hangfire:ConnectionString"];
+                if (string.IsNullOrWhiteSpace(hangfireConnectionString))
+                {
+                    DbConfig dbConfig = Config.GetOrCreateConfig<DbConfig>(builder.Configuration);
+                    hangfireConnectionString = dbConfig.ConnectionString;
+                }
+
+                if (string.IsNullOrWhiteSpace(hangfireConnectionString))
+                {
+                    throw new InvalidOperationException(
+                        "Hangfire PostgreSQL storage requires Hangfire:ConnectionString or a composed DbConfig connection string.");
+                }
+
+                string hangfireSchema =
+                    builder.Configuration["Hangfire:SchemaName"];
+                if (string.IsNullOrWhiteSpace(hangfireSchema))
+                {
+                    hangfireSchema = "hangfire";
+                }
+
                 builder.Services.AddHangfire(configuration => configuration
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
-                    .UseInMemoryStorage());
+                    .UsePostgreSqlStorage(
+                        bootstrap => bootstrap.UseNpgsqlConnection(hangfireConnectionString),
+                        new PostgreSqlStorageOptions
+                        {
+                            SchemaName = hangfireSchema,
+                            PrepareSchemaIfNecessary = true,
+                        }));
                 builder.Services.AddHangfireServer();
                 builder.Services.AddScoped<OverdueAlarmRecurringJob>();
                 builder.Services.AddScoped<EmbeddingRefreshRecurringJob>();

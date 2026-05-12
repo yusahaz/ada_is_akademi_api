@@ -13,7 +13,7 @@
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Core\src\Persistence\Persistence.csproj" />
+		<ProjectReference Include="..\..\Core\src\Persistence\Persistence.csproj" />
 		<ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
 	<ItemGroup>

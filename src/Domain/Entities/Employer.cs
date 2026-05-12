@@ -20,7 +20,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         private readonly List<JobPosting> _jobPostings = new();
         private readonly List<EmployerLocation> _locations = new();
         private readonly List<EmployerSocialLink> _socialLinks = new();
-        private readonly List<ShiftSupervisor> _supervisors = new();
+        private readonly List<Supervisor> _supervisors = new();
 
         #endregion Fields
 
@@ -123,16 +123,16 @@ namespace Azoxia.AdaIsAkademi.Domain
         }
 
         /// <summary>
-        /// Adds or returns an existing shift supervisor link for the user.
+        /// Adds or returns an existing supervisor link for the user.
         /// </summary>
-        protected internal ShiftSupervisor AddShiftSupervisor(int systemUserId, int? locationId = null)
+        protected internal Supervisor AddSupervisor(int systemUserId, int? locationId = null)
         {
-            ShiftSupervisor? existing = Supervisors
+            Supervisor? existing = Supervisors
                 .FirstOrDefault(x => x.SystemUserId == systemUserId);
 
             if (existing is null)
             {
-                ShiftSupervisor supervisor = new(Id, systemUserId, locationId);
+                Supervisor supervisor = new(Id, systemUserId, locationId);
                 _supervisors.Add(supervisor);
                 return supervisor;
             }
@@ -149,9 +149,9 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// <summary>
         /// Deactivates a supervisor assignment for the given user when present.
         /// </summary>
-        protected internal void RemoveShiftSupervisor(int systemUserId)
+        protected internal void RemoveSupervisor(int systemUserId)
         {
-            ShiftSupervisor? supervisor = Supervisors
+            Supervisor? supervisor = Supervisors
                 .FirstOrDefault(x => x.SystemUserId == systemUserId);
 
             if (supervisor is not null)
@@ -302,7 +302,7 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// <summary>
         /// Shift supervisors assigned to this employer.
         /// </summary>
-        public virtual IReadOnlyList<ShiftSupervisor> Supervisors => _supervisors.AsReadOnly();
+        public virtual IReadOnlyList<Supervisor> Supervisors => _supervisors.AsReadOnly();
 
         #endregion Properties
     }

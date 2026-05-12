@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application.Tests
 {
+    using Azoxia.AdaIsAkademi.Application;
     using Azoxia.AdaIsAkademi.Application.Tests.Support;
     using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.AdaIsAkademi.Persistence;
@@ -39,6 +40,52 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
 
             result.Items.Should().HaveCount(1);
             result.Items[0].Title.Should().Be("TR Posting");
+        }
+
+        [Fact]
+        public async Task ListOpenJobPostingsQueryHandler_filters_by_distance_when_near_coordinates_provided()
+        {
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider();
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            await SeedOpenPostingAsync(db, "TR", "IST Posting");
+
+            var handler = new ListOpenJobPostingsQueryHandler(sp);
+
+            PagedQueryResultModel<JobPostingSummaryModel> farFromIstanbul =
+                await ((IRequestHandler<ListOpenJobPostingsQuery, PagedQueryResultModel<JobPostingSummaryModel>>)handler)
+                    .HandleAsync(
+                        new ListOpenJobPostingsQuery
+                        {
+                            NearLatitude = 52.520008,
+                            NearLongitude = 13.404954,
+                            RadiusMetres = 5000,
+                            Limit = 50,
+                            Offset = 0,
+                        },
+                        CancellationToken.None);
+
+            farFromIstanbul.Items.Should().BeEmpty();
+
+            PagedQueryResultModel<JobPostingSummaryModel> nearIstanbul =
+                await ((IRequestHandler<ListOpenJobPostingsQuery, PagedQueryResultModel<JobPostingSummaryModel>>)handler)
+                    .HandleAsync(
+                        new ListOpenJobPostingsQuery
+                        {
+                            NearLatitude = 41.015137,
+                            NearLongitude = 28.97953,
+                            RadiusMetres = 50_000,
+                            Limit = 50,
+                            Offset = 0,
+                        },
+                        CancellationToken.None);
+
+            nearIstanbul.Items.Should().HaveCount(1);
+            nearIstanbul.Items[0].Title.Should().Be("IST Posting");
+            nearIstanbul.Items[0].DistanceMetres.Should().NotBeNull();
+            nearIstanbul.Items[0].DistanceMetres!.Value.Should().BeLessThan(1000d);
         }
 
         private static async Task SeedOpenPostingAsync(AdaIsAkademiDbContext db, string country, string title)

@@ -23,14 +23,22 @@ namespace Azoxia.AdaIsAkademi.Application
             IWorkerEmployerProfileAccess workerEmployerProfileAccess =
                 ServiceProvider.GetRequiredService<IWorkerEmployerProfileAccess>();
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
-            int employerId = executionContext.RequireAdaIsEmployerActorId();
-            await workerEmployerProfileAccess.EnsureEmployerSharesJobApplicationWithWorkerAsync(
-                UnitOfWork,
-                employerId,
-                query.WorkerId,
-                cancellationToken);
+            bool isAdmin = executionContext.GetClaim("system_user_type") == ((int)SystemUserType.Admin).ToString();
+            int? employerId = null;
+            if (!isAdmin)
+            {
+                employerId = executionContext.RequireAdaIsEmployerActorId();
+                await workerEmployerProfileAccess.EnsureEmployerSharesJobApplicationWithWorkerAsync(
+                    UnitOfWork,
+                    employerId.Value,
+                    query.WorkerId,
+                    cancellationToken);
+            }
 
-            CacheKey cacheKey = AdaIsCacheKeys.WorkerEmployerSafeDetailKey(employerId, query.WorkerId);
+            string viewerScope = isAdmin
+                ? "admin"
+                : employerId!.Value.ToString();
+            CacheKey cacheKey = new("query", "WorkerEmployerSafeDetail", $"{viewerScope}:{query.WorkerId}");
             WorkerEmployerSafeDetailModel? cached =
                 await CacheService.GetAsync<WorkerEmployerSafeDetailModel>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -47,12 +55,16 @@ namespace Azoxia.AdaIsAkademi.Application
 
             entity = entity.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
-            int employerViews =
-                await workerEmployerProfileAccess.GetEmployerSourcedProfileViewCountAsync(
-                    UnitOfWork,
-                    employerId,
-                    entity.Id,
-                    cancellationToken);
+            int employerViews = 0;
+            if (employerId.HasValue)
+            {
+                employerViews =
+                    await workerEmployerProfileAccess.GetEmployerSourcedProfileViewCountAsync(
+                        UnitOfWork,
+                        employerId.Value,
+                        entity.Id,
+                        cancellationToken);
+            }
 
             IReadOnlyList<string> tags = entity.Skills
                 .Select(x => x.Tag.Value)
@@ -68,12 +80,16 @@ namespace Azoxia.AdaIsAkademi.Application
                 tags,
                 employerViews);
 
+            List<CacheDependency> dependencies = [AdaIsCacheKeys.WorkerDependency(entity.Id)];
+            if (employerId.HasValue)
+            {
+                dependencies.Add(AdaIsCacheKeys.EmployerWorkerProfileViewStatDependency(employerId.Value, entity.Id));
+            }
+
             await CacheService.SetAsync(
                 cacheKey,
                 model,
-                AdaIsCacheKeys.DetailReadModelOptions(
-                    AdaIsCacheKeys.WorkerDependency(entity.Id),
-                    AdaIsCacheKeys.EmployerWorkerProfileViewStatDependency(employerId, entity.Id)),
+                AdaIsCacheKeys.DetailReadModelOptions([.. dependencies]),
                 cancellationToken);
 
             return model;

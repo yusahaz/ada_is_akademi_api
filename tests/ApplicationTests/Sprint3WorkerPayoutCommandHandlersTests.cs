@@ -29,21 +29,22 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             executionContext.ReplaceClaim("employer_id", employerId.ToString());
 
             var createHandler = new CreateWorkerPayoutCommandHandler(sp);
-            int firstId = await ((IRequestHandler<CreateWorkerPayoutCommand, int>)createHandler).HandleAsync(
+            WorkerPayoutSnapshotModel first = await ((IRequestHandler<CreateWorkerPayoutCommand, WorkerPayoutSnapshotModel>)createHandler).HandleAsync(
                 new CreateWorkerPayoutCommand { AssignmentId = assignmentId },
                 CancellationToken.None);
-            int secondId = await ((IRequestHandler<CreateWorkerPayoutCommand, int>)createHandler).HandleAsync(
+            WorkerPayoutSnapshotModel second = await ((IRequestHandler<CreateWorkerPayoutCommand, WorkerPayoutSnapshotModel>)createHandler).HandleAsync(
                 new CreateWorkerPayoutCommand { AssignmentId = assignmentId },
                 CancellationToken.None);
 
-            firstId.Should().Be(secondId);
+            int firstId = first.WorkerPayoutId;
+            firstId.Should().Be(second.WorkerPayoutId);
             WorkerPayout payout = await db.Set<WorkerPayout>().AsNoTracking().FirstAsync(x => x.Id == firstId);
             payout.WorkerId.Should().Be(workerId);
             payout.Status.Should().Be(WorkerPayoutStatus.Pending);
 
             int auditCount = await db.Set<CommissionAuditLog>()
                 .AsNoTracking()
-                .CountAsync(x => x.WorkerPayoutId == firstId && x.EventType == CommissionAuditEventType.WorkerPayoutCreated);
+                .CountAsync(x => x.AssignmentId == assignmentId && x.EventType == CommissionAuditEventType.WorkerPayoutCreated);
             auditCount.Should().Be(1);
         }
 
@@ -59,18 +60,19 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
 
             executionContext.ReplaceClaim("employer_id", employerId.ToString());
             var createHandler = new CreateWorkerPayoutCommandHandler(sp);
-            int payoutId = await ((IRequestHandler<CreateWorkerPayoutCommand, int>)createHandler).HandleAsync(
+            WorkerPayoutSnapshotModel created = await ((IRequestHandler<CreateWorkerPayoutCommand, WorkerPayoutSnapshotModel>)createHandler).HandleAsync(
                 new CreateWorkerPayoutCommand { AssignmentId = assignmentId },
                 CancellationToken.None);
+            int payoutId = created.WorkerPayoutId;
 
             var markHandler = new MarkWorkerPayoutAsProcessingCommandHandler(sp);
-            await ((IRequestHandler<MarkWorkerPayoutAsProcessingCommand, Unit>)markHandler).HandleAsync(
+            await ((IRequestHandler<MarkWorkerPayoutAsProcessingCommand, WorkerPayoutSnapshotModel>)markHandler).HandleAsync(
                 new MarkWorkerPayoutAsProcessingCommand { WorkerPayoutId = payoutId },
                 CancellationToken.None);
 
             executionContext.ReplaceClaim("worker_id", workerId.ToString());
             var confirmHandler = new ConfirmWorkerPayoutCommandHandler(sp);
-            await ((IRequestHandler<ConfirmWorkerPayoutCommand, Unit>)confirmHandler).HandleAsync(
+            await ((IRequestHandler<ConfirmWorkerPayoutCommand, WorkerPayoutSnapshotModel>)confirmHandler).HandleAsync(
                 new ConfirmWorkerPayoutCommand { WorkerPayoutId = payoutId },
                 CancellationToken.None);
 
@@ -80,7 +82,8 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
 
             List<CommissionAuditEventType> eventTypes = await db.Set<CommissionAuditLog>()
                 .AsNoTracking()
-                .Where(x => x.WorkerPayoutId == payoutId)
+                .Where(x => x.WorkerPayoutId == payoutId
+                    || (x.AssignmentId == assignmentId && x.EventType == CommissionAuditEventType.WorkerPayoutCreated))
                 .OrderBy(x => x.Id)
                 .Select(x => x.EventType)
                 .ToListAsync();
@@ -102,22 +105,23 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             executionContext.ReplaceClaim("employer_id", employerId.ToString());
 
             var createHandler = new CreateWorkerPayoutCommandHandler(sp);
-            int payoutId = await ((IRequestHandler<CreateWorkerPayoutCommand, int>)createHandler).HandleAsync(
+            WorkerPayoutSnapshotModel created = await ((IRequestHandler<CreateWorkerPayoutCommand, WorkerPayoutSnapshotModel>)createHandler).HandleAsync(
                 new CreateWorkerPayoutCommand { AssignmentId = assignmentId },
                 CancellationToken.None);
+            int payoutId = created.WorkerPayoutId;
 
             var markHandler = new MarkWorkerPayoutAsProcessingCommandHandler(sp);
-            await ((IRequestHandler<MarkWorkerPayoutAsProcessingCommand, Unit>)markHandler).HandleAsync(
+            await ((IRequestHandler<MarkWorkerPayoutAsProcessingCommand, WorkerPayoutSnapshotModel>)markHandler).HandleAsync(
                 new MarkWorkerPayoutAsProcessingCommand { WorkerPayoutId = payoutId },
                 CancellationToken.None);
 
             var failHandler = new FailWorkerPayoutCommandHandler(sp);
-            await ((IRequestHandler<FailWorkerPayoutCommand, Unit>)failHandler).HandleAsync(
+            await ((IRequestHandler<FailWorkerPayoutCommand, WorkerPayoutSnapshotModel>)failHandler).HandleAsync(
                 new FailWorkerPayoutCommand { WorkerPayoutId = payoutId, Reason = "bank_timeout" },
                 CancellationToken.None);
 
             var retryHandler = new RetryWorkerPayoutCommandHandler(sp);
-            await ((IRequestHandler<RetryWorkerPayoutCommand, Unit>)retryHandler).HandleAsync(
+            await ((IRequestHandler<RetryWorkerPayoutCommand, WorkerPayoutSnapshotModel>)retryHandler).HandleAsync(
                 new RetryWorkerPayoutCommand { WorkerPayoutId = payoutId },
                 CancellationToken.None);
 
@@ -138,19 +142,20 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             executionContext.ReplaceClaim("employer_id", employerId.ToString());
 
             var createHandler = new CreateWorkerPayoutCommandHandler(sp);
-            int payoutId = await ((IRequestHandler<CreateWorkerPayoutCommand, int>)createHandler).HandleAsync(
+            WorkerPayoutSnapshotModel created = await ((IRequestHandler<CreateWorkerPayoutCommand, WorkerPayoutSnapshotModel>)createHandler).HandleAsync(
                 new CreateWorkerPayoutCommand { AssignmentId = assignmentId },
                 CancellationToken.None);
+            int payoutId = created.WorkerPayoutId;
 
             var markHandler = new MarkWorkerPayoutAsProcessingCommandHandler(sp);
-            await ((IRequestHandler<MarkWorkerPayoutAsProcessingCommand, Unit>)markHandler).HandleAsync(
+            await ((IRequestHandler<MarkWorkerPayoutAsProcessingCommand, WorkerPayoutSnapshotModel>)markHandler).HandleAsync(
                 new MarkWorkerPayoutAsProcessingCommand { WorkerPayoutId = payoutId },
                 CancellationToken.None);
 
             executionContext.ReplaceClaim("worker_id", "777777");
             var confirmHandler = new ConfirmWorkerPayoutCommandHandler(sp);
             Func<Task> act = async () =>
-                await ((IRequestHandler<ConfirmWorkerPayoutCommand, Unit>)confirmHandler).HandleAsync(
+                await ((IRequestHandler<ConfirmWorkerPayoutCommand, WorkerPayoutSnapshotModel>)confirmHandler).HandleAsync(
                     new ConfirmWorkerPayoutCommand { WorkerPayoutId = payoutId },
                     CancellationToken.None);
 

@@ -42,6 +42,15 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasColumnOrder(columnOrder++)
                 .IsRequired(false);
 
+            builder.Property(e => e.CvOptions)
+                .HasColumnName("CvOptions")
+                .HasConversion(
+                    value => value.HasValue ? value.Value.Value : null,
+                    value => value == null ? (CvOptions?)null : new CvOptions(value))
+                .HasMaxLength(1024)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
             builder.Property(e => e.SkillEmbedding)
                 .HasColumnType("real[]")
                 .HasColumnOrder(columnOrder++)

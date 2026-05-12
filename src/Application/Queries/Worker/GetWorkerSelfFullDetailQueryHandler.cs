@@ -72,6 +72,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.SystemUserId,
                 entity.Nationality,
                 entity.University,
+                entity.CvOptions?.Value,
                 entity.Bio,
                 entity.ProfilePhotoObjectKey,
                 entity.EmbeddingUpdatedAt,

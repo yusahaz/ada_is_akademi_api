@@ -26,6 +26,7 @@ internal static class SeedPipeline
     internal static async Task RunAsync(
         AdaIsAkademiDbContext db,
         SeedOptions options,
+        ObjectStorageMediaUploader? mediaUploader,
         CancellationToken cancellationToken)
     {
         if (IsProductionBlocked(options))
@@ -55,7 +56,9 @@ internal static class SeedPipeline
 
         var state = new SeederState();
         await RunStageAsync("Lookup", () => LookupStage.RunAsync(db, state, cancellationToken));
-        await RunStageAsync("Workforce", () => WorkforceStage.RunAsync(db, state, options, rnd, faker, cancellationToken));
+        await RunStageAsync(
+            "Workforce",
+            () => WorkforceStage.RunAsync(db, state, options, rnd, faker, mediaUploader, cancellationToken));
         await RunStageAsync("JobPostingApplication", () => JobPostingApplicationStage.RunAsync(db, state, options, rnd, faker, cancellationToken));
         await RunStageAsync("Monetization", () => MonetizationStage.RunAsync(db, state, options, rnd, cancellationToken));
 

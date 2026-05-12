@@ -19,6 +19,11 @@ namespace Azoxia.AdaIsAkademi.Application
         #region Properties
 
         /// <summary>
+        /// Optional target worker id for admin-initiated updates.
+        /// </summary>
+        public int? WorkerId { get; set; }
+
+        /// <summary>
         /// Optional given name text.
         /// </summary>
         public string? FirstName { get; set; }
@@ -49,6 +54,12 @@ namespace Azoxia.AdaIsAkademi.Application
         public ValidationResult Validate(UpdateWorkerProfileCommand request)
         {
             List<ValidationFailure> failures = [];
+
+            if (request.WorkerId.HasValue &&
+                request.WorkerId.Value <= 0)
+            {
+                failures.Add(AzoxiaErrorCodes.RequestValidationFailed.ForField(nameof(UpdateWorkerProfileCommand.WorkerId)));
+            }
 
             if (!request.Nationality.IsNullOrWhiteSpace() &&
                 request.Nationality.Trim().Length > 128)
@@ -89,7 +100,10 @@ namespace Azoxia.AdaIsAkademi.Application
         protected override async Task<Unit> HandleAsync(UpdateWorkerProfileCommand command, CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
-            int workerId = executionContext.RequireAdaIsWorkerActorId();
+            bool isAdmin = executionContext.GetClaim("system_user_type") == ((int)SystemUserType.Admin).ToString();
+            int workerId = isAdmin && command.WorkerId.HasValue && command.WorkerId.Value > 0
+                ? command.WorkerId.Value
+                : executionContext.RequireAdaIsWorkerActorId();
 
             Worker? worker = await UnitOfWork
                 .GetRepository<Worker>()
@@ -116,14 +130,6 @@ namespace Azoxia.AdaIsAkademi.Application
             worker.UpdateProfile(command.Nationality, command.University);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerDependency(workerId),
-                cancellationToken);
-
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerAllDependency(),
-                cancellationToken);
 
             return Unit.Value;
         }

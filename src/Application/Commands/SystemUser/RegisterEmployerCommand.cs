@@ -165,7 +165,7 @@ namespace Azoxia.AdaIsAkademi.Application
             UnitOfWork.Add(employer);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            employer.AddShiftSupervisor(user.Id);
+            user.BindToEmployerOrganization(employer.Id);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
             await CacheService.InvalidateByDependencyAsync(

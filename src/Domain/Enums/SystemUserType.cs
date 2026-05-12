@@ -16,6 +16,11 @@
         Employer = 20,
 
         /// <summary>
+        /// Employer-scoped field supervisor (QR / shift operations).
+        /// </summary>
+        Supervisor = 25,
+
+        /// <summary>
         /// Individual applicant maintaining a worker profile.
         /// </summary>
         Worker = 30,

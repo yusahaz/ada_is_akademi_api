@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
     using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
@@ -12,7 +13,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     /// Aggregate root representing a worker profile and related employment metadata.
     /// </summary>
     public class Worker :
-        DeletableEntityBase
+        DeletableAggregateRoot
     {
         #region Fields
 
@@ -42,11 +43,17 @@ namespace Azoxia.AdaIsAkademi.Domain
         protected internal Worker(int systemUserId)
         {
             SystemUserId = systemUserId;
+            RaiseDomainEvent(() => new WorkerRegisteredEvent(Id, SystemUserId));
         }
 
         #endregion Ctors
 
         #region Utils
+
+        private void NotifyWorkerProfileMaterialChanged()
+        {
+            RaiseDomainEvent(() => new WorkerProfileUpdatedEvent(Id));
+        }
 
         /// <summary>
         /// Adds or returns an existing identical weekly availability window.
@@ -64,6 +71,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             WorkerAvailability availability = new(Id, dayOfWeek, timeFrom, timeTo);
             _availabilities.Add(availability);
+            NotifyWorkerProfileMaterialChanged();
             return availability;
         }
 
@@ -91,6 +99,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             WorkerCertificate certificate = new(Id, name, issuingOrganization, issuedAt, expiresAt, documentUrl);
             _certificates.Add(certificate);
+            NotifyWorkerProfileMaterialChanged();
             return certificate;
         }
 
@@ -122,6 +131,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             WorkerEducation education = new(Id, school, department, educationType, startYear, endYear, isOngoing);
             _educations.Add(education);
+            NotifyWorkerProfileMaterialChanged();
             return education;
         }
 
@@ -150,6 +160,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             WorkerExperience experience = new(Id, companyName, position, startDate, endDate, description);
             _experiences.Add(experience);
+            NotifyWorkerProfileMaterialChanged();
             return experience;
         }
 
@@ -170,6 +181,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             WorkerLanguage workerLanguage = new(Id, language, level);
             _languages.Add(workerLanguage);
+            NotifyWorkerProfileMaterialChanged();
             return workerLanguage;
         }
 
@@ -195,6 +207,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             WorkerReference reference = new(Id, company, position, contact);
             _references.Add(reference);
+            NotifyWorkerProfileMaterialChanged();
             return reference;
         }
 
@@ -212,6 +225,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             {
                 skill = new(Id, normalizedTag);
                 _skills.Add(skill);
+                NotifyWorkerProfileMaterialChanged();
                 return skill;
             }
 
@@ -232,6 +246,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             WorkerAvailability? availability = Availabilities.FirstOrDefault(x => x.Id == availabilityId);
             availability = availability.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
             _availabilities.Remove(availability);
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -242,6 +257,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             WorkerCertificate? certificate = Certificates.FirstOrDefault(x => x.Id == certificateId);
             certificate = certificate.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
             _certificates.Remove(certificate);
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -252,6 +268,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             WorkerEducation? education = Educations.FirstOrDefault(x => x.Id == educationId);
             education = education.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
             _educations.Remove(education);
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -262,6 +279,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             WorkerExperience? experience = Experiences.FirstOrDefault(x => x.Id == experienceId);
             experience = experience.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
             _experiences.Remove(experience);
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -272,6 +290,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             WorkerLanguage? language = Languages.FirstOrDefault(x => x.Id == languageId);
             language = language.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
             _languages.Remove(language);
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -282,6 +301,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             WorkerReference? reference = References.FirstOrDefault(x => x.Id == referenceId);
             reference = reference.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
             _references.Remove(reference);
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -292,6 +312,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             WorkerSkill? skill = Skills.FirstOrDefault(x => x.Id == skillId);
             skill = skill.ThrowIfNull(DomainErrorCodes.WorkerProfileItemNotFound);
             _skills.Remove(skill);
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -307,6 +328,8 @@ namespace Azoxia.AdaIsAkademi.Domain
             {
                 _interestedJobCategories.Add(new WorkerInterestedJobCategory(Id, categoryId));
             }
+
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -324,6 +347,8 @@ namespace Azoxia.AdaIsAkademi.Domain
             {
                 _socialLinks.Add(new WorkerSocialLink(Id, row.Platform, row.Url));
             }
+
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -334,6 +359,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             ProfilePhotoObjectKey = objectKey.IsNullOrWhiteSpace()
                 ? null
                 : objectKey.Trim();
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -344,6 +370,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             Bio = bio.IsNullOrWhiteSpace()
                 ? null
                 : bio.Trim();
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -376,6 +403,8 @@ namespace Azoxia.AdaIsAkademi.Domain
                 ExpectedSalaryMaxAmount = m.Amount;
                 ExpectedSalaryMaxCurrency = m.Currency.Trim().ToUpperInvariant();
             }
+
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -389,6 +418,18 @@ namespace Azoxia.AdaIsAkademi.Domain
             University = university.IsNullOrWhiteSpace()
                 ? null
                 : university.Trim();
+            NotifyWorkerProfileMaterialChanged();
+        }
+
+        /// <summary>
+        /// Updates persisted serialized CV options payload.
+        /// </summary>
+        protected internal void UpdateCvOptions(string? cvOptions)
+        {
+            CvOptions = cvOptions.IsNullOrWhiteSpace()
+                ? (CvOptions?)null
+                : new CvOptions(cvOptions.Trim());
+            NotifyWorkerProfileMaterialChanged();
         }
 
         /// <summary>
@@ -400,11 +441,13 @@ namespace Azoxia.AdaIsAkademi.Domain
             {
                 SkillEmbedding = null;
                 EmbeddingUpdatedAt = null;
+                NotifyWorkerProfileMaterialChanged();
                 return;
             }
 
             SkillEmbedding = skillEmbedding;
             EmbeddingUpdatedAt = DateTimeOffset.UtcNow;
+            NotifyWorkerProfileMaterialChanged();
         }
 
         #endregion Utils
@@ -465,6 +508,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// University name associated with the worker, if applicable.
         /// </summary>
         public string? University { get; private set; }
+
+        /// <summary>
+        /// Persisted worker-selected serialized CV options payload.
+        /// </summary>
+        public CvOptions? CvOptions { get; private set; }
 
 
         /// <summary>

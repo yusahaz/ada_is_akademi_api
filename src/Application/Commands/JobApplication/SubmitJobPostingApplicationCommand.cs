@@ -96,18 +96,6 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.JobPostingDependency(command.JobPostingId),
-                cancellationToken);
-
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.EmployerJobPostingsSummaryDependency(posting.EmployerId),
-                cancellationToken);
-
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.JobApplicationAllDependency(),
-                cancellationToken);
-
             return application.Id;
         }
 

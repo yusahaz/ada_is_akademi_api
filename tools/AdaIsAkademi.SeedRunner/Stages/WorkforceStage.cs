@@ -23,6 +23,7 @@ internal static class WorkforceStage
         SeedOptions options,
         Random rnd,
         Faker faker,
+        ObjectStorageMediaUploader? mediaUploader,
         CancellationToken cancellationToken)
     {
         string[] clusters =
@@ -122,7 +123,7 @@ internal static class WorkforceStage
 
             MaybeSetWorkerBio(worker, rnd, faker);
             MaybeSetWorkerSocialLinks(worker, rnd, faker);
-            MaybeSetWorkerProfilePhotoKey(worker, i, rnd);
+            worker.SetProfilePhotoObjectKey($"seed/demo/workers/worker-{i:D3}/profile.jpg");
 
             string embedSeed = string.Join('|', tags.OrderBy(x => x));
             worker.UpdateSkillEmbedding(EmbeddingFaker.GenerateDeterministic(embedSeed));
@@ -142,6 +143,12 @@ internal static class WorkforceStage
         }
 
         await db.SaveChangesAsync(cancellationToken);
+
+        if (mediaUploader is not null && mediaUploader.CanUploadForScale(options))
+        {
+            Console.WriteLine("[WorkforceStage] MinIO: worker profil görselleri yükleniyor...");
+            await mediaUploader.SeedWorkerAvatarsAsync(state, cancellationToken);
+        }
 
         (string City, string Country, double Lat, double Lon)[] geo =
         [
@@ -171,16 +178,18 @@ internal static class WorkforceStage
             db.Set<SystemUser>().Add(primary);
             await db.SaveChangesAsync(cancellationToken);
 
-            employer.AddShiftSupervisor(primary.Id);
+            primary.BindToEmployerOrganization(employer.Id);
+            await db.SaveChangesAsync(cancellationToken);
             List<SystemUser> extraSupervisors = [];
             if (rnd.NextDouble() < 0.50)
             {
-                SystemUser sup = new($"employer{e:D2}-super2@adaisakademi.seed.local", SeedConstants.DefaultPassword, SystemUserType.Employer);
+                SystemUser sup = new($"employer{e:D2}-super2@adaisakademi.seed.local", SeedConstants.DefaultPassword, SystemUserType.Supervisor);
                 sup.Update(faker.Name.FirstName(), faker.Name.LastName(), PhoneTurkey(faker));
                 sup.Reactivate();
                 db.Set<SystemUser>().Add(sup);
                 await db.SaveChangesAsync(cancellationToken);
-                employer.AddShiftSupervisor(sup.Id);
+                sup.InitializeEmployerScopedSupervisor(employer.Id);
+                employer.AddSupervisor(sup.Id);
                 extraSupervisors.Add(sup);
             }
 
@@ -210,6 +219,12 @@ internal static class WorkforceStage
             {
                 Console.WriteLine($"[WorkforceStage] Employer ilerleme: {e}/{options.Employers}");
             }
+        }
+
+        if (mediaUploader is not null && mediaUploader.CanUploadForScale(options))
+        {
+            Console.WriteLine("[WorkforceStage] MinIO: işveren logoları yükleniyor...");
+            await mediaUploader.SeedEmployerLogosAsync(state, cancellationToken);
         }
 
         Console.WriteLine(
@@ -260,10 +275,7 @@ internal static class WorkforceStage
             ]);
         }
 
-        if (rnd.NextDouble() < 0.55)
-        {
-            employer.SetLogoObjectKey($"seed/demo/employers/employer-{employerIndex:D2}/logo.png");
-        }
+        employer.SetLogoObjectKey($"seed/demo/employers/employer-{employerIndex:D2}/logo.png");
     }
 
     private static void MaybeSetWorkerBio(Worker worker, Random rnd, Faker faker)
@@ -271,14 +283,6 @@ internal static class WorkforceStage
         if (rnd.NextDouble() < 0.65)
         {
             worker.UpdateBio(faker.Lorem.Paragraph());
-        }
-    }
-
-    private static void MaybeSetWorkerProfilePhotoKey(Worker worker, int workerIndex, Random rnd)
-    {
-        if (rnd.NextDouble() < 0.35)
-        {
-            worker.SetProfilePhotoObjectKey($"seed/demo/workers/worker-{workerIndex:D3}/profile.jpg");
         }
     }
 

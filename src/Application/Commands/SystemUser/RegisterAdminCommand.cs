@@ -88,35 +88,6 @@ namespace Azoxia.AdaIsAkademi.Application
             UnitOfWork.Add(user);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            SystemUserGroup? adminGroup = await UnitOfWork
-                .GetRepository<SystemUserGroup>()
-                .Filter(x => x.Name == "Default Admin")
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (adminGroup is not null)
-            {
-                bool membershipExists = await UnitOfWork
-                    .GetRepository<SystemUserGroupMembership>()
-                    .AnyAsync(
-                        x => x.SystemUserGroupId == adminGroup.Id
-                            && x.SystemUserId == user.Id
-                            && x.ScopeType == MembershipScopeType.Global
-                            && x.ScopeId == null,
-                        cancellationToken);
-
-                if (!membershipExists)
-                {
-                    SystemUserGroupMembership membership = new(adminGroup.Id, user.Id);
-                    UnitOfWork.Add(membership);
-                    await UnitOfWork.SaveChangesAsync(cancellationToken);
-
-                    await CacheService.InvalidateByDependencyAsync(
-                        AdaIsCacheKeys.PermissionResolverMembershipAllDependency(),
-                        cancellationToken);
-                }
-            }
-
             await CacheService.InvalidateByDependencyAsync(
                 AdaIsCacheKeys.SystemUserAllDependency(),
                 cancellationToken);

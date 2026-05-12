@@ -87,8 +87,17 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasColumnOrder(columnOrder++)
                 .IsRequired(false);
 
+            builder.Property(e => e.EmployerId)
+                .HasColumnOrder(columnOrder++)
+                .IsRequired(false);
+
             builder.HasIndex(e => e.Email)
                 .IsUnique();
+
+            builder.HasOne(e => e.Employer)
+                .WithMany()
+                .HasForeignKey(e => e.EmployerId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasMany(e => e.Devices)
                 .WithOne(d => d.SystemUser)

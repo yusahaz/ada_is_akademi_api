@@ -4,6 +4,7 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Caching;
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
+    using Azoxia.Core.Exceptions;
     using Azoxia.Core.Extensions;
 
     /// <summary>
@@ -13,6 +14,7 @@ namespace Azoxia.AdaIsAkademi.Application
         QueryBase<PagedQueryResultModel<SystemUserListItemModel>>
     {
         public AccountStatus? AccountStatus { get; set; }
+        public int? EmployerId { get; set; }
         public int Limit { get; set; } = 20;
         public int Offset { get; set; }
         public string? SearchEmail { get; set; }
@@ -26,6 +28,7 @@ namespace Azoxia.AdaIsAkademi.Application
             List<ValidationFailure> failures = [];
             if (request.Limit is < 1 or > 200) failures.Add(ApplicationValidationCodes.ListSystemUsersLimit.ForField(nameof(ListSystemUsersQuery.Limit)));
             if (request.Offset < 0) failures.Add(ApplicationValidationCodes.ListSystemUsersOffset.ForField(nameof(ListSystemUsersQuery.Offset)));
+            if (request.EmployerId.HasValue && request.EmployerId.Value <= 0) failures.Add(AzoxiaErrorCodes.RequestValidationFailed.ForField(nameof(ListSystemUsersQuery.EmployerId)));
             return new ValidationResult(failures);
         }
     }
@@ -42,6 +45,7 @@ namespace Azoxia.AdaIsAkademi.Application
             var filter = UnitOfWork.GetRepository<SystemUser>().Filter().AsNoTracking();
             if (query.AccountStatus.HasValue) filter = filter.Filter(x => x.AccountStatus == query.AccountStatus.Value);
             if (query.Type.HasValue) filter = filter.Filter(x => x.Type == query.Type.Value);
+            if (query.EmployerId.HasValue) filter = filter.Filter(x => x.EmployerId == query.EmployerId.Value);
             if (!query.SearchEmail.IsNullOrWhiteSpace())
             {
                 string s = query.SearchEmail.Trim().ToLowerInvariant();

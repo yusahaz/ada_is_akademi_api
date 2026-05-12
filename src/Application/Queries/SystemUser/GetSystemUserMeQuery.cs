@@ -51,9 +51,10 @@ namespace Azoxia.AdaIsAkademi.Application
             int? workerId = int.TryParse(executionContext.GetClaim("worker_id"), out int parsedWorkerId) && parsedWorkerId > 0
                 ? parsedWorkerId
                 : null;
-            int? employerId = int.TryParse(executionContext.GetClaim("employer_id"), out int parsedEmployerId) && parsedEmployerId > 0
+            int? employerIdFromClaim = int.TryParse(executionContext.GetClaim("employer_id"), out int parsedEmployerId) && parsedEmployerId > 0
                 ? parsedEmployerId
                 : null;
+            int? employerId = user.EmployerId ?? employerIdFromClaim;
 
             return new SystemUserMeModel(
                 user.Id,

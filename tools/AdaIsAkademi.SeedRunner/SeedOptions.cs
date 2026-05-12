@@ -38,6 +38,11 @@ public sealed class SeedOptions
     public bool Reset { get; init; }
 
     /// <summary>
+    /// When true, skips downloading and uploading avatar/logo bytes (object keys are still written).
+    /// </summary>
+    public bool SkipMediaUpload { get; init; }
+
+    /// <summary>
     /// Deterministic seed for Bogus and System.Random.
     /// </summary>
     public int Seed { get; init; } = 12_345;
@@ -60,6 +65,7 @@ public sealed class SeedOptions
     {
         bool reset = false;
         bool allowProduction = false;
+        bool skipMediaUpload = false;
         string? connectionString = null;
         int workers = 100;
         int employers = 20;
@@ -77,6 +83,9 @@ public sealed class SeedOptions
                     break;
                 case "--allow-production":
                     allowProduction = true;
+                    break;
+                case "--skip-media-upload":
+                    skipMediaUpload = true;
                     break;
                 case "--workers":
                     workers = int.Parse(args[++i]);
@@ -103,6 +112,7 @@ public sealed class SeedOptions
         {
             Reset = reset,
             AllowProduction = allowProduction,
+            SkipMediaUpload = skipMediaUpload,
             ConnectionString = connectionString,
             Workers = workers,
             Employers = employers,

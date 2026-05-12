@@ -6,8 +6,10 @@ namespace Azoxia.AdaIsAkademi.Application
     using Azoxia.Core.Application.Queries;
     using Azoxia.Core.Application.Validation;
     using Azoxia.Core.Exceptions;
+    using Azoxia.Core.Extensions;
     using Azoxia.Core.Identity;
     using Microsoft.Extensions.DependencyInjection;
+    using SystemUserType = Azoxia.AdaIsAkademi.Domain.SystemUserType;
 
     /// <summary>
     /// Lists authenticated employer locations.
@@ -16,6 +18,12 @@ namespace Azoxia.AdaIsAkademi.Application
         QueryBase<PagedQueryResultModel<EmployerLocationListItemModel>>
     {
         #region Properties
+
+        /// <summary>
+        /// Optional employer id for admin queries. When supplied, caller must be an admin.
+        /// Otherwise the authenticated employer actor id claim is used.
+        /// </summary>
+        public int? EmployerId { get; set; }
 
         public int Limit { get; set; } = 20;
         public int Offset { get; set; }
@@ -39,6 +47,11 @@ namespace Azoxia.AdaIsAkademi.Application
                 failures.Add(AzoxiaErrorCodes.RequestValidationFailed.ForField(nameof(ListEmployerLocationsQuery.Offset)));
             }
 
+            if (request.EmployerId.HasValue && request.EmployerId.Value <= 0)
+            {
+                failures.Add(AzoxiaErrorCodes.RequestValidationFailed.ForField(nameof(ListEmployerLocationsQuery.EmployerId)));
+            }
+
             return new ValidationResult(failures);
         }
     }
@@ -52,7 +65,18 @@ namespace Azoxia.AdaIsAkademi.Application
             CancellationToken cancellationToken)
         {
             IExecutionContext executionContext = ServiceProvider.GetRequiredService<IExecutionContext>();
-            int employerId = executionContext.RequireAdaIsEmployerActorId();
+            int employerId;
+            if (query.EmployerId.HasValue)
+            {
+                bool isAdmin = executionContext.GetClaim("system_user_type") == ((int)SystemUserType.Admin).ToString();
+                // Keep endpoint safe: non-admin callers cannot enumerate other employers.
+                isAdmin.ThrowIfFalse(AzoxiaErrorCodes.RequestValidationFailed);
+                employerId = query.EmployerId.Value;
+            }
+            else
+            {
+                employerId = executionContext.RequireAdaIsEmployerActorId();
+            }
 
             CacheKey cacheKey = new("query", "EmployerLocations", $"{employerId}:{query.Limit}:{query.Offset}");
             PagedQueryResultModel<EmployerLocationListItemModel>? cached =

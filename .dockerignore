@@ -5,3 +5,7 @@
 **/*.user
 **/.git
 **/node_modules
+
+# Tests and docs not needed for API / migrator / seed images
+tests/
+docs/

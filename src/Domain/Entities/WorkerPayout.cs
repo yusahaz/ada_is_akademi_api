@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
     using Azoxia.Core.Extensions;
     using Azoxia.Core.ValueTypes;
@@ -8,7 +9,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     /// Tracks employer-to-worker payout lifecycle for a completed assignment.
     /// </summary>
     public class WorkerPayout :
-        EntityBase
+        EntityAggregateRoot
     {
         #region Fields
 
@@ -43,6 +44,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             NetAmount = new Money(netAmount, grossAmount.Currency);
             Status = WorkerPayoutStatus.Pending;
             CreatedAt = DateTimeOffset.UtcNow;
+            RaiseDomainEvent(() => new WorkerPayoutPendingEvent(Id, AssignmentId, WorkerId, EmployerId));
         }
 
         #endregion Ctors
@@ -59,6 +61,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             Status = WorkerPayoutStatus.Paid;
             PaidAt = DateTimeOffset.UtcNow;
+            RaiseDomainEvent(() => new WorkerPayoutConfirmedEvent(Id, AssignmentId, WorkerId, EmployerId));
         }
 
         /// <summary>
@@ -73,6 +76,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             FailedAt = DateTimeOffset.UtcNow;
             RetryCount += 1;
             LastFailureReason = reason;
+            RaiseDomainEvent(() => new WorkerPayoutFailedEvent(Id, AssignmentId, WorkerId, EmployerId, reason));
         }
 
         /// <summary>
@@ -90,6 +94,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             Status = WorkerPayoutStatus.Processing;
             ProcessingMarkedAt = DateTimeOffset.UtcNow;
             ConfirmationDueAt = ProcessingMarkedAt.Value.AddHours(WorkerConfirmationWindowHours);
+            RaiseDomainEvent(() => new WorkerPayoutMarkedAsPaidEvent(Id, AssignmentId, WorkerId, EmployerId));
         }
 
         /// <summary>

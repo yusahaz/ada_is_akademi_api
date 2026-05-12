@@ -1,6 +1,7 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
     using System.Collections.Generic;
+    using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application.Models;
     using System;
 
@@ -21,8 +22,12 @@ namespace Azoxia.AdaIsAkademi.Application
         string LocationText,
         int HeadCount,
         int ApplicationCount,
+        JobPostingStatus Status,
         IReadOnlyList<string> Tags,
         IReadOnlyList<string> RequiredTags,
-        string Description) :
+        string Description,
+        double LocationLatitude,
+        double LocationLongitude,
+        double? DistanceMetres) :
         ModelBase;
 }

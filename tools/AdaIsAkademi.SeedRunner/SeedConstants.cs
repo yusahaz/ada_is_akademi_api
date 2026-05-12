@@ -10,7 +10,7 @@ internal static class SeedConstants
     /// <summary>
     /// Shared password for all seed worker and employer accounts (test environments only).
     /// </summary>
-    internal const string DefaultPassword = "Ada!Test123";
+    internal const string DefaultPassword = "Ada!Test123*";
 
     #endregion Fields
 }

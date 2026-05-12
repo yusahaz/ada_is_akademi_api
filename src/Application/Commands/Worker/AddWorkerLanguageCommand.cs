@@ -28,8 +28,7 @@ namespace Azoxia.AdaIsAkademi.Application
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             WorkerLanguage item = worker.AddLanguage(command.Language, command.Level);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await InvalidateWorkerAsync(workerId, cancellationToken);
-            return item.Id;
+return item.Id;
         }
     }
 }

@@ -11,6 +11,8 @@ namespace Azoxia.AdaIsAkademi.Application
         string Email,
         string? FirstName,
         string? LastName,
+        string? ProfilePhotoObjectKey,
+        string? ProfilePhotoViewUrl,
         int SystemUserId,
         int WorkerId) :
         ModelBase

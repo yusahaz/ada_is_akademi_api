@@ -34,8 +34,7 @@ namespace Azoxia.AdaIsAkademi.Application
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             WorkerExperience item = worker.AddExperience(command.CompanyName, command.Position, command.StartDate, command.EndDate, command.Description);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await InvalidateWorkerAsync(workerId, cancellationToken);
-            return item.Id;
+return item.Id;
         }
     }
 }

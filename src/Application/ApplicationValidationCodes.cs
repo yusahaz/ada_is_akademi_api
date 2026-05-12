@@ -59,13 +59,6 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "EmployerId must be greater than zero.");
 
         /// <summary>
-        /// System user group id must be positive when activating a group.
-        /// </summary>
-        internal static readonly ErrorCode ActivateSystemUserGroupSystemUserGroupId = new(
-            Code: "AZX_ADA_APP_VAL_401",
-            ErrorMessage: "SystemUserGroupId must be greater than zero.");
-
-        /// <summary>
         /// Job posting id must be positive when adding a required skill.
         /// </summary>
         internal static readonly ErrorCode AddJobPostingSkillJobPostingId = new(
@@ -78,20 +71,6 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode AddJobPostingSkillTag = new(
             Code: "AZX_ADA_APP_VAL_105",
             ErrorMessage: "Tag cannot be null, empty, or whitespace.");
-
-        /// <summary>
-        /// Permission id must be positive when adding a group permission row.
-        /// </summary>
-        internal static readonly ErrorCode AddSystemUserGroupPermissionPermissionId = new(
-            Code: "AZX_ADA_APP_VAL_404",
-            ErrorMessage: "PermissionId must be greater than zero.");
-
-        /// <summary>
-        /// System user group id must be positive when adding a group permission row.
-        /// </summary>
-        internal static readonly ErrorCode AddSystemUserGroupPermissionSystemUserGroupId = new(
-            Code: "AZX_ADA_APP_VAL_403",
-            ErrorMessage: "SystemUserGroupId must be greater than zero.");
 
         /// <summary>
         /// Tag text is required when adding a worker skill.
@@ -507,13 +486,6 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Shift assignment can only be created for accepted applications.");
 
         /// <summary>
-        /// System user group id must be positive when deactivating a group.
-        /// </summary>
-        internal static readonly ErrorCode DeactivateSystemUserGroupSystemUserGroupId = new(
-            Code: "AZX_ADA_APP_VAL_402",
-            ErrorMessage: "SystemUserGroupId must be greater than zero.");
-
-        /// <summary>
         /// Employer id must be positive on get employer by id query.
         /// </summary>
         internal static readonly ErrorCode GetEmployerByIdEmployerId = new(
@@ -640,6 +612,34 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Offset must be greater than or equal to zero.");
 
         /// <summary>
+        /// Near latitude and near longitude must both be provided for geographic filtering on open job postings.
+        /// </summary>
+        internal static readonly ErrorCode ListOpenJobPostingsGeoPair = new(
+            Code: "AZX_ADA_APP_VAL_936",
+            ErrorMessage: "NearLatitude and NearLongitude must both be set when filtering by location.");
+
+        /// <summary>
+        /// Near latitude must be between -90 and 90 degrees for open job posting geographic filtering.
+        /// </summary>
+        internal static readonly ErrorCode ListOpenJobPostingsGeoLatitude = new(
+            Code: "AZX_ADA_APP_VAL_937",
+            ErrorMessage: "NearLatitude must be between -90 and 90 degrees.");
+
+        /// <summary>
+        /// Near longitude must be between -180 and 180 degrees for open job posting geographic filtering.
+        /// </summary>
+        internal static readonly ErrorCode ListOpenJobPostingsGeoLongitude = new(
+            Code: "AZX_ADA_APP_VAL_938",
+            ErrorMessage: "NearLongitude must be between -180 and 180 degrees.");
+
+        /// <summary>
+        /// Search radius in metres must be between 100 and 500000 for open job posting geographic filtering.
+        /// </summary>
+        internal static readonly ErrorCode ListOpenJobPostingsGeoRadius = new(
+            Code: "AZX_ADA_APP_VAL_939",
+            ErrorMessage: "RadiusMetres must be between 100 and 500000 when set.");
+
+        /// <summary>
         /// Limit must be between 1 and 50 for semantic posting list query.
         /// </summary>
         internal static readonly ErrorCode ListSemanticMatchedJobPostingsLimitRange = new(
@@ -752,6 +752,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Commission range is invalid.");
 
         /// <summary>
+        /// Sort field must be one of the supported employer list columns.
+        /// </summary>
+        internal static readonly ErrorCode ListEmployersSortBy = new(
+            Code: "AZX_ADA_APP_VAL_921",
+            ErrorMessage: "SortBy must be name, taxNumber, status, commissionRate, or employerId.");
+
+        /// <summary>
         /// Limit must be between 1 and 200 for list workers query.
         /// </summary>
         internal static readonly ErrorCode ListWorkersLimit = new(
@@ -777,20 +784,6 @@ namespace Azoxia.AdaIsAkademi.Application
         /// </summary>
         internal static readonly ErrorCode ListSystemUsersOffset = new(
             Code: "AZX_ADA_APP_VAL_922",
-            ErrorMessage: "Offset must be greater than or equal to zero.");
-
-        /// <summary>
-        /// Limit must be between 1 and 200 for list system user groups query.
-        /// </summary>
-        internal static readonly ErrorCode ListSystemUserGroupsLimit = new(
-            Code: "AZX_ADA_APP_VAL_923",
-            ErrorMessage: "Limit must be between 1 and 200.");
-
-        /// <summary>
-        /// Offset must be zero or positive for list system user groups query.
-        /// </summary>
-        internal static readonly ErrorCode ListSystemUserGroupsOffset = new(
-            Code: "AZX_ADA_APP_VAL_924",
             ErrorMessage: "Offset must be greater than or equal to zero.");
 
         /// <summary>
@@ -1149,6 +1142,55 @@ namespace Azoxia.AdaIsAkademi.Application
         internal static readonly ErrorCode SuspendEmployerEmployerId = new(
             Code: "AZX_ADA_APP_VAL_202",
             ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
+        /// Employer id must be positive when updating employer profile.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerProfileEmployerId = new(
+            Code: "AZX_ADA_APP_VAL_210",
+            ErrorMessage: "EmployerId must be greater than zero.");
+
+        /// <summary>
+        /// Name is required when updating employer profile.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerProfileNameRequired = new(
+            Code: "AZX_ADA_APP_VAL_211",
+            ErrorMessage: "Name cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Tax number is required when updating employer profile.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerProfileTaxNumberRequired = new(
+            Code: "AZX_ADA_APP_VAL_212",
+            ErrorMessage: "TaxNumber cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// First name is required when updating employer profile contact.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerProfileFirstNameRequired = new(
+            Code: "AZX_ADA_APP_VAL_213",
+            ErrorMessage: "FirstName cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Last name is required when updating employer profile contact.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerProfileLastNameRequired = new(
+            Code: "AZX_ADA_APP_VAL_214",
+            ErrorMessage: "LastName cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Email is required when updating employer profile contact.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerProfileEmailRequired = new(
+            Code: "AZX_ADA_APP_VAL_215",
+            ErrorMessage: "Email cannot be null, empty, or whitespace.");
+
+        /// <summary>
+        /// Phone is required when updating employer profile contact.
+        /// </summary>
+        internal static readonly ErrorCode UpdateEmployerProfilePhoneRequired = new(
+            Code: "AZX_ADA_APP_VAL_216",
+            ErrorMessage: "Phone cannot be null, empty, or whitespace.");
 
         /// <summary>
         /// Commission rate must be between 0 and 1.

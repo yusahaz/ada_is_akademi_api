@@ -21,12 +21,6 @@ namespace Azoxia.AdaIsAkademi.Application
             worker = worker.ThrowIfNull(AzoxiaErrorCodes.NotFound);
             return (workerId, worker);
         }
-
-        protected async Task InvalidateWorkerAsync(int workerId, CancellationToken cancellationToken)
-        {
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerDependency(workerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerAllDependency(), cancellationToken);
-        }
     }
 
     internal abstract class WorkerCollectionUnitCommandHandlerBase<TCommand>(IServiceProvider serviceProvider)
@@ -40,12 +34,6 @@ namespace Azoxia.AdaIsAkademi.Application
             Worker? worker = await UnitOfWork.GetRepository<Worker>().GetByIdAsync(workerId, cancellationToken);
             worker = worker.ThrowIfNull(AzoxiaErrorCodes.NotFound);
             return (workerId, worker);
-        }
-
-        protected async Task InvalidateWorkerAsync(int workerId, CancellationToken cancellationToken)
-        {
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerDependency(workerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerAllDependency(), cancellationToken);
         }
     }
 }

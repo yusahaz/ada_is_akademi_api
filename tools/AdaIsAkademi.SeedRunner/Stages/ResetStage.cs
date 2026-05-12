@@ -38,7 +38,7 @@ internal static class ResetStage
               "JobPostingSkill",
               "OverdueJobAlarm",
               "JobPosting",
-              "ShiftSupervisor",
+              "Supervisor",
               "EmployerLocation",
               "WorkerInterestedJobCategory",
               "WorkerSkill",
@@ -57,15 +57,6 @@ internal static class ResetStage
               "SystemUserDevice",
               "AppLogs"
             RESTART IDENTITY CASCADE;
-            """,
-            cancellationToken);
-
-        await db.Database.ExecuteSqlRawAsync(
-            $"""
-            DELETE FROM "SystemUserGroupMembership"
-            WHERE "SystemUserId" IN (
-                SELECT "Id" FROM "SystemUser" WHERE "Email" <> '{MigrationAdminEmail}'
-            );
             """,
             cancellationToken);
 

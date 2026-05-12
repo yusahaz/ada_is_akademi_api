@@ -112,6 +112,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<UpdateEmployerLocationCommand, Unit>, UpdateEmployerLocationCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateWorkerSocialLinksCommand, Unit>, UpdateWorkerSocialLinksCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateWorkerProfileCommand, Unit>, UpdateWorkerProfileCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateWorkerCvTemplatePreferenceCommand, Unit>, UpdateWorkerCvTemplatePreferenceCommandHandler>();
             services.AddScoped<IRequestHandler<SendWorkerNotificationCommand, int>, SendWorkerNotificationCommandHandler>();
             services.AddScoped<IRequestHandler<SendSystemUserNotificationCommand, int>, SendSystemUserNotificationCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateJobPostingCommand, Unit>, UpdateJobPostingCommandHandler>();
@@ -305,6 +306,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<UpdateEmployerLocationCommand>, UpdateEmployerLocationCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateWorkerSocialLinksCommand>, UpdateWorkerSocialLinksCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateWorkerProfileCommand>, UpdateWorkerProfileCommandValidator>();
+            services.AddScoped<IRequestValidator<UpdateWorkerCvTemplatePreferenceCommand>, UpdateWorkerCvTemplatePreferenceCommandValidator>();
             services.AddScoped<IRequestValidator<SendWorkerNotificationCommand>, SendWorkerNotificationCommandValidator>();
             services.AddScoped<IRequestValidator<SendSystemUserNotificationCommand>, SendSystemUserNotificationCommandValidator>();
             services.AddScoped<IRequestValidator<UpdateJobPostingCommand>, UpdateJobPostingCommandValidator>();

@@ -11,6 +11,8 @@ namespace Azoxia.AdaIsAkademi.Application
         int EmployerId,
         string Name,
         EmployerStatus Status,
-        string TaxNumber) :
+        string TaxNumber,
+        string? LogoObjectKey = null,
+        string? LogoViewUrl = null) :
         ModelBase;
 }

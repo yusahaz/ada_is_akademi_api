@@ -57,13 +57,30 @@ namespace Azoxia.AdaIsAkademi.Application
             SystemUser? systemUser = await UnitOfWork.GetRepository<SystemUser>().GetByIdAsync(command.SystemUserId, cancellationToken);
             systemUser = systemUser.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
+            (systemUser.Type == SystemUserType.Worker || systemUser.Type == SystemUserType.Supervisor)
+                .ThrowIfFalse(AzoxiaErrorCodes.RequestValidationFailed);
+
+            if (systemUser.Type == SystemUserType.Worker)
+            {
+                systemUser.PromoteToEmployerSupervisor(employerId);
+            }
+            else if (systemUser.Type == SystemUserType.Supervisor)
+            {
+                (systemUser.EmployerId is null || systemUser.EmployerId == employerId)
+                    .ThrowIfFalse(AzoxiaErrorCodes.RequestValidationFailed);
+                if (systemUser.EmployerId is null)
+                {
+                    systemUser.InitializeEmployerScopedSupervisor(employerId);
+                }
+            }
+
             if (command.LocationId.HasValue)
             {
                 bool hasLocation = employer.Locations.Any(x => x.Id == command.LocationId.Value);
                 hasLocation.ThrowIfFalse(AzoxiaErrorCodes.NotFound);
             }
 
-            ShiftSupervisor supervisor = employer.AddShiftSupervisor(command.SystemUserId, command.LocationId);
+            Supervisor supervisor = employer.AddSupervisor(command.SystemUserId, command.LocationId);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
             await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerDependency(employerId), cancellationToken);

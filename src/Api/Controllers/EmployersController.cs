@@ -174,6 +174,17 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Updates employer profile and primary contact (admin).</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Update employer profile")]
+        [EndpointDescription("Updates employer name, tax number, description, and embedded contact details.")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        public Task<IActionResult> UpdateProfile(
+            [FromBody] UpdateEmployerProfileCommand command,
+            CancellationToken cancellationToken)
+            => ExecuteCommand(command, cancellationToken);
+
         /// <summary>Gets employer-specific commission estimate metrics.</summary>
         [HttpPost]
         [Consumes("application/json")]

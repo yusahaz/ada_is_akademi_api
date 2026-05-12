@@ -101,9 +101,13 @@ namespace Azoxia.AdaIsAkademi.Application
                         x.EmployerLocation.Address.City + ", " + x.EmployerLocation.Address.Country,
                         x.HeadCount,
                         x.Applications.Count,
+                        x.Status,
                         x.Skills.Select(skill => skill.Tag.Value).ToList(),
                         x.Skills.Where(skill => skill.IsRequired).Select(skill => skill.Tag.Value).ToList(),
-                        x.Description),
+                        x.Description,
+                        x.EmployerLocation.Coordinate.Latitude,
+                        x.EmployerLocation.Coordinate.Longitude,
+                        null),
                     cancellationToken))
                 .ToList();
 

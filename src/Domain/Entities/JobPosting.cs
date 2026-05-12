@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
     using Azoxia.Core.Extensions;
     using Azoxia.Core.ValueTypes;
@@ -8,7 +9,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     /// Represents an open or draft job posting created by an employer.
     /// </summary>
     public class JobPosting :
-        DeletableEntityBase
+        DeletableAggregateRoot
     {
         #region Fields
 
@@ -74,9 +75,15 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             application.Accept();
 
+            RaiseDomainEvent(() => new JobApplicationAcceptedEvent(Id, EmployerId, applicationId, application.WorkerId));
+
             if (Applications.Count(x => x.Status == JobApplicationStatus.Accepted) >= HeadCount)
             {
-                Status = JobPostingStatus.Filled;
+                if (Status != JobPostingStatus.Filled)
+                {
+                    Status = JobPostingStatus.Filled;
+                    RaiseDomainEvent(() => new JobPostingFilledEvent(Id, EmployerId));
+                }
             }
         }
 
@@ -98,6 +105,7 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             JobApplication application = new(Id, workerId, note);
             _applications.Add(application);
+            RaiseDomainEvent(() => new JobApplicationSubmittedEvent(Id, EmployerId, workerId, application.AppliedAt));
             return application;
         }
 
@@ -131,6 +139,7 @@ namespace Azoxia.AdaIsAkademi.Domain
                 || Status == JobPostingStatus.Filled)
                 .ThrowIfFalse(DomainErrorCodes.JobPostingInvalidStatusTransition);
             Status = JobPostingStatus.Cancelled;
+            RaiseDomainEvent(() => new JobPostingCancelledEvent(Id, EmployerId));
         }
 
         /// <summary>
@@ -141,6 +150,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             (Status == JobPostingStatus.Open || Status == JobPostingStatus.Filled)
                 .ThrowIfFalse(DomainErrorCodes.JobPostingInvalidStatusTransition);
             Status = JobPostingStatus.Completed;
+            RaiseDomainEvent(() => new JobPostingCompletedEvent(Id, EmployerId));
         }
 
         /// <summary>
@@ -159,6 +169,7 @@ namespace Azoxia.AdaIsAkademi.Domain
             (Status == JobPostingStatus.Draft)
                 .ThrowIfFalse(DomainErrorCodes.JobPostingInvalidStatusTransition);
             Status = JobPostingStatus.Open;
+            RaiseDomainEvent(() => new JobPostingPublishedEvent(Id, EmployerId));
         }
 
         /// <summary>
@@ -175,6 +186,8 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             bool wasAccepted = application.Status == JobApplicationStatus.Accepted;
             application.Reject(reason);
+
+            RaiseDomainEvent(() => new JobApplicationRejectedEvent(Id, EmployerId, applicationId, application.WorkerId, reason));
 
             if (wasAccepted && Status == JobPostingStatus.Filled)
             {

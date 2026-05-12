@@ -34,8 +34,7 @@ namespace Azoxia.AdaIsAkademi.Application
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             WorkerCertificate item = worker.AddCertificate(command.Name, command.IssuingOrganization, command.IssuedAt, command.ExpiresAt, command.DocumentUrl);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await InvalidateWorkerAsync(workerId, cancellationToken);
-            return item.Id;
+return item.Id;
         }
     }
 }

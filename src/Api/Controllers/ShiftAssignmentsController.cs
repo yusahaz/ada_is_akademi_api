@@ -69,6 +69,23 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
                 result => result.Offset,
                 cancellationToken);
 
+        /// <summary>Lists shift assignments for the authenticated employer.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("List employer shift assignments")]
+        [EndpointDescription("Lists assignments under this employer's postings; optional exclusion of completed assignments.")]
+        [ProducesResponseType(typeof(PageableApiResponse<WorkerShiftAssignmentListItemModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> ListEmployerAssignments(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ListEmployerShiftAssignmentsQuery? query,
+            CancellationToken cancellationToken)
+            => ExecutePageQuery<WorkerShiftAssignmentListItemModel, PagedQueryResultModel<WorkerShiftAssignmentListItemModel>>(
+                query ?? new ListEmployerShiftAssignmentsQuery(),
+                result => result.Items,
+                result => result.TotalCount,
+                result => result.Limit,
+                result => result.Offset,
+                cancellationToken);
+
         /// <summary>Lists employer-side shift history rows.</summary>
         [HttpPost]
         [Consumes("application/json")]

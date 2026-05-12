@@ -67,6 +67,18 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query ?? new GetFinancialReconciliationSummaryQuery(), cancellationToken);
 
+        /// <summary>Returns commission receivable totals grouped by calendar period for charting.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get commission revenue series")]
+        [EndpointDescription("Returns summed commission receivable amounts per calendar bucket (monthly, quarterly, half-yearly, or yearly) using period-end attribution.")]
+        [ProducesResponseType(typeof(ApiResponse<CommissionRevenueSeriesModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> CommissionRevenueSeries(
+            [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)]
+            GetCommissionRevenueSeriesQuery? query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query ?? new GetCommissionRevenueSeriesQuery(), cancellationToken);
+
         /// <summary>Lists paged reconciliation rows with optional employer/date filters.</summary>
         [HttpPost]
         [Consumes("application/json")]

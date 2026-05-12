@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Domain
 {
+    using Azoxia.AdaIsAkademi.Domain.Events;
     using Azoxia.Core.Domain;
     using Azoxia.Core.Extensions;
 
@@ -7,7 +8,7 @@ namespace Azoxia.AdaIsAkademi.Domain
     /// Represents a worker-to-posting assignment instance for shift attendance flow.
     /// </summary>
     public class ShiftAssignment :
-        EntityBase
+        EntityAggregateRoot
     {
         #region Fields
 
@@ -81,6 +82,13 @@ namespace Azoxia.AdaIsAkademi.Domain
 
             CheckedOutAt = now;
             Status = ShiftAssignmentStatus.CheckedOut;
+
+            RaiseDomainEvent(() => new AssignmentCheckedOutEvent(Id, JobPostingId, WorkerId));
+            RaiseDomainEvent(() => new AssignmentCompletedEvent(Id, JobPostingId, WorkerId));
+            if (IsAnomalyFlagged)
+            {
+                RaiseDomainEvent(() => new AnomalyDetectedEvent(Id, JobPostingId, WorkerId, AnomalyCode ?? string.Empty));
+            }
         }
 
         /// <summary>
@@ -114,7 +122,12 @@ namespace Azoxia.AdaIsAkademi.Domain
             (difference <= TimeSpan.FromMinutes(MutualQrGraceMinutesThreshold))
                 .ThrowIfFalse(DomainErrorCodes.ShiftAssignmentMutualQrWindowExpired);
 
+            ShiftAssignmentStatus prior = Status;
             Status = ShiftAssignmentStatus.CheckedIn;
+            if (prior != ShiftAssignmentStatus.CheckedIn)
+            {
+                RaiseDomainEvent(() => new AssignmentCheckedInEvent(Id, JobPostingId, WorkerId));
+            }
         }
 
         #endregion Utils

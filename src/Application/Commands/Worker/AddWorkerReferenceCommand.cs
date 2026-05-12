@@ -40,8 +40,7 @@ namespace Azoxia.AdaIsAkademi.Application
             Contact contact = new(command.ContactFirstName, command.ContactLastName, command.ContactEmail, command.ContactPhone);
             WorkerReference item = worker.AddReference(command.Company, command.Position, contact);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await InvalidateWorkerAsync(workerId, cancellationToken);
-            return item.Id;
+return item.Id;
         }
     }
 }
