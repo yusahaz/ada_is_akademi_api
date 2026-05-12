@@ -15,6 +15,9 @@ services:
       - db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+    networks:
+      - coolify
+      - default
 
   ada-is-akademi-redis:
     image: redis:7.4-alpine
@@ -233,3 +236,7 @@ volumes:
   dbview_data:
   api_dataprotection_keys:
   backup_data:
+
+networks:
+  coolify:
+    external: true
