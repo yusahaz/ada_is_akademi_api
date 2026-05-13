@@ -69,7 +69,14 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         public Task<IActionResult> Login(
             [FromBody] LoginSystemUserCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+        {
+            if (!string.IsNullOrWhiteSpace(command.Email))
+            {
+                command.Email = SystemUserEmailNormalizer.Normalize(command.Email);
+            }
+
+            return ExecuteCommand(command, cancellationToken);
+        }
 
         /// <summary>Revokes a device-bound refresh token (logout).</summary>
         [AllowAnonymous]
@@ -166,7 +173,14 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         public Task<IActionResult> RegisterAdmin(
             [FromBody] RegisterAdminCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+        {
+            if (!string.IsNullOrWhiteSpace(command.Email))
+            {
+                command.Email = SystemUserEmailNormalizer.Normalize(command.Email);
+            }
+
+            return ExecuteCommand(command, cancellationToken);
+        }
 
         /// <summary>Registers a new employer account and organization.</summary>
         [AllowAnonymous]
@@ -178,7 +192,14 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         public Task<IActionResult> RegisterEmployer(
             [FromBody] RegisterEmployerCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+        {
+            if (!string.IsNullOrWhiteSpace(command.Email))
+            {
+                command.Email = SystemUserEmailNormalizer.Normalize(command.Email);
+            }
+
+            return ExecuteCommand(command, cancellationToken);
+        }
 
         /// <summary>Registers a new worker account and worker profile.</summary>
         [AllowAnonymous]
@@ -190,7 +211,14 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         public Task<IActionResult> RegisterWorker(
             [FromBody] RegisterWorkerCommand command,
             CancellationToken cancellationToken)
-            => ExecuteCommand(command, cancellationToken);
+        {
+            if (!string.IsNullOrWhiteSpace(command.Email))
+            {
+                command.Email = SystemUserEmailNormalizer.Normalize(command.Email);
+            }
+
+            return ExecuteCommand(command, cancellationToken);
+        }
 
         /// <summary>Stores a new email verification token for the user.</summary>
         [AllowAnonymous]
