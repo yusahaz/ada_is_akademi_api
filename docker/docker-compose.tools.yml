@@ -38,8 +38,6 @@ services:
         condition: service_healthy
       ada-is-akademi-minio:
         condition: service_healthy
-      ada-is-akademi-minio-init:
-        condition: service_completed_successfully
       ada-is-akademi-migrate:
         condition: service_completed_successfully
     networks:
