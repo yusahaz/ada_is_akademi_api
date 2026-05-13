@@ -85,7 +85,7 @@ services:
       - dbview_data:/var/lib/pgadmin
 
   ada-is-akademi-migrate:
-    profiles: ["migrate", "seed"]
+    profiles: ["migrate"]
     build:
       context: ..
       dockerfile: tools/AdaIsAkademi.Migrator/Dockerfile
@@ -131,10 +131,7 @@ services:
     environment:
       ASPNETCORE_URLS: ${ASPNETCORE_URLS}
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      # Local Vite / dev frontends (override via docker/.env if needed)
-      Cors__AllowedOrigins__0: ${CORS_ORIGIN_VITE:-http://localhost:5173}
-      Cors__AllowedOrigins__1: ${CORS_ORIGIN_VITE_ALT:-http://127.0.0.1:5173}
-      Cors__AllowedOrigins__2: ${CORS_ORIGIN_ALT:-http://localhost:3000}
+      Cors__AllowedOrigins__0: ${Cors__AllowedOrigins__0:-}
       JwtConfig__Issuer: ${JWT_ISSUER}
       JwtConfig__Audience: ${JWT_AUDIENCE}
       JwtConfig__Key: ${JWT_SIGNING_KEY}
