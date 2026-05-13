@@ -145,23 +145,25 @@ namespace Azoxia.AdaIsAkademi.Application
         /// <inheritdoc />
         protected override async Task<int> HandleAsync(RegisterEmployerCommand command, CancellationToken cancellationToken)
         {
+            string email = SystemUserEmailNormalizer.Normalize(command.Email);
+
             bool emailExists = await UnitOfWork
                 .GetRepository<SystemUser>()
-                .AnyAsync(x => x.Email == command.Email, cancellationToken);
+                .AnyAsync(x => x.Email == email, cancellationToken);
 
             if (emailExists)
             {
                 ApplicationValidationCodes.RegisterSystemUserEmailAlreadyExists.Throw();
             }
 
-            SystemUser user = new(command.Email, command.Password, SystemUserType.Employer);
+            SystemUser user = new(email, command.Password, SystemUserType.Employer);
             user.Update(command.FirstName, command.LastName, command.Phone);
             UnitOfWork.Add(user);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
             Employer employer = new(command.EmployerName, command.EmployerDescription, command.EmployerTaxNumber);
             employer.SetAddress(new Address(command.EmployerAddressLine1, command.EmployerAddressCity, command.EmployerAddressCountry));
-            employer.SetContact(new Contact(command.FirstName, command.LastName, command.Email, command.Phone));
+            employer.SetContact(new Contact(command.FirstName, command.LastName, email, command.Phone));
             UnitOfWork.Add(employer);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 

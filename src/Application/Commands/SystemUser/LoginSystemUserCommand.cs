@@ -100,7 +100,7 @@ namespace Azoxia.AdaIsAkademi.Application
         protected override async Task<SystemUserTokenModel> HandleAsync(LoginSystemUserCommand command, CancellationToken cancellationToken)
         {
             ITokenService tokenService = ServiceProvider.GetRequiredService<ITokenService>();
-            string normalizedEmail = command.Email.Trim().ToLowerInvariant();
+            string normalizedEmail = SystemUserEmailNormalizer.Normalize(command.Email);
 
             Logger.LogInformation(
                 "Login request received. Email={Email}, EmailLength={EmailLength}, TrimmedEmailLength={TrimmedEmailLength}, SystemUserType={SystemUserType}, Platform={Platform}, DeviceIdentifier={DeviceIdentifier}, HasDeviceToken={HasDeviceToken}.",
@@ -115,7 +115,7 @@ namespace Azoxia.AdaIsAkademi.Application
             SystemUser? user = await UnitOfWork
                 .GetRepository<SystemUser>()
                 .Filter(x =>
-                    x.Email.ToLower() == normalizedEmail
+                    x.Email == normalizedEmail
                     && (command.SystemUserType == SystemUserType.Admin || x.Type == command.SystemUserType))
                 .AsSplitQuery()
                 .Include(x => x.Devices)
