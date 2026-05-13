@@ -15,7 +15,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
         {
             // PBKDF2-SHA256, 100000 iterations, 32-byte hash, 16-byte salt — aligned with Domain.SystemUser.
             // Salt is deterministic (SHA256 prefix) so the migration is reproducible across environments.
-            const string bootstrapEmail = "admin@adaisakademi.com";
+            const string bootstrapEmail = "osman.yildirim@adaisakademi.com";
             const string passwordHashB64 = "NfT6OyIkNb8BkD8lRvllE30zMF5c+S5SHblw2L9fCf8=";
             const string passwordSaltB64 = "f8+G+4bxnjX6N0ShvcTvQg==";
 
@@ -52,8 +52,8 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     '{passwordSaltB64}',
                     10,
                     10,
-                    'Administrator',
-                    NULL,
+                    'Osman',
+                    'YILDIRIM',
                     NULL,
                     0,
                     NULL,
@@ -64,9 +64,8 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
                     TIMESTAMPTZ '2026-05-13 11:10:17+00',
                     NULL,
                     TIMESTAMPTZ '2026-05-13 11:10:17+00',
-                    NULL,
-                    'Migration.SeedBootstrapAdminSystemUser',
-                    NULL,
+                    'Migration',
+                    TIMESTAMPTZ '2026-05-13 11:10:17+00',
                     NULL,
                     FALSE,
                     NULL,
@@ -85,7 +84,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
             migrationBuilder.Sql(
                 """
                 DELETE FROM "SystemUser"
-                WHERE lower(trim("Email")) = lower(trim('admin@adaisakademi.dev'))
+                WHERE lower(trim("Email")) = lower(trim('admin@adaisakademi.com'))
                   AND "Type" = 10;
                 """);
         }
