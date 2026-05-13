@@ -15,7 +15,7 @@ namespace Azoxia.AdaIsAkademi.Persistence.Migrations
         {
             // PBKDF2-SHA256, 100000 iterations, 32-byte hash, 16-byte salt — aligned with Domain.SystemUser.
             // Salt is deterministic (SHA256 prefix) so the migration is reproducible across environments.
-            const string bootstrapEmail = "admin@adaisakademi.dev";
+            const string bootstrapEmail = "admin@adaisakademi.com";
             const string passwordHashB64 = "NfT6OyIkNb8BkD8lRvllE30zMF5c+S5SHblw2L9fCf8=";
             const string passwordSaltB64 = "f8+G+4bxnjX6N0ShvcTvQg==";
 
