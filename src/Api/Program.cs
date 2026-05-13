@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Api
 {
+    using System.Collections.Generic;
     using System;
     using Azoxia.AdaIsAkademi.Api.Automation;
     using Azoxia.AdaIsAkademi.Api.DependencyInjection;
@@ -19,6 +20,8 @@ namespace Azoxia.AdaIsAkademi.Api
     /// </summary>
     class Program
     {
+        private const string CorsPolicyName = "Frontend";
+
         #region Utils
 
         /// <summary>
@@ -32,85 +35,20 @@ namespace Azoxia.AdaIsAkademi.Api
             startup.OnConfigureServices += (builder) =>
             {
                 builder.Services.AddAzoxiaCore(builder.Configuration);
-                string[] allowedOrigins = builder.Configuration
+                string[] configuredOrigins = builder.Configuration
                     .GetSection("Cors:AllowedOrigins")
                     .Get<string[]>() ?? [];
+
                 builder.Services.AddCors(options =>
                 {
-                    options.AddPolicy("Frontend", policy =>
+                    options.AddPolicy(CorsPolicyName, policy =>
                     {
-                        string[] effectiveOrigins = allowedOrigins.Length == 0
-                            ? [
-                                "https://adaisakademi.com",
-                                "https://*.adaisakademi.com",
-                                "http://localhost:3000",
-                                "http://localhost:5173",
-                                "https://localhost:3000",
-                                "https://localhost:5173"
-                            ]
-                            : allowedOrigins;
-
-                        bool isLocalDevelopmentOrigin(string origin)
-                        {
-                            if (!builder.Environment.IsDevelopment())
-                            {
-                                return false;
-                            }
-
-                            if (!Uri.TryCreate(origin, UriKind.Absolute, out Uri? uri))
-                            {
-                                return false;
-                            }
-
-                            return string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase)
-                                || string.Equals(uri.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase);
-                        }
-
-                        bool isConfiguredOrigin(string origin)
-                        {
-                            if (isLocalDevelopmentOrigin(origin))
-                            {
-                                return true;
-                            }
-
-                            if (!Uri.TryCreate(origin, UriKind.Absolute, out Uri? originUri))
-                            {
-                                return false;
-                            }
-
-                            foreach (string configuredOrigin in effectiveOrigins)
-                            {
-                                if (!Uri.TryCreate(configuredOrigin, UriKind.Absolute, out Uri? configuredUri))
-                                {
-                                    continue;
-                                }
-
-                                if (configuredUri.Host.StartsWith("*.", StringComparison.Ordinal))
-                                {
-                                    string wildcardSuffix = configuredUri.Host[1..];
-                                    bool isWildcardMatch =
-                                        string.Equals(originUri.Scheme, configuredUri.Scheme, StringComparison.OrdinalIgnoreCase)
-                                        && originUri.Host.EndsWith(wildcardSuffix, StringComparison.OrdinalIgnoreCase);
-                                    if (isWildcardMatch)
-                                    {
-                                        return true;
-                                    }
-
-                                    continue;
-                                }
-
-                                bool isExactMatch = string.Equals(origin, configuredOrigin, StringComparison.OrdinalIgnoreCase);
-                                if (isExactMatch)
-                                {
-                                    return true;
-                                }
-                            }
-
-                            return false;
-                        }
-
                         policy
-                            .SetIsOriginAllowed(isConfiguredOrigin)
+                            .SetIsOriginAllowed(origin =>
+                                builder.Environment.IsDevelopment()
+                                || IsAllowedOrigin(
+                                    origin,
+                                    configuredOrigins))
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials();
@@ -202,6 +140,69 @@ namespace Azoxia.AdaIsAkademi.Api
             };
 
             startup.Run(args);
+        }
+
+        private static bool IsAllowedOrigin(string origin, IEnumerable<string> configuredOrigins)
+        {
+            if (!TryNormalizeOrigin(origin, out string? normalizedOrigin, out Uri? requestUri))
+            {
+                return false;
+            }
+
+            foreach (string configuredOrigin in configuredOrigins)
+            {
+                if (!TryNormalizeOrigin(configuredOrigin, out string? normalizedConfiguredOrigin, out Uri? configuredUri))
+                {
+                    continue;
+                }
+
+                if (IsWildcardHost(configuredUri.Host))
+                {
+                    if (MatchesWildcardHost(requestUri, configuredUri))
+                    {
+                        return true;
+                    }
+
+                    continue;
+                }
+
+                if (string.Equals(normalizedOrigin, normalizedConfiguredOrigin, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryNormalizeOrigin(string value, out string? normalizedOrigin, out Uri? uri)
+        {
+            normalizedOrigin = null;
+            uri = null;
+            if (!Uri.TryCreate(value, UriKind.Absolute, out Uri? parsedUri))
+            {
+                return false;
+            }
+
+            uri = parsedUri;
+            normalizedOrigin = parsedUri.GetLeftPart(UriPartial.Authority);
+            return true;
+        }
+
+        private static bool IsWildcardHost(string host)
+        {
+            return host.StartsWith("*.", StringComparison.Ordinal);
+        }
+
+        private static bool MatchesWildcardHost(Uri requestUri, Uri configuredWildcardUri)
+        {
+            if (!string.Equals(requestUri.Scheme, configuredWildcardUri.Scheme, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            string suffix = configuredWildcardUri.Host[1..];
+            return requestUri.Host.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion Utils
