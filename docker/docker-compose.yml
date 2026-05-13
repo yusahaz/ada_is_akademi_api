@@ -60,7 +60,11 @@ services:
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "/usr/bin/curl -sf http://127.0.0.1:9000/minio/health/live >/dev/null || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "if command -v curl >/dev/null 2>&1; then curl -fsS http://127.0.0.1:9000/minio/health/live >/dev/null; elif command -v wget >/dev/null 2>&1; then wget -q -O- http://127.0.0.1:9000/minio/health/live >/dev/null; else exit 1; fi",
+        ]
       interval: 15s
       timeout: 10s
       retries: 8
@@ -76,14 +80,14 @@ services:
       - default
     depends_on:
       ada-is-akademi-minio:
-        condition: service_healthy
+        condition: service_started
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: ${MINIO_BUCKET:-ada-is-akademi}
     entrypoint: ["/bin/sh", "-c"]
     command:
-      - 'mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; mc mb --ignore-existing ada/"$$MINIO_BUCKET"'
+      - 'until mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do echo "MinIO hazir degil, tekrar deneniyor..."; sleep 2; done; mc mb --ignore-existing ada/"$$MINIO_BUCKET"'
 
   ada-is-akademi-dbview:
     image: dpage/pgadmin4:9.0
@@ -163,7 +167,7 @@ services:
       ada-is-akademi-redis:
         condition: service_healthy
       ada-is-akademi-minio:
-        condition: service_healthy
+        condition: service_started
       ada-is-akademi-minio-init:
         condition: service_completed_successfully
 
