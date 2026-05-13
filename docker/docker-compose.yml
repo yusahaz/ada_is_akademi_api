@@ -80,7 +80,7 @@ services:
       - default
     depends_on:
       ada-is-akademi-minio:
-        condition: service_healthy
+        condition: service_started
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -167,7 +167,7 @@ services:
       ada-is-akademi-redis:
         condition: service_healthy
       ada-is-akademi-minio:
-        condition: service_healthy
+        condition: service_started
       ada-is-akademi-minio-init:
         condition: service_completed_successfully
 
