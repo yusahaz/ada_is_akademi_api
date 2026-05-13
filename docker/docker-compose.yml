@@ -84,6 +84,28 @@ services:
     volumes:
       - dbview_data:/var/lib/pgadmin
 
+  ada-is-akademi-migrate:
+    profiles: ["migrate", "seed"]
+    build:
+      context: ..
+      dockerfile: tools/AdaIsAkademi.Migrator/Dockerfile
+    container_name: ada-is-akademi-migrate
+    restart: "no"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      DbConfig__Provider: 30
+      DbConfig__Host: ada-is-akademi-db
+      DbConfig__Port: 5432
+      DbConfig__Database: ${DB_NAME}
+      DbConfig__Username: ${DB_USER}
+      DbConfig__Password: ${DB_PASS}
+    depends_on:
+      ada-is-akademi-db:
+        condition: service_healthy
+    networks:
+      - coolify
+      - default
+
   ada-is-akademi-api:
     build:
       context: ..
