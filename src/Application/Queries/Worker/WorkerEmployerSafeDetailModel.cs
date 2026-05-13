@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
+    using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application.Models;
     using System;
     using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Azoxia.AdaIsAkademi.Application
         int Id,
         int SystemUserId,
         string? Nationality,
+        WorkerGender Gender,
         string? University,
         DateTimeOffset? EmbeddingUpdatedAt,
         IReadOnlyList<string> SkillTags,

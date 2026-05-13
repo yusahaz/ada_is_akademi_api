@@ -115,6 +115,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "University length cannot exceed 512 characters.");
 
         /// <summary>
+        /// Gender must be a defined worker gender value when supplied.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerProfileGenderInvalid = new(
+            Code: "AZX_ADA_APP_VAL_1963",
+            ErrorMessage: "Gender must be unspecified, male, or female.");
+
+        /// <summary>
         /// Worker bio exceeds the maximum length.
         /// </summary>
         internal static readonly ErrorCode UpdateWorkerBioMaxLength = new(

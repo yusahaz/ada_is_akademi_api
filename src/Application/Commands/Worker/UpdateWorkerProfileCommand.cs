@@ -1,14 +1,15 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
-    using Azoxia.AdaIsAkademi.Application.Identity;
-    using Azoxia.AdaIsAkademi.Domain;
-    using Azoxia.Core.Application;
-    using Azoxia.Core.Application.Commands;
-    using Azoxia.Core.Application.Validation;
-    using Azoxia.Core.Exceptions;
-    using Azoxia.Core.Extensions;
-    using Azoxia.Core.Identity;
-    using Microsoft.Extensions.DependencyInjection;
+using Azoxia.AdaIsAkademi.Application.Identity;
+using Azoxia.AdaIsAkademi.Domain;
+using Azoxia.Core.Application;
+using Azoxia.Core.Application.Commands;
+using Azoxia.Core.Application.Validation;
+using Azoxia.Core.Exceptions;
+using Azoxia.Core.Extensions;
+using Azoxia.Core.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
     /// <summary>
     /// Updates authenticated worker's profile basics.
@@ -42,6 +43,11 @@ namespace Azoxia.AdaIsAkademi.Application
         /// Optional university text.
         /// </summary>
         public string? University { get; set; }
+
+        /// <summary>
+        /// Optional gender; when omitted, existing value is kept.
+        /// </summary>
+        public WorkerGender? Gender { get; set; }
 
         #endregion Properties
     }
@@ -83,6 +89,12 @@ namespace Azoxia.AdaIsAkademi.Application
                 request.LastName.Trim().Length > 128)
             {
                 failures.Add(ApplicationValidationCodes.UpdateWorkerProfileLastNameMaxLength.ForField(nameof(UpdateWorkerProfileCommand.LastName)));
+            }
+
+            if (request.Gender.HasValue &&
+                !Enum.IsDefined(typeof(WorkerGender), request.Gender.Value))
+            {
+                failures.Add(ApplicationValidationCodes.UpdateWorkerProfileGenderInvalid.ForField(nameof(UpdateWorkerProfileCommand.Gender)));
             }
 
             return new ValidationResult(failures);
@@ -127,7 +139,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 systemUser.Update(resolvedFirstName, resolvedLastName);
             }
 
-            worker.UpdateProfile(command.Nationality, command.University);
+            worker.UpdateProfile(command.Nationality, command.University, command.Gender);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
