@@ -75,6 +75,7 @@ namespace Azoxia.AdaIsAkademi.Application
                 entity.Id,
                 entity.SystemUserId,
                 entity.Nationality,
+                entity.Gender,
                 entity.University,
                 entity.EmbeddingUpdatedAt,
                 tags,

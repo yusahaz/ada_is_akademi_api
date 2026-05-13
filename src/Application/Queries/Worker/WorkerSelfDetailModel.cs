@@ -1,5 +1,6 @@
 namespace Azoxia.AdaIsAkademi.Application
 {
+    using Azoxia.AdaIsAkademi.Domain;
     using Azoxia.Core.Application.Models;
     using Azoxia.Core.ValueTypes;
     using System;
@@ -12,6 +13,7 @@ namespace Azoxia.AdaIsAkademi.Application
         int Id,
         int SystemUserId,
         string? Nationality,
+        WorkerGender Gender,
         string? University,
         string? CvOptions,
         string? Bio,

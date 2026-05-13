@@ -37,6 +37,11 @@ namespace Azoxia.AdaIsAkademi.Persistence.Mapping
                 .HasColumnOrder(columnOrder++)
                 .IsRequired(false);
 
+            builder.Property(e => e.Gender)
+                .HasConversion<int>()
+                .HasColumnOrder(columnOrder++)
+                .IsRequired();
+
             builder.Property(e => e.University)
                 .HasMaxLength(512)
                 .HasColumnOrder(columnOrder++)

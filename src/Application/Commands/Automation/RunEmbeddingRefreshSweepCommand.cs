@@ -88,7 +88,7 @@ namespace Azoxia.AdaIsAkademi.Application
         private string BuildWorkerEmbeddingText(Worker worker)
         {
             string tags = string.Join(' ', worker.Skills.Select(x => x.Tag.Value));
-            return $"{worker.Nationality} {worker.University} {tags}";
+            return $"{worker.Nationality} {worker.University} {worker.Gender} {tags}";
         }
 
         #endregion Utils

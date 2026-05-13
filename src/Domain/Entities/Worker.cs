@@ -408,9 +408,9 @@ namespace Azoxia.AdaIsAkademi.Domain
         }
 
         /// <summary>
-        /// Updates nationality and university fields after trimming.
+        /// Updates nationality and university fields after trimming; optionally updates gender when provided.
         /// </summary>
-        protected internal void UpdateProfile(string? nationality, string? university)
+        protected internal void UpdateProfile(string? nationality, string? university, WorkerGender? gender = null)
         {
             Nationality = nationality.IsNullOrWhiteSpace()
                 ? null
@@ -418,6 +418,11 @@ namespace Azoxia.AdaIsAkademi.Domain
             University = university.IsNullOrWhiteSpace()
                 ? null
                 : university.Trim();
+            if (gender.HasValue)
+            {
+                Gender = gender.Value;
+            }
+
             NotifyWorkerProfileMaterialChanged();
         }
 
@@ -488,6 +493,11 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// Declared nationality of the worker, if provided.
         /// </summary>
         public string? Nationality { get; private set; }
+
+        /// <summary>
+        /// Declared gender; defaults to <see cref="WorkerGender.Unspecified"/>.
+        /// </summary>
+        public WorkerGender Gender { get; private set; }
 
         /// <summary>
         /// MinIO / S3 object key for the worker profile portrait, if uploaded.

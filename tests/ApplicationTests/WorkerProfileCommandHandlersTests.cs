@@ -35,6 +35,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
                 {
                     Nationality = "TR",
                     University = "Bogazici University",
+                    Gender = WorkerGender.Male,
                 },
                 CancellationToken.None);
 
@@ -42,6 +43,7 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
             reloaded.Should().NotBeNull();
             reloaded!.Nationality.Should().Be("TR");
             reloaded.University.Should().Be("Bogazici University");
+            reloaded.Gender.Should().Be(WorkerGender.Male);
         }
 
         [Fact]
