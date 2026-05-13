@@ -80,14 +80,14 @@ services:
       - default
     depends_on:
       ada-is-akademi-minio:
-        condition: service_started
+        condition: service_healthy
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: ${MINIO_BUCKET:-ada-is-akademi}
     entrypoint: ["/bin/sh", "-c"]
     command:
-      - 'until mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do echo "MinIO hazir degil, tekrar deneniyor..."; sleep 2; done; mc mb --ignore-existing ada/"$$MINIO_BUCKET"'
+      - 'attempt=0; max_attempts=60; until mc alias set ada http://ada-is-akademi-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do attempt=$$((attempt+1)); if [ "$$attempt" -ge "$$max_attempts" ]; then echo "MinIO baglantisi kurulamadi (60 deneme)"; exit 1; fi; echo "MinIO hazir degil, tekrar deneniyor... ($$attempt/$$max_attempts)"; sleep 2; done; mc mb --ignore-existing ada/"$$MINIO_BUCKET"'
 
   ada-is-akademi-dbview:
     image: dpage/pgadmin4:9.0
@@ -167,7 +167,7 @@ services:
       ada-is-akademi-redis:
         condition: service_healthy
       ada-is-akademi-minio:
-        condition: service_started
+        condition: service_healthy
       ada-is-akademi-minio-init:
         condition: service_completed_successfully
 
