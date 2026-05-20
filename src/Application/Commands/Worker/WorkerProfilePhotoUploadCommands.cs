@@ -158,6 +158,10 @@ namespace Azoxia.AdaIsAkademi.Application
             worker.SetProfilePhotoObjectKey(objectKey);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
 
             return Unit.Value;
         }
@@ -213,6 +217,10 @@ namespace Azoxia.AdaIsAkademi.Application
             worker.SetProfilePhotoObjectKey(null);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
 
             return Unit.Value;
         }

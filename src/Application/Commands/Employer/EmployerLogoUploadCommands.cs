@@ -158,8 +158,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.EmployerDependency(employerId),
+            await AdaIsReadModelCacheInvalidation.InvalidateEmployerReadModelsAsync(
+                CacheService,
+                employerId,
                 cancellationToken);
 
             return Unit.Value;
@@ -217,8 +218,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.EmployerDependency(employerId),
+            await AdaIsReadModelCacheInvalidation.InvalidateEmployerReadModelsAsync(
+                CacheService,
+                employerId,
                 cancellationToken);
 
             return Unit.Value;

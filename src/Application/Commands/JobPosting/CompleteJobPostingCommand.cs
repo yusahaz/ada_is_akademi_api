@@ -66,6 +66,11 @@ namespace Azoxia.AdaIsAkademi.Application
             entity.Complete();
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateJobPostingReadModelsAsync(
+                CacheService,
+                entity.Id,
+                entity.EmployerId,
+                cancellationToken);
 
             return Unit.Value;
         }

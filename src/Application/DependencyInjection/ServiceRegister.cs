@@ -162,6 +162,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestHandler<GetWorkerDetailQuery, WorkerEmployerSafeFullDetailModel>, GetWorkerDetailQueryHandler>();
             services.AddScoped<IRequestHandler<GetWorkerSelfDetailQuery, WorkerSelfDetailModel>, GetWorkerSelfDetailQueryHandler>();
             services.AddScoped<IRequestHandler<GetWorkerSelfFullDetailQuery, WorkerSelfFullDetailModel>, GetWorkerSelfFullDetailQueryHandler>();
+            services.AddScoped<IRequestHandler<GetWorkerActiveCvUploadSessionQuery, WorkerActiveCvUploadSessionModel?>, GetWorkerActiveCvUploadSessionQueryHandler>();
             services.AddScoped<IRequestHandler<ListGlobalSkillsQuery, IReadOnlyList<string>>, ListGlobalSkillsQueryHandler>();
             services.AddScoped<IRequestHandler<ListWorkersQuery, PagedQueryResultModel<WorkerListItemModel>>, ListWorkersQueryHandler>();
             services.AddScoped<IRequestHandler<SemanticSearchWorkersQuery, PagedQueryResultModel<SemanticSearchedWorkerListItemModel>>, SemanticSearchWorkersQueryHandler>();
@@ -262,6 +263,7 @@ namespace Azoxia.AdaIsAkademi.Application.DependencyInjection
             services.AddScoped<IRequestValidator<ListGlobalSkillsQuery>, ListGlobalSkillsQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerSelfDetailQuery>, GetWorkerSelfDetailQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerSelfFullDetailQuery>, GetWorkerSelfFullDetailQueryValidator>();
+            services.AddScoped<IRequestValidator<GetWorkerActiveCvUploadSessionQuery>, GetWorkerActiveCvUploadSessionQueryValidator>();
             services.AddScoped<IRequestValidator<GetWorkerDetailQuery>, GetWorkerDetailQueryValidator>();
             services.AddScoped<IRequestValidator<ListWorkersQuery>, ListWorkersQueryValidator>();
             services.AddScoped<IRequestValidator<SemanticSearchWorkersQuery>, SemanticSearchWorkersQueryValidator>();

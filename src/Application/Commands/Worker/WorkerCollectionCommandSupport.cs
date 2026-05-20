@@ -21,6 +21,20 @@ namespace Azoxia.AdaIsAkademi.Application
             worker = worker.ThrowIfNull(AzoxiaErrorCodes.NotFound);
             return (workerId, worker);
         }
+
+        protected Task InvalidateWorkerReadModelsAsync(int workerId, CancellationToken cancellationToken)
+            => AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
+
+        protected async Task SaveWorkerChangesAndInvalidateReadModelsAsync(
+            int workerId,
+            CancellationToken cancellationToken)
+        {
+            await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await InvalidateWorkerReadModelsAsync(workerId, cancellationToken);
+        }
     }
 
     internal abstract class WorkerCollectionUnitCommandHandlerBase<TCommand>(IServiceProvider serviceProvider)
@@ -34,6 +48,20 @@ namespace Azoxia.AdaIsAkademi.Application
             Worker? worker = await UnitOfWork.GetRepository<Worker>().GetByIdAsync(workerId, cancellationToken);
             worker = worker.ThrowIfNull(AzoxiaErrorCodes.NotFound);
             return (workerId, worker);
+        }
+
+        protected Task InvalidateWorkerReadModelsAsync(int workerId, CancellationToken cancellationToken)
+            => AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
+
+        protected async Task SaveWorkerChangesAndInvalidateReadModelsAsync(
+            int workerId,
+            CancellationToken cancellationToken)
+        {
+            await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await InvalidateWorkerReadModelsAsync(workerId, cancellationToken);
         }
     }
 }

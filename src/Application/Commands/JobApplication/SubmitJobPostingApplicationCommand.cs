@@ -95,6 +95,16 @@ namespace Azoxia.AdaIsAkademi.Application
                 command.Note);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateJobPostingReadModelsAsync(
+                CacheService,
+                posting.Id,
+                posting.EmployerId,
+                cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken,
+                removeSelfDetailKeys: false);
 
             return application.Id;
         }

@@ -71,6 +71,10 @@ namespace Azoxia.AdaIsAkademi.Application
 
             worker.UpdateCvOptions(command.CvOptions);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
             return Unit.Value;
         }
 

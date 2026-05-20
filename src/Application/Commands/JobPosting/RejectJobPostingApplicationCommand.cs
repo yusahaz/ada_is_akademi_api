@@ -87,6 +87,11 @@ namespace Azoxia.AdaIsAkademi.Application
             entity.RejectApplication(command.ApplicationId, command.Reason);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateJobPostingReadModelsAsync(
+                CacheService,
+                entity.Id,
+                entity.EmployerId,
+                cancellationToken);
 
             return Unit.Value;
         }

@@ -34,8 +34,9 @@ namespace Azoxia.AdaIsAkademi.Application.DomainEvents
                     }
 
                     any = true;
-                    MethodInfo? method = handler.GetType().GetMethod(
-                        "HandleAsync",
+                    // Resolve via handler interface so explicit interface implementations are found.
+                    MethodInfo? method = handlerInterface.GetMethod(
+                        nameof(IDomainEventHandler<IDomainEvent>.HandleAsync),
                         [eventType, typeof(CancellationToken)]);
                     if (method is null)
                     {

@@ -122,6 +122,13 @@ namespace Azoxia.AdaIsAkademi.Application
             ErrorMessage: "Gender must be unspecified, male, or female.");
 
         /// <summary>
+        /// Phone length cannot exceed 64 characters for worker profile updates.
+        /// </summary>
+        internal static readonly ErrorCode UpdateWorkerProfilePhoneMaxLength = new(
+            Code: "AZX_ADA_APP_VAL_1964",
+            ErrorMessage: "Phone length cannot exceed 64 characters.");
+
+        /// <summary>
         /// Worker bio exceeds the maximum length.
         /// </summary>
         internal static readonly ErrorCode UpdateWorkerBioMaxLength = new(

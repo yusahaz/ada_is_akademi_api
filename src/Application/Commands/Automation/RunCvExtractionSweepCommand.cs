@@ -88,6 +88,15 @@ namespace Azoxia.AdaIsAkademi.Application
             }
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            foreach (int workerId in sessions.Select(x => x.WorkerId).Distinct())
+            {
+                await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                    CacheService,
+                    workerId,
+                    cancellationToken);
+            }
+
             return sessions.Count;
         }
 

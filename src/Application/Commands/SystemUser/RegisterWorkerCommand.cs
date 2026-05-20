@@ -94,9 +94,11 @@ namespace Azoxia.AdaIsAkademi.Application
             UnitOfWork.Add(worker);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.SystemUserAllDependency(),
-                cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                worker.Id,
+                cancellationToken,
+                invalidateSystemUserScopes: true);
 
             return worker.Id;
         }

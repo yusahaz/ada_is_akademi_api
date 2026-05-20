@@ -75,7 +75,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.OverdueAlarmAllDependency(), cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateOverdueAlarmReadModelsAsync(
+                CacheService,
+                cancellationToken);
 
             return createdCount;
         }

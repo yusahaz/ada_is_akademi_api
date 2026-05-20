@@ -73,8 +73,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerAllDependency(), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.JobPostingAllDependency(), cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateSkillAndEmbeddingListCachesAsync(
+                CacheService,
+                cancellationToken);
 
             return totalUpdated;
         }

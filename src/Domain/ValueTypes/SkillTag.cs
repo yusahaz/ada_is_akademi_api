@@ -15,10 +15,15 @@ namespace Azoxia.AdaIsAkademi.Domain
         /// <param name="value">Raw skill tag text.</param>
         public SkillTag(string value)
         {
-            Value = value
-                .ThrowIfNullOrWhiteSpace(DomainErrorCodes.SkillTagInvalid)
-                .Trim()
-                .ToUpperInvariant();
+            string normalized = SkillLabelNormalizer.ToDisplayPascalCase(
+                value.ThrowIfNullOrWhiteSpace(DomainErrorCodes.SkillTagInvalid));
+
+            if (normalized.Length == 0)
+            {
+                DomainErrorCodes.SkillTagInvalid.Throw();
+            }
+
+            Value = normalized;
         }
 
         #endregion Ctors
@@ -31,6 +36,18 @@ namespace Azoxia.AdaIsAkademi.Domain
         public string Value { get; }
 
         #endregion Properties
+
+        #region Methods
+
+        /// <inheritdoc />
+        public bool Equals(SkillTag other) =>
+            string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+
+        /// <inheritdoc />
+        public override readonly int GetHashCode() =>
+            StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
+
+        #endregion Methods
 
         #region Operators
 

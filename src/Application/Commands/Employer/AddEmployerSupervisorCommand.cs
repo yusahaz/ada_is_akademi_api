@@ -83,9 +83,11 @@ namespace Azoxia.AdaIsAkademi.Application
             Supervisor supervisor = employer.AddSupervisor(command.SystemUserId, command.LocationId);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerDependency(employerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerAllDependency(), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.SystemUserAllDependency(), cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateEmployerReadModelsAsync(
+                CacheService,
+                employerId,
+                cancellationToken,
+                invalidateSystemUserScopes: true);
 
             return supervisor.Id;
         }

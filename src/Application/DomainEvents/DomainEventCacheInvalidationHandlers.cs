@@ -17,27 +17,15 @@ namespace Azoxia.AdaIsAkademi.Application.DomainEvents
         IDomainEventHandler<JobApplicationAcceptedEvent>,
         IDomainEventHandler<JobApplicationRejectedEvent>
     {
-        private async Task InvalidateRelatedCachesAsync(
+        private Task InvalidateRelatedCachesAsync(
             int jobPostingId,
             int employerId,
             CancellationToken cancellationToken)
-        {
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.JobPostingDependency(jobPostingId),
+            => AdaIsReadModelCacheInvalidation.InvalidateJobPostingReadModelsAsync(
+                cacheService,
+                jobPostingId,
+                employerId,
                 cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.EmployerJobPostingsSummaryDependency(employerId),
-                cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.JobPostingAllDependency(),
-                cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.JobApplicationAllDependency(),
-                cancellationToken);
-        }
 
         Task IDomainEventHandler<JobPostingPublishedEvent>.HandleAsync(
             JobPostingPublishedEvent domainEvent,
@@ -82,16 +70,11 @@ namespace Azoxia.AdaIsAkademi.Application.DomainEvents
         IDomainEventHandler<WorkerProfileUpdatedEvent>,
         IDomainEventHandler<WorkerRegisteredEvent>
     {
-        private async Task InvalidateWorkerCachesAsync(int workerId, CancellationToken cancellationToken)
-        {
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerDependency(workerId),
+        private Task InvalidateWorkerCachesAsync(int workerId, CancellationToken cancellationToken)
+            => AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                cacheService,
+                workerId,
                 cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerAllDependency(),
-                cancellationToken);
-        }
 
         Task IDomainEventHandler<WorkerProfileUpdatedEvent>.HandleAsync(
             WorkerProfileUpdatedEvent domainEvent,
@@ -114,16 +97,11 @@ namespace Azoxia.AdaIsAkademi.Application.DomainEvents
         IDomainEventHandler<CvImportConfirmedEvent>,
         IDomainEventHandler<CvImportDiscardedEvent>
     {
-        private async Task InvalidateWorkerAsync(int workerId, CancellationToken cancellationToken)
-        {
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerDependency(workerId),
+        private Task InvalidateWorkerAsync(int workerId, CancellationToken cancellationToken)
+            => AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                cacheService,
+                workerId,
                 cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerAllDependency(),
-                cancellationToken);
-        }
 
         Task IDomainEventHandler<CvUploadedEvent>.HandleAsync(CvUploadedEvent e, CancellationToken ct)
             => InvalidateWorkerAsync(e.WorkerId, ct);
@@ -150,32 +128,17 @@ namespace Azoxia.AdaIsAkademi.Application.DomainEvents
         IDomainEventHandler<WorkerPayoutConfirmedEvent>,
         IDomainEventHandler<WorkerPayoutFailedEvent>
     {
-        private async Task InvalidatePayoutProjectionCachesAsync(
+        private Task InvalidatePayoutProjectionCachesAsync(
             int workerPayoutId,
             int employerId,
             int workerId,
             CancellationToken cancellationToken)
-        {
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerPayoutDependency(workerPayoutId),
+            => AdaIsReadModelCacheInvalidation.InvalidateWorkerPayoutReadModelsAsync(
+                cacheService,
+                workerPayoutId,
+                employerId,
+                workerId,
                 cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerPayoutEmployerDependency(employerId),
-                cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerPayoutWorkerDependency(workerId),
-                cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerPayoutAllDependency(),
-                cancellationToken);
-
-            await cacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.CommissionAuditLogAllDependency(),
-                cancellationToken);
-        }
 
         Task IDomainEventHandler<WorkerPayoutPendingEvent>.HandleAsync(WorkerPayoutPendingEvent e, CancellationToken ct)
             => InvalidatePayoutProjectionCachesAsync(e.WorkerPayoutId, e.EmployerId, e.WorkerId, ct);

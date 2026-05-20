@@ -26,8 +26,11 @@ namespace Azoxia.AdaIsAkademi.Application
         {
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             worker.RemoveSkill(command.SkillId);
-            await UnitOfWork.SaveChangesAsync(cancellationToken);
-return Unit.Value;
+            await SaveWorkerChangesAndInvalidateReadModelsAsync(workerId, cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateSkillAndEmbeddingListCachesAsync(
+                CacheService,
+                cancellationToken);
+            return Unit.Value;
         }
     }
 }

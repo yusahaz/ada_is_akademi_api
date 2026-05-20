@@ -241,6 +241,10 @@ namespace Azoxia.AdaIsAkademi.Application
 
             UnitOfWork.Add(session);
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
             return session.Id;
         }
 

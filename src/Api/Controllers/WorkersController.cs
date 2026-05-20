@@ -206,6 +206,16 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
             CancellationToken cancellationToken)
             => ExecuteQuery(query, cancellationToken);
 
+        /// <summary>Returns the latest non-terminal CV upload session for the authenticated worker.</summary>
+        [HttpPost]
+        [Consumes("application/json")]
+        [EndpointSummary("Get worker active CV upload session")]
+        [ProducesResponseType(typeof(ApiResponse<WorkerActiveCvUploadSessionModel>), StatusCodes.Status200OK)]
+        public Task<IActionResult> GetActiveCvUploadSession(
+            [FromBody] GetWorkerActiveCvUploadSessionQuery query,
+            CancellationToken cancellationToken)
+            => ExecuteQuery(query, cancellationToken);
+
         /// <summary>Gets authenticated worker full profile with private matching preferences.</summary>
         [HttpPost]
         [Consumes("application/json")]
@@ -412,7 +422,7 @@ namespace Azoxia.AdaIsAkademi.Api.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [EndpointSummary("Update worker profile")]
-        [EndpointDescription("Updates first name, last name, nationality, and university fields for the authenticated worker.")]
+        [EndpointDescription("Updates first name, last name, phone, nationality, university, and gender for the authenticated worker.")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         public Task<IActionResult> UpdateProfile(
             [FromBody] UpdateWorkerProfileCommand command,

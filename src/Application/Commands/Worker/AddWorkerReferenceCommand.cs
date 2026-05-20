@@ -39,8 +39,8 @@ namespace Azoxia.AdaIsAkademi.Application
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             Contact contact = new(command.ContactFirstName, command.ContactLastName, command.ContactEmail, command.ContactPhone);
             WorkerReference item = worker.AddReference(command.Company, command.Position, contact);
-            await UnitOfWork.SaveChangesAsync(cancellationToken);
-return item.Id;
+            await SaveWorkerChangesAndInvalidateReadModelsAsync(workerId, cancellationToken);
+            return item.Id;
         }
     }
 }

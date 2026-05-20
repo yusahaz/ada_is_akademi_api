@@ -76,7 +76,7 @@ namespace Azoxia.AdaIsAkademi.Application
 
             IReadOnlyList<JobPostingSkillItemModel> skills = entity.Skills
                 .OrderBy(x => x.Tag.Value)
-                .Select(x => new JobPostingSkillItemModel(x.Tag.Value, x.IsRequired))
+                .Select(x => new JobPostingSkillItemModel(x.Id, x.Tag.Value, x.IsRequired))
                 .ToList();
 
             JobPostingDetailModel model = new(

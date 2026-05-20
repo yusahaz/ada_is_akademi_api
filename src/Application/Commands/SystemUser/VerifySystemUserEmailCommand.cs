@@ -74,8 +74,9 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.SystemUserAllDependency(),
+            await AdaIsReadModelCacheInvalidation.InvalidateSystemUserReadModelsAsync(
+                CacheService,
+                command.SystemUserId,
                 cancellationToken);
 
             return Unit.Value;

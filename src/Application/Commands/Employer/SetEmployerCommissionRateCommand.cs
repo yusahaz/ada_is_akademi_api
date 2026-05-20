@@ -68,9 +68,14 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerDependency(command.EmployerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerAllDependency(), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerCommissionPolicyDependency(command.EmployerId), cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateEmployerReadModelsAsync(
+                CacheService,
+                command.EmployerId,
+                cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateEmployerCommissionReadModelsAsync(
+                CacheService,
+                command.EmployerId,
+                cancellationToken);
 
             return Unit.Value;
         }

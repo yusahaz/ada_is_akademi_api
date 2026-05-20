@@ -108,6 +108,10 @@ namespace Azoxia.AdaIsAkademi.Application
             ApplyPayload(worker, payload, command);
             session.Confirm();
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
             return Unit.Value;
         }
 
@@ -310,6 +314,10 @@ namespace Azoxia.AdaIsAkademi.Application
 
             session.Discard();
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
             return Unit.Value;
         }
 

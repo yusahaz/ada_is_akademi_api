@@ -78,16 +78,10 @@ namespace Azoxia.AdaIsAkademi.Application
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.ShiftAssignmentDependency(assignment.Id),
-                cancellationToken);
-
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.ShiftAssignmentAllDependency(),
-                cancellationToken);
-
-            await CacheService.InvalidateByDependencyAsync(
-                AdaIsCacheKeys.WorkerDependency(assignment.WorkerId),
+            await AdaIsReadModelCacheInvalidation.InvalidateShiftAssignmentReadModelsAsync(
+                CacheService,
+                assignment.Id,
+                assignment.WorkerId,
                 cancellationToken);
 
             return Unit.Value;

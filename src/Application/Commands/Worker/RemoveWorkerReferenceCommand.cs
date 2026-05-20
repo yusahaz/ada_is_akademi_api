@@ -26,8 +26,8 @@ namespace Azoxia.AdaIsAkademi.Application
         {
             (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             worker.RemoveReference(command.ReferenceId);
-            await UnitOfWork.SaveChangesAsync(cancellationToken);
-return Unit.Value;
+            await SaveWorkerChangesAndInvalidateReadModelsAsync(workerId, cancellationToken);
+            return Unit.Value;
         }
     }
 }

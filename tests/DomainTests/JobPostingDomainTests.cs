@@ -48,7 +48,7 @@ public class JobPostingDomainTests
         // Assert
         first.Id.Should().Be(second.Id);
         posting.Skills.Should().HaveCount(1);
-        ((string)first.Tag).Should().Be("CSHARP");
+        ((string)first.Tag).Should().Be("CSharp");
     }
 
     private static JobPosting CreateDraftPosting()

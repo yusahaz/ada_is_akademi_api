@@ -47,6 +47,33 @@ namespace Azoxia.AdaIsAkademi.Application.Tests
         }
 
         [Fact]
+        public async Task UpdateWorkerProfileHandler_updates_phone_on_linked_system_user()
+        {
+            var executionContext = new TestExecutionContext(isAuthenticated: true);
+            using ServiceProvider root = ApplicationHandlerTestServices.CreateProvider(executionContext);
+            using IServiceScope scope = root.CreateScope();
+            IServiceProvider sp = scope.ServiceProvider;
+            AdaIsAkademiDbContext db = sp.GetRequiredService<AdaIsAkademiDbContext>();
+
+            Worker worker = await SeedWorkerAsync(db);
+            executionContext.ReplaceClaim("worker_id", worker.Id.ToString());
+
+            var handler = new UpdateWorkerProfileCommandHandler(sp);
+            await ((IRequestHandler<UpdateWorkerProfileCommand, Unit>)handler).HandleAsync(
+                new UpdateWorkerProfileCommand
+                {
+                    Phone = "+905383760000",
+                },
+                CancellationToken.None);
+
+            SystemUser? reloadedUser = await db.Set<SystemUser>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == worker.SystemUserId);
+            reloadedUser.Should().NotBeNull();
+            reloadedUser!.Phone.Should().Be("+905383760000");
+        }
+
+        [Fact]
         public async Task UpdateWorkerProfileHandler_throws_when_actor_worker_not_found()
         {
             var executionContext = new TestExecutionContext(isAuthenticated: true);

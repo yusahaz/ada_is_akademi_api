@@ -121,9 +121,14 @@ namespace Azoxia.AdaIsAkademi.Application
                 note: $"period:{command.PeriodStart:yyyy-MM-dd}-{command.PeriodEnd:yyyy-MM-dd}"));
             await UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionReceivableDependency(command.EmployerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionReceivableAllDependency(), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.CommissionAuditLogAllDependency(), cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateCommissionReceivableReadModelsAsync(
+                CacheService,
+                command.EmployerId,
+                cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateEmployerCommissionReadModelsAsync(
+                CacheService,
+                command.EmployerId,
+                cancellationToken);
 
             return receivable.Id;
         }

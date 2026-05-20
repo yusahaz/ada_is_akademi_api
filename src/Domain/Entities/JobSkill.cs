@@ -23,10 +23,20 @@ namespace Azoxia.AdaIsAkademi.Domain
         protected internal JobSkill(
             string name,
             string? description = null) :
-            base(name, description)
+            base(SkillLabelNormalizer.ToCompoundPascalCase(name), description)
         {
         }
 
         #endregion Ctors
+
+        #region Methods
+
+        /// <inheritdoc />
+        protected override void UpdateName(string name, string? description = null)
+        {
+            base.UpdateName(SkillLabelNormalizer.ToCompoundPascalCase(name), description);
+        }
+
+        #endregion Methods
     }
 }

@@ -49,6 +49,11 @@ using System;
         /// </summary>
         public WorkerGender? Gender { get; set; }
 
+        /// <summary>
+        /// Optional phone on linked system user; omitted when null and names are not updated.
+        /// </summary>
+        public string? Phone { get; set; }
+
         #endregion Properties
     }
 
@@ -97,6 +102,12 @@ using System;
                 failures.Add(ApplicationValidationCodes.UpdateWorkerProfileGenderInvalid.ForField(nameof(UpdateWorkerProfileCommand.Gender)));
             }
 
+            if (!request.Phone.IsNullOrWhiteSpace() &&
+                request.Phone.Trim().Length > 64)
+            {
+                failures.Add(ApplicationValidationCodes.UpdateWorkerProfilePhoneMaxLength.ForField(nameof(UpdateWorkerProfileCommand.Phone)));
+            }
+
             return new ValidationResult(failures);
         }
 
@@ -123,25 +134,43 @@ using System;
             worker = worker.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
             bool hasNameUpdate = !command.FirstName.IsNullOrWhiteSpace() || !command.LastName.IsNullOrWhiteSpace();
-            if (hasNameUpdate)
+            bool shouldUpdateSystemUser = hasNameUpdate || command.Phone != null;
+            if (shouldUpdateSystemUser)
             {
                 SystemUser? systemUser = await UnitOfWork
                     .GetRepository<SystemUser>()
                     .GetByIdAsync(worker.SystemUserId, cancellationToken);
                 systemUser = systemUser.ThrowIfNull(AzoxiaErrorCodes.NotFound);
 
-                string resolvedFirstName = command.FirstName.IsNullOrWhiteSpace()
-                    ? systemUser.FirstName ?? string.Empty
-                    : command.FirstName.Trim();
-                string resolvedLastName = command.LastName.IsNullOrWhiteSpace()
-                    ? systemUser.LastName ?? string.Empty
-                    : command.LastName.Trim();
-                systemUser.Update(resolvedFirstName, resolvedLastName);
+                string resolvedFirstName = hasNameUpdate
+                    ? command.FirstName.IsNullOrWhiteSpace()
+                        ? systemUser.FirstName ?? string.Empty
+                        : command.FirstName.Trim()
+                    : systemUser.FirstName ?? string.Empty;
+                string resolvedLastName = hasNameUpdate
+                    ? command.LastName.IsNullOrWhiteSpace()
+                        ? systemUser.LastName ?? string.Empty
+                        : command.LastName.Trim()
+                    : systemUser.LastName ?? string.Empty;
+                string? resolvedPhone = command.Phone != null
+                    ? command.Phone.IsNullOrWhiteSpace()
+                        ? null
+                        : command.Phone.Trim()
+                    : hasNameUpdate
+                        ? null
+                        : systemUser.Phone;
+                systemUser.Update(resolvedFirstName, resolvedLastName, resolvedPhone);
             }
 
             worker.UpdateProfile(command.Nationality, command.University, command.Gender);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken,
+                invalidateSystemUserScopes: shouldUpdateSystemUser);
 
             return Unit.Value;
         }

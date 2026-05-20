@@ -80,8 +80,10 @@ namespace Azoxia.AdaIsAkademi.Application
             location.SetGeofenceRadiusMetres(command.GeofenceRadiusMetres);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerDependency(employerId), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.EmployerAllDependency(), cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateEmployerReadModelsAsync(
+                CacheService,
+                employerId,
+                cancellationToken);
 
             return Unit.Value;
         }

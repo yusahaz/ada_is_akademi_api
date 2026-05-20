@@ -41,11 +41,6 @@ namespace Azoxia.AdaIsAkademi.Application
         {
             List<ValidationFailure> failures = [];
 
-            if (request.WorkerId <= 0)
-            {
-                failures.Add(ApplicationValidationCodes.AddWorkerSkillWorkerId.ForField(nameof(request.WorkerId)));
-            }
-
             if (string.IsNullOrWhiteSpace(request.Tag))
             {
                 failures.Add(ApplicationValidationCodes.AddWorkerSkillTagRequired.ForField(nameof(request.Tag)));
@@ -58,30 +53,17 @@ namespace Azoxia.AdaIsAkademi.Application
     }
 
     internal class AddWorkerSkillCommandHandler(IServiceProvider serviceProvider) :
-        CommandHandlerBase<AddWorkerSkillCommand, int>(serviceProvider)
+        WorkerCollectionCommandHandlerBase<AddWorkerSkillCommand>(serviceProvider)
     {
-        #region Utils
-
-        /// <summary>
-        /// Loads the worker, adds the skill, and persists changes.
-        /// </summary>
-        /// <param name="command">Command payload.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>The persisted worker skill identifier.</returns>
         protected override async Task<int> HandleAsync(AddWorkerSkillCommand command, CancellationToken cancellationToken)
         {
-            Worker? worker = await UnitOfWork
-                .GetRepository<Worker>()
-                .GetByIdAsync(command.WorkerId, cancellationToken);
-            worker = worker.ThrowIfNull(AzoxiaErrorCodes.NotFound);
-
+            (int workerId, Worker worker) = await GetActorWorkerAsync(cancellationToken);
             WorkerSkill skill = worker.AddSkill(command.Tag);
-
-            await UnitOfWork.SaveChangesAsync(cancellationToken);
-
+            await SaveWorkerChangesAndInvalidateReadModelsAsync(workerId, cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateSkillAndEmbeddingListCachesAsync(
+                CacheService,
+                cancellationToken);
             return skill.Id;
         }
-
-        #endregion Utils
     }
 }

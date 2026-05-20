@@ -35,9 +35,10 @@ namespace Azoxia.AdaIsAkademi.Application
             user.DeleteSystemUser();
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerDependency(worker.Id), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.WorkerAllDependency(), cancellationToken);
-            await CacheService.InvalidateByDependencyAsync(AdaIsCacheKeys.SystemUserAllDependency(), cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateDeletedWorkerReadModelsAsync(
+                CacheService,
+                worker.Id,
+                cancellationToken);
 
             return Unit.Value;
         }

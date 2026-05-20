@@ -133,6 +133,10 @@ namespace Azoxia.AdaIsAkademi.Application
             worker.ReplaceSocialLinks(inputs);
 
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerReadModelsAsync(
+                CacheService,
+                workerId,
+                cancellationToken);
 
             return Unit.Value;
         }

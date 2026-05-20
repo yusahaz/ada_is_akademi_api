@@ -107,6 +107,12 @@ namespace Azoxia.AdaIsAkademi.Application
                 assignmentId: assignment.Id,
                 note: "created_from_checked_out_assignment"));
             await UnitOfWork.SaveChangesAsync(cancellationToken);
+            await AdaIsReadModelCacheInvalidation.InvalidateWorkerPayoutReadModelsAsync(
+                CacheService,
+                payout.Id,
+                employerId,
+                assignment.WorkerId,
+                cancellationToken);
 
             return new WorkerPayoutSnapshotModel(
                 payout.Id,
